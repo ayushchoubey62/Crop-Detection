@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto p-4 about-bg rounded-lg shadow-xl">
+    <div class="flex items-center mb-6">
+        <img src="{{ url_for('static', filename='icons8-chaff-48.png') }}" alt="Logo" class="h-16 w-16 mr-4 rounded-full">
+        <div>
+            <h1 class="text-3xl font-bold about-title">About Crop Disease Detection App</h1>
+        </div>
+    </div>
+
+    <!-- Application Overview Section -->
+    <div class="card p-4 mb-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-3 section-title">Application Overview</h2>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed about-text">
+            The Crop Disease Detection App is an innovative tool designed to assist farmers
+            and agricultural enthusiasts in identifying common plant leaf diseases using
+            advanced machine learning models. Our goal is to provide quick, accessible,
+            and preliminary diagnoses to help in timely intervention and better crop management.
+        </p>
+    </div>
+
+    <!-- Key Features Section -->
+    <div class="card p-4 mb-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-3 section-title">Key Features:</h2>
+        <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 about-text">
+            <li>AI-powered disease detection for various crops.</li>
+            <li>Image upload and live camera capture capabilities (browser dependent).</li>
+            <li>Image enhancement tools for better analysis.</li>
+            <li>Detailed diagnosis reports with confidence scores and treatment suggestions.</li>
+            <li>History tracking of past diagnoses.</li>
+            <li>User feedback system for continuous improvement.</li>
+        </ul>
+    </div>
+
+    <!-- Development Information Section -->
+    <div class="card p-4 mb-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-3 section-title">Development Information:</h2>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed about-text">
+            Developed by: [AYUSH CHOUBEY]<br>
+            Version: 1.0.0<br>
+            Release Date: {{ now.strftime('%B %d, %Y') }}
+        </p>
+    </div>
+
+    <!-- Technologies Used Section -->
+    <div class="card p-4 mb-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-3 section-title">Technologies Used:</h2>
+        <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 about-text">
+            <li>Python (Programming Language)</li>
+            <li>Flask (Web Framework)</li>
+            <li>HTML, CSS (Tailwind CSS), JavaScript (Frontend)</li>
+            <li>TensorFlow/Keras (Machine Learning)</li>
+            <li>Pillow (PIL Fork - Image Processing)</li>
+            <li>OpenCV (Computer Vision - for heuristics)</li>
+            <li>NumPy (Numerical Computing)</li>
+            <li>FPDF (PDF Generation)</li>
+        </ul>
+    </div>
+
+    <!-- Contact Us Section -->
+    <div class="card p-4 mb-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-3 section-title">Contact Us:</h2>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-2 about-text">
+            For support or inquiries, please contact:
+        </p>
+        <a href="mailto:ayushchoubey800@gmail.com" class="text-blue-600 dark:text-blue-400 hover:underline about-text">ayushchoubey800@gmail.com</a>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-2 mb-2 about-text">
+            Visit our website/repository:
+        </p>
+        <a href="https://www.linkedin.com/in/ayush-choubey-b2a366281?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline about-text">LinkedIn Profile</a>
+    </div>
+
+    <!-- Disclaimer Section -->
+    <div class="card p-4 mb-6 rounded-lg shadow-md border border-red-400 dark:border-red-600 bg-red-50 dark:bg-red-900">
+        <h2 class="text-xl font-semibold mb-3 text-red-700 dark:text-red-300">Disclaimer:</h2>
+        <p class="text-red-600 dark:text-red-200 leading-relaxed italic about-disclaimer">
+            This application is a diagnostic aid and should not replace professional agricultural advice.
+            Always consult with a qualified agronomist or plant pathologist for definitive diagnoses and treatment plans.
+        </p>
+    </div>
+
+    <!-- Back to Home Button -->
+    <div class="flex justify-start mt-8">
+        <a href="/" class="btn-primary px-6 py-2 rounded-md">← Back to Home</a>
+    </div>
+</div>
+{% endblock %}

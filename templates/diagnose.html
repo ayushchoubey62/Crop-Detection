@@ -1,0 +1,1005 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto p-4 diagnosis-bg rounded-lg shadow-xl">
+    <h1 class="text-3xl font-bold mb-6 diagnosis-title">Crop Disease Diagnosis</h1>
+
+    <!-- Image Tools Section -->
+    <div class="card p-4 mb-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4 section-title">Image Tools</h2>
+        <div class="flex flex-wrap items-center gap-4">
+            <input type="file" id="imageUpload" accept="image/*" class="hidden"> {# Removed onchange attribute here #}
+            <button onclick="document.getElementById('imageUpload').click()" class="btn-primary px-4 py-2 rounded-md">Upload Image</button>
+            <button id="clearImageBtn" class="btn-primary px-4 py-2 rounded-md" disabled>Clear Image</button>
+
+            <label class="flex items-center space-x-2 cursor-pointer">
+                <input type="checkbox" id="livePreviewToggle" class="form-checkbox h-5 w-5 text-primary rounded" checked>
+                <span class="text-gray-700 dark:text-gray-300">Live Preview</span>
+            </label>
+
+            <button id="cropImageBtn" class="btn-primary px-4 py-2 rounded-md" disabled>Crop Image</button>
+            <button id="applyCropBtn" class="btn-primary px-4 py-2 rounded-md hidden">Apply Crop</button>
+            <button id="resetCropBtn" class="btn-primary px-4 py-2 rounded-md hidden">Reset Crop</button>
+
+            <span id="statusMessage" class="text-sm text-gray-600 dark:text-gray-400 ml-auto">Ready to upload image</span>
+            <span id="loadingIndicator" class="text-xl ml-2 hidden"></span>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- Image Preview Section -->
+        <div class="card p-4 rounded-lg shadow-md flex flex-col">
+            <h2 class="text-xl font-semibold mb-4 section-title">Image Preview</h2>
+            <div class="relative flex-grow border rounded-md overflow-hidden image-canvas-bg flex items-center justify-center p-2">
+                <img id="imagePreview" src="" alt="Image Preview" class="max-w-full max-h-full object-contain cursor-grab active:cursor-grabbing" style="display: none;">
+                <p id="noImageText" class="text-gray-500 dark:text-gray-400">No image uploaded</p>
+                <div id="cropOverlay" class="absolute inset-0 border-2 border-red-500 border-dashed hidden pointer-events-none"></div>
+                <div id="cropSelection" class="absolute border-2 border-red-500 bg-red-500 bg-opacity-20 hidden cursor-crosshair"></div>
+            </div>
+            <div class="flex justify-between items-center mt-2">
+                <button id="compareOriginalBtn" class="btn-primary px-3 py-1 rounded-md text-sm" disabled>Compare Original</button>
+                <span id="zoomLevel" class="text-sm text-gray-600 dark:text-gray-400">Zoom: 1.0x</span>
+            </div>
+        </div>
+
+        <!-- Diagnosis Results Section -->
+        <div class="card p-4 rounded-lg shadow-md flex flex-col">
+            <h2 class="text-xl font-semibold mb-4 section-title">Diagnosis Results</h2>
+            <div id="diagnosisResults" class="flex-grow p-4 border rounded-md overflow-y-auto text-area-bg text-gray-800 dark:text-gray-200">
+                <p>No diagnosis available. Upload an image to start.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Enhancement Tools Section -->
+    <div class="card p-4 mb-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4 section-title">Image Enhancement Tools</h2>
+        <div class="flex flex-col md:flex-row md:space-x-8">
+            <!-- Basic Adjustments -->
+            <div class="flex-1 mb-4 md:mb-0">
+                <h3 class="font-medium mb-2 text-gray-700 dark:text-gray-300">Basic Adjustments</h3>
+                <div class="grid grid-cols-3 items-center gap-2 mb-2">
+                    <label for="brightness" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">Brightness:</label>
+                    <input type="range" id="brightness" min="0.1" max="2.0" step="0.1" value="1.0" class="col-span-2 w-full">
+                    <span id="brightnessValue" class="text-sm text-gray-600 dark:text-gray-400 text-right">1.0</span>
+                </div>
+                <div class="grid grid-cols-3 items-center gap-2 mb-2">
+                    <label for="contrast" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">Contrast:</label>
+                    <input type="range" id="contrast" min="0.1" max="2.0" step="0.1" value="1.0" class="col-span-2 w-full">
+                    <span id="contrastValue" class="text-sm text-gray-600 dark:text-gray-400 text-right">1.0</span>
+                </div>
+                <div class="grid grid-cols-3 items-center gap-2 mb-2">
+                    <label for="saturation" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">Saturation:</label>
+                    <input type="range" id="saturation" min="0.0" max="2.0" step="0.1" value="1.0" class="col-span-2 w-full">
+                    <span id="saturationValue" class="text-sm text-gray-600 dark:text-gray-400 text-right">1.0</span>
+                </div>
+            </div>
+
+            <!-- Advanced Adjustments -->
+            <div class="flex-1 mb-4 md:mb-0">
+                <h3 class="font-medium mb-2 text-gray-700 dark:text-gray-300">Advanced Adjustments</h3>
+                <div class="grid grid-cols-3 items-center gap-2 mb-2">
+                    <label for="edgeEnhance" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">Edge Enhance:</label>
+                    <input type="range" id="edgeEnhance" min="0.0" max="2.0" step="0.1" value="0.0" class="col-span-2 w-full">
+                    <span id="edgeEnhanceValue" class="text-sm text-gray-600 dark:text-gray-400 text-right">0.0</span>
+                </div>
+                <div class="grid grid-cols-3 items-center gap-2 mb-2">
+                    <label for="blurReduce" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">Blur Reduce:</label>
+                    <input type="range" id="blurReduce" min="0.0" max="2.0" step="0.1" value="0.0" class="col-span-2 w-full">
+                    <span id="blurReduceValue" class="text-sm text-gray-600 dark:text-gray-400 text-right">0.0</span>
+                </div>
+                <div class="grid grid-cols-3 items-center gap-2 mb-2">
+                    <label for="colorBalance" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">Color Balance:</label>
+                    <input type="range" id="colorBalance" min="-1.0" max="1.0" step="0.1" value="0.0" class="col-span-2 w-full">
+                    <span id="colorBalanceValue" class="text-sm text-gray-600 dark:text-gray-400 text-right">0.0</span>
+                </div>
+            </div>
+
+            <!-- Presets -->
+            <div class="flex-1">
+                <h3 class="font-medium mb-2 text-gray-700 dark:text-gray-300">Presets</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="autoContrastBtn" class="btn-primary px-4 py-2 rounded-md text-sm">Auto Contrast</button>
+                    <button id="sharpenBtn" class="btn-primary px-4 py-2 rounded-md text-sm">Sharpen</button>
+                    <button id="grayscaleBtn" class="btn-primary px-4 py-2 rounded-md text-sm">Grayscale</button>
+                    <button id="resetFiltersBtn" class="btn-primary px-4 py-2 rounded-md text-sm">Reset Filters</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Buttons -->
+    <div class="flex justify-end space-x-4">
+        <button id="saveReportBtn" class="btn-primary px-6 py-2 rounded-md" disabled>Save Report</button>
+        <button id="printReportBtn" class="btn-primary px-6 py-2 rounded-md" disabled>Print Report</button>
+        <a href="/" class="btn-primary px-6 py-2 rounded-md">Back to Home</a>
+    </div>
+</div>
+
+<script>
+    const imageUpload = document.getElementById('imageUpload');
+    const imagePreview = document.getElementById('imagePreview');
+    const noImageText = document.getElementById('noImageText');
+    const statusMessage = document.getElementById('statusMessage');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const diagnosisResults = document.getElementById('diagnosisResults');
+    const clearImageBtn = document.getElementById('clearImageBtn');
+    const compareOriginalBtn = document.getElementById('compareOriginalBtn');
+    const cropImageBtn = document.getElementById('cropImageBtn');
+    const applyCropBtn = document.getElementById('applyCropBtn');
+    const resetCropBtn = document.getElementById('resetCropBtn');
+    const livePreviewToggle = document.getElementById('livePreviewToggle');
+    const saveReportBtn = document.getElementById('saveReportBtn');
+    const printReportBtn = document.getElementById('printReportBtn');
+
+    // Filter controls
+    const brightnessSlider = document.getElementById('brightness');
+    const brightnessValueSpan = document.getElementById('brightnessValue');
+    const contrastSlider = document.getElementById('contrast');
+    const contrastValueSpan = document.getElementById('contrastValue');
+    const saturationSlider = document.getElementById('saturation');
+    const saturationValueSpan = document.getElementById('saturationValue');
+    const edgeEnhanceSlider = document.getElementById('edgeEnhance');
+    const edgeEnhanceValueSpan = document.getElementById('edgeEnhanceValue');
+    const blurReduceSlider = document.getElementById('blurReduce');
+    const blurReduceValueSpan = document.getElementById('blurReduceValue');
+    const colorBalanceSlider = document.getElementById('colorBalance');
+    const colorBalanceValueSpan = document.getElementById('colorBalanceValue');
+
+    const autoContrastBtn = document.getElementById('autoContrastBtn');
+    const sharpenBtn = document.getElementById('sharpenBtn');
+    const grayscaleBtn = document.getElementById('grayscaleBtn');
+    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+
+    let originalImageBase64 = null;
+    let currentImageBase64 = null; // Image with filters applied
+    let currentImageFilename = null; // Filename from server for report generation
+    let currentDiagnosisDetails = null; // Store diagnosis details for report
+    let currentDiseaseInfo = null; // Store disease info for report
+    let currentTreatmentSuggestions = null; // Store treatment suggestions for report
+
+    // Cropping variables
+    let isCropping = false;
+    let cropStartX, cropStartY, cropEndX, cropEndY;
+    const cropSelection = document.getElementById('cropSelection');
+    const imagePreviewContainer = imagePreview.parentElement;
+
+    // Zoom and Pan variables
+    let zoomLevel = 1.0;
+    let panStartX, panStartY;
+    let isPanning = false;
+
+    // Store state for compareOriginalBtn
+    let savedZoomLevel = 1.0;
+    let savedPanLeft = 0;
+    let savedPanTop = 0;
+
+    const loadingFrames = ["⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷"];
+    let loadingInterval;
+
+    // Embed the Python dictionaries directly as JavaScript objects
+    // Parse the JSON strings to JavaScript objects
+    const ALL_DISEASE_INFO = JSON.parse('{{ disease_info | tojson | safe }}');
+    const ALL_TREATMENT_SUGGESTIONS = JSON.parse('{{ treatment_suggestions_data | tojson | safe }}');
+    // Pass the uploads_base_url from Flask
+    const UPLOADS_BASE_URL = "{{ uploads_base_url }}";
+
+
+    function startLoadingAnimation() {
+        let idx = 0;
+        loadingIndicator.classList.remove('hidden');
+        loadingInterval = setInterval(() => {
+            loadingIndicator.textContent = loadingFrames[idx];
+            idx = (idx + 1) % loadingFrames.length;
+        }, 100);
+    }
+
+    function stopLoadingAnimation() {
+        clearInterval(loadingInterval);
+        loadingIndicator.classList.add('hidden');
+        loadingIndicator.textContent = '';
+    }
+
+    function resetFiltersUI() {
+        brightnessSlider.value = 1.0;
+        brightnessValueSpan.textContent = '1.0';
+        contrastSlider.value = 1.0;
+        contrastValueSpan.textContent = '1.0';
+        saturationSlider.value = 1.0;
+        saturationValueSpan.textContent = '1.0';
+        edgeEnhanceSlider.value = 0.0;
+        edgeEnhanceValueSpan.textContent = '0.0';
+        blurReduceSlider.value = 0.0;
+        blurReduceValueSpan.textContent = '0.0';
+        colorBalanceSlider.value = 0.0;
+        colorBalanceValueSpan.textContent = '0.0';
+    }
+
+    async function handleImageUpload(event, file = null) {
+        console.log("handleImageUpload started.");
+        let selectedFile = file || imageUpload.files[0]; // Use imageUpload.files[0] if event is null (for history load)
+        if (!selectedFile) {
+            console.log("No file selected in handleImageUpload.");
+            return;
+        }
+
+        if (selectedFile.size < 100 * 1024) { // 100KB
+            showNotification("Image resolution might be too low for accurate diagnosis. Minimum 100KB recommended.", "warning", 5000);
+        }
+
+        try {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                console.log("FileReader onload triggered.");
+                originalImageBase64 = e.target.result;
+                currentImageBase64 = originalImageBase64; // Initialize current with original
+                displayImage(currentImageBase64);
+                resetFiltersUI();
+                enableImageControls();
+                clearDiagnosisResults();
+                statusMessage.textContent = "Image uploaded. Apply filters or click 'Diagnose'.";
+
+                // Automatically start diagnosis after upload
+                console.log("Calling diagnoseImage from handleImageUpload.");
+                await diagnoseImage(currentImageBase64);
+            };
+            reader.readAsDataURL(selectedFile);
+            console.log("FileReader readAsDataURL called.");
+        } catch (error) {
+            console.error("Error in handleImageUpload:", error);
+            showNotification("Failed to read image file.", "error");
+            statusMessage.textContent = "Error uploading image.";
+        }
+        console.log("handleImageUpload finished.");
+    }
+
+    function displayImage(base64Image) {
+        imagePreview.src = base64Image;
+        imagePreview.style.display = 'block';
+        noImageText.style.display = 'none';
+        // Do not reset zoom/pan here unless explicitly resetting to default view
+        // Zoom/pan state should be managed separately if preserving across image changes (e.g., filter application)
+        imagePreview.style.cursor = 'grab';
+        applyZoomPan(); // Apply current zoom/pan state
+    }
+
+    function enableImageControls() {
+        clearImageBtn.disabled = false;
+        compareOriginalBtn.disabled = false;
+        cropImageBtn.disabled = false;
+        saveReportBtn.disabled = false;
+        printReportBtn.disabled = false;
+    }
+
+    function disableImageControls() {
+        clearImageBtn.disabled = true;
+        compareOriginalBtn.disabled = true;
+        cropImageBtn.disabled = true;
+        saveReportBtn.disabled = true;
+        printReportBtn.disabled = true;
+    }
+
+    function clearImage() {
+        originalImageBase64 = null;
+        currentImageBase64 = null;
+        currentImageFilename = null;
+        currentDiagnosisDetails = null;
+        currentDiseaseInfo = null;
+        currentTreatmentSuggestions = null;
+        imagePreview.src = '';
+        imagePreview.style.display = 'none';
+        noImageText.style.display = 'block';
+        statusMessage.textContent = "Ready to upload image";
+        clearDiagnosisResults();
+        disableImageControls();
+        resetFiltersUI();
+        resetCropMode();
+        zoomLevel = 1.0; // Reset zoom for new image
+        resetPan(); // Reset pan for new image
+        updateZoomLabel();
+        showNotification("Image cleared.", "info");
+    }
+
+    function clearDiagnosisResults() {
+        diagnosisResults.innerHTML = '<p>No diagnosis available. Upload an image to start.</p>';
+    }
+
+    // --- Image Filtering ---
+    let filterTimeout;
+    function applyFilters() {
+        if (!originalImageBase64 || !livePreviewToggle.checked) {
+            return;
+        }
+        clearTimeout(filterTimeout);
+        filterTimeout = setTimeout(async () => {
+            const filters = {
+                brightness: brightnessSlider.value,
+                contrast: contrastSlider.value,
+                saturation: saturationSlider.value,
+                edge_enhance: edgeEnhanceSlider.value,
+                blur_reduce: blurReduceSlider.value,
+                color_balance: colorBalanceSlider.value,
+            };
+            await sendImageForPreview(originalImageBase64, filters);
+        }, 100); // Debounce for 100ms
+    }
+
+    async function sendImageForPreview(base64Image, filters) {
+        try {
+            const formData = new FormData();
+            formData.append('file', dataURLtoBlob(base64Image), 'image.png');
+            for (const key in filters) {
+                formData.append(key, filters[key]);
+            }
+
+            const response = await fetch('/diagnose', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            if (data.success) {
+                const imageUrl = data.image_url;
+                const imageResponse = await fetch(imageUrl);
+                const imageBlob = await imageResponse.blob();
+
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    currentImageBase64 = reader.result;
+                    imagePreview.src = currentImageBase64;
+                    imagePreview.onload = () => {
+                        applyZoomPan();
+                    };
+                };
+                reader.readAsDataURL(imageBlob);
+
+            } else {
+                showNotification(`Preview error: ${data.error}`, 'error');
+            }
+        } catch (error) {
+            console.error("Error sending image for preview:", error);
+            showNotification("Failed to generate live preview.", "error");
+        }
+    }
+
+    // Convert Data URL to Blob for FormData
+    function dataURLtoBlob(dataurl) {
+        console.log("dataURLtoBlob called.");
+        const arr = dataurl.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        console.log("dataURLtoBlob returning Blob.");
+        return new Blob([u8arr], { type: mime });
+    }
+
+    brightnessSlider.addEventListener('input', () => {
+        brightnessValueSpan.textContent = parseFloat(brightnessSlider.value).toFixed(1);
+        applyFilters();
+    });
+    contrastSlider.addEventListener('input', () => {
+        contrastValueSpan.textContent = parseFloat(contrastSlider.value).toFixed(1);
+        applyFilters();
+    });
+    saturationSlider.addEventListener('input', () => {
+        saturationValueSpan.textContent = parseFloat(saturationSlider.value).toFixed(1);
+        applyFilters();
+    });
+    edgeEnhanceSlider.addEventListener('input', () => {
+        edgeEnhanceValueSpan.textContent = parseFloat(edgeEnhanceSlider.value).toFixed(1);
+        applyFilters();
+    });
+    blurReduceSlider.addEventListener('input', () => {
+        blurReduceValueSpan.textContent = parseFloat(blurReduceSlider.value).toFixed(1);
+        applyFilters();
+    });
+    colorBalanceSlider.addEventListener('input', () => {
+        colorBalanceValueSpan.textContent = parseFloat(colorBalanceSlider.value).toFixed(1);
+        applyFilters();
+    });
+
+    autoContrastBtn.addEventListener('click', async () => {
+        if (!originalImageBase64) return;
+        resetFiltersUI(); // Reset sliders for manual adjustments
+        await sendImageForPreview(originalImageBase64, { auto_contrast: 'true' });
+        showNotification("Auto contrast applied.", "info");
+    });
+    sharpenBtn.addEventListener('click', async () => {
+        if (!originalImageBase64) return;
+        resetFiltersUI(); // Reset sliders for manual adjustments
+        await sendImageForPreview(originalImageBase64, { sharpen: 'true' });
+        showNotification("Image sharpened.", "info");
+    });
+    grayscaleBtn.addEventListener('click', async () => {
+        if (!originalImageBase64) return;
+        resetFiltersUI(); // Reset sliders for manual adjustments
+        saturationSlider.value = 0.0; // Set saturation slider to 0
+        saturationValueSpan.textContent = '0.0';
+        await sendImageForPreview(originalImageBase64, { grayscale: 'true' });
+        showNotification("Image converted to grayscale.", "info");
+    });
+    resetFiltersBtn.addEventListener('click', async () => {
+        if (!originalImageBase64) return;
+        resetFiltersUI();
+        currentImageBase64 = originalImageBase64;
+        displayImage(currentImageBase64); // Display original image
+        showNotification("Image filters reset.", "info");
+    });
+
+    livePreviewToggle.addEventListener('change', () => {
+        if (livePreviewToggle.checked) {
+            applyFilters(); // Re-apply filters if enabled
+            showNotification("Live preview enabled.", "info");
+        } else {
+            // Revert to original image if live preview is disabled
+            if (originalImageBase64) {
+                currentImageBase64 = originalImageBase64;
+                displayImage(currentImageBase64);
+            }
+            showNotification("Live preview disabled.", "info");
+        }
+    });
+
+    // --- Diagnosis Logic ---
+    async function diagnoseImage(base64Image) {
+        console.log("diagnoseImage started.");
+        if (!base64Image) {
+            showNotification("No image to diagnose.", "warning");
+            console.log("diagnoseImage: No base64Image provided.");
+            return;
+        }
+
+        startLoadingAnimation();
+        statusMessage.textContent = "Analyzing image...";
+        diagnosisResults.innerHTML = '<p>Processing image...</p>';
+        saveReportBtn.disabled = true;
+        printReportBtn.disabled = true;
+
+        try {
+            const formData = new FormData();
+            formData.append('file', dataURLtoBlob(base64Image), 'diagnose_image.png');
+
+            // Log formData contents for debugging
+            console.log("FormData contents:");
+            for (let pair of formData.entries()) {
+                console.log(pair[0]+ ', ' + pair[1]);
+            }
+
+            // Include current filter values for diagnosis
+            formData.append('brightness', brightnessSlider.value);
+            formData.append('contrast', contrastSlider.value);
+            formData.append('saturation', saturationSlider.value);
+            formData.append('edge_enhance', edgeEnhanceSlider.value);
+            formData.append('blur_reduce', blurReduceSlider.value);
+            formData.append('color_balance', colorBalanceSlider.value);
+
+            console.log("Sending POST request to /diagnose...");
+            const response = await fetch('/diagnose', {
+                method: 'POST',
+                body: formData
+            });
+
+            console.log("Response received from /diagnose.");
+            const data = await response.json();
+            console.log("Diagnosis response data:", data);
+            stopLoadingAnimation();
+
+            if (data.success) {
+                currentDiagnosisDetails = data.diagnosis;
+                currentImageFilename = data.image_filename; // Store filename for report
+
+                // Use the disease_key_for_lookup provided by the backend
+                const diseaseLookupKey = currentDiagnosisDetails.disease_key_for_lookup;
+                console.log("Frontend using diseaseLookupKey:", diseaseLookupKey);
+
+                currentDiseaseInfo = ALL_DISEASE_INFO[diseaseLookupKey] || ALL_DISEASE_INFO['healthy'];
+                currentTreatmentSuggestions = ALL_TREATMENT_SUGGESTIONS[diseaseLookupKey] || ALL_TREATMENT_SUGGESTIONS['healthy'];
+
+                displayDiagnosisResults(currentDiagnosisDetails, currentDiseaseInfo, currentTreatmentSuggestions);
+                statusMessage.textContent = "Analysis complete!";
+                saveReportBtn.disabled = false;
+                printReportBtn.disabled = false;
+                showNotification("Diagnosis complete!", "success");
+            } else {
+                diagnosisResults.innerHTML = `<p class="text-red-500 font-bold">DIAGNOSIS FAILED</p><p>${data.error}</p>`;
+                statusMessage.textContent = `Analysis failed: ${data.error}`;
+                showNotification("Diagnosis failed. See results for details.", "error");
+                currentDiagnosisDetails = null;
+                currentImageFilename = null;
+            }
+        } catch (error) {
+            console.error("Error during diagnosis fetch:", error);
+            stopLoadingAnimation();
+            diagnosisResults.innerHTML = `<p class="text-red-500 font-bold">DIAGNOSIS FAILED</p><p>An unexpected error occurred: ${error.message}</p>`;
+            statusMessage.textContent = "An unexpected error occurred.";
+            showNotification("An unexpected error occurred during diagnosis.", "error");
+            currentDiagnosisDetails = null;
+            currentImageFilename = null;
+        }
+        console.log("diagnoseImage finished.");
+    }
+
+    function displayDiagnosisResults(diagnosis, info, treatments) {
+        let html = `
+            <h3 class="text-xl font-bold mb-2 text-primary">DIAGNOSIS RESULTS</h3>
+            <p><strong>Crop Type:</strong> ${diagnosis.crop_type}</p>
+            <p><strong>Disease:</strong> ${diagnosis.disease_name} ${diagnosis.disease_name.toLowerCase().includes('healthy') ? '✅' : '⚠️'}</p>
+            <p><strong>Confidence:</strong> <span class="${getConfidenceColorClass(diagnosis.confidence)}">${diagnosis.confidence}</span></p>
+        `;
+        if (diagnosis.note) {
+            html += `<p class="text-yellow-500 italic">${diagnosis.note}</p>`;
+        }
+        html += `<hr class="my-4 border-gray-300 dark:border-gray-600">`;
+
+        html += `
+            <h3 class="text-xl font-bold mb-2 text-primary">Disease Information</h3>
+            <p><strong>Description:</strong> ${info.description}</p>
+            <p class="mt-2"><strong>Symptoms:</strong> ${info.symptoms}</p>
+            <hr class="my-4 border-gray-300 dark:border-gray-600">
+        `;
+
+        html += `
+            <h3 class="text-xl font-bold mb-2 text-primary">Treatment Suggestions</h3>
+            <ul class="list-disc pl-5">
+        `;
+        if (treatments && treatments.length > 0) {
+            treatments.forEach(s => {
+                html += `<li>${s}</li>`;
+            });
+        } else {
+            html += `<li>No specific treatment suggestions available for this diagnosis.</li>`;
+        }
+        html += `</ul>`;
+
+        diagnosisResults.innerHTML = html;
+    }
+
+    function getConfidenceColorClass(confidence) {
+        const confVal = parseFloat(confidence.replace('%', ''));
+        if (confVal > 75) return 'text-green-500 font-semibold';
+        if (confVal > 50) return 'text-orange-500 font-semibold';
+        return 'text-red-500 font-semibold';
+    }
+
+    // --- Report Generation ---
+    saveReportBtn.addEventListener('click', async () => {
+        if (!currentDiagnosisDetails || !currentImageFilename) {
+            showNotification("No diagnosis data or image to save report.", "warning");
+            return;
+        }
+
+        showNotification("Generating report...", "info");
+        try {
+            const response = await fetch('/generate_report', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    image_filename: currentImageFilename,
+                    diagnosis_details: currentDiagnosisDetails,
+                    disease_info: currentDiseaseInfo,
+                    treatment_suggestions: currentTreatmentSuggestions
+                })
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `diagnosis_report_${new Date().toISOString().slice(0,10)}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                showNotification("Report saved successfully!", "success");
+            } else {
+                const errorData = await response.json();
+                showNotification(`Failed to save report: ${errorData.error}`, "error");
+            }
+        } catch (error) {
+            console.error("Error saving report:", error);
+            showNotification("An error occurred while saving the report.", "error");
+        }
+    });
+
+    printReportBtn.addEventListener('click', async () => {
+        if (!currentDiagnosisDetails || !currentImageFilename) {
+            showNotification("No diagnosis data or image to print report.", "warning");
+            return;
+        }
+
+        showNotification("Generating printable report...", "info");
+        try {
+            const response = await fetch('/generate_report', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    image_filename: currentImageFilename,
+                    diagnosis_details: currentDiagnosisDetails,
+                    disease_info: currentDiseaseInfo,
+                    treatment_suggestions: currentTreatmentSuggestions
+                })
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                // Open in a new tab for printing
+                const newWindow = window.open(url, '_blank');
+                if (newWindow) {
+                    newWindow.focus();
+                    showNotification("Report opened for printing. Use your browser's print function.", "info", 5000);
+                } else {
+                    showNotification("Pop-up blocked. Please allow pop-ups for this site to view the report.", "warning", 5000);
+                }
+            } else {
+                const errorData = await response.json();
+                showNotification(`Failed to generate printable report: ${errorData.error}`, "error");
+            }
+        } catch (error) {
+            console.error("Error printing report:", error);
+            showNotification("An error occurred while generating the printable report.", "error");
+        }
+    });
+
+    // --- Zoom and Pan ---
+    const zoomLevelSpan = document.getElementById('zoomLevel');
+
+    imagePreview.addEventListener('wheel', (e) => {
+        e.preventDefault(); // Prevent page scrolling
+        if (!originalImageBase64) return;
+
+        const scaleAmount = 0.1;
+        if (e.deltaY < 0) {
+            zoomLevel += scaleAmount; // Zoom in
+        } else {
+            zoomLevel -= scaleAmount; // Zoom out
+        }
+        zoomLevel = Math.max(0.1, Math.min(10.0, zoomLevel)); // Clamp zoom level
+
+        updateZoomLabel();
+        applyZoomPan();
+    });
+
+    function updateZoomLabel() {
+        zoomLevelSpan.textContent = `Zoom: ${zoomLevel.toFixed(1)}x`;
+    }
+
+    function applyZoomPan() {
+        if (!imagePreview.src) return;
+
+        // Get current image position (relative to its container)
+        const currentLeft = parseFloat(imagePreview.style.left || '0px');
+        const currentTop = parseFloat(imagePreview.style.top || '0px');
+
+        // Calculate new dimensions
+        const naturalWidth = imagePreview.naturalWidth;
+        const naturalHeight = imagePreview.naturalHeight;
+        const scaledWidth = naturalWidth * zoomLevel;
+        const scaledHeight = naturalHeight * zoomLevel;
+
+        // Apply scale
+        imagePreview.style.transform = `scale(${zoomLevel})`;
+        imagePreview.style.transformOrigin = '0 0'; // Set origin for consistent scaling
+
+        // Adjust position to keep image centered or within bounds
+        const containerWidth = imagePreviewContainer.clientWidth;
+        const containerHeight = imagePreviewContainer.clientHeight;
+
+        let newLeft = currentLeft;
+        let newTop = currentTop;
+
+        // If image is smaller than container, center it
+        if (scaledWidth <= containerWidth) {
+            newLeft = (containerWidth - scaledWidth) / 2;
+        } else {
+            // Keep current pan, but ensure it doesn't go out of bounds
+            newLeft = Math.max(containerWidth - scaledWidth, Math.min(0, newLeft));
+        }
+
+        if (scaledHeight <= containerHeight) {
+            newTop = (containerHeight - scaledHeight) / 2;
+        } else {
+            newTop = Math.max(containerHeight - scaledHeight, Math.min(0, newTop));
+        }
+
+        imagePreview.style.left = `${newLeft}px`;
+        imagePreview.style.top = `${newTop}px`;
+    }
+
+    imagePreview.addEventListener('mousedown', (e) => {
+        if (isCropping) return;
+        isPanning = true;
+        panStartX = e.clientX - parseFloat(imagePreview.style.left || '0');
+        panStartY = e.clientY - parseFloat(imagePreview.style.top || '0');
+        imagePreview.style.cursor = 'grabbing';
+    });
+
+    imagePreview.addEventListener('mousemove', (e) => {
+        if (!isPanning) return;
+        e.preventDefault(); // Prevent selection while dragging
+
+        const newLeft = e.clientX - panStartX;
+        const newTop = e.clientY - panStartY;
+
+        // Clamp panning to image boundaries
+        const naturalWidth = imagePreview.naturalWidth;
+        const naturalHeight = imagePreview.naturalHeight;
+        const scaledWidth = naturalWidth * zoomLevel;
+        const scaledHeight = naturalHeight * zoomLevel;
+
+        const containerWidth = imagePreviewContainer.clientWidth;
+        const containerHeight = imagePreviewContainer.clientHeight;
+
+        const maxLeft = Math.max(0, containerWidth - scaledWidth);
+        const maxTop = Math.max(0, containerHeight - scaledHeight);
+
+        imagePreview.style.left = `${Math.min(0, Math.max(maxLeft, newLeft))}px`;
+        imagePreview.style.top = `${Math.min(0, Math.max(maxTop, newTop))}px`;
+    });
+
+    imagePreview.addEventListener('mouseup', () => {
+        isPanning = false;
+        if (!isCropping) {
+            imagePreview.style.cursor = 'grab';
+        }
+    });
+
+    imagePreviewContainer.addEventListener('mouseleave', () => {
+        isPanning = false;
+        if (!isCropping) {
+            imagePreview.style.cursor = 'grab';
+        }
+    });
+
+    function resetPan() {
+        imagePreview.style.left = '0px';
+        imagePreview.style.top = '0px';
+    }
+
+    // --- Cropping Logic ---
+    const cropOverlay = document.getElementById('cropOverlay');
+
+    cropImageBtn.addEventListener('click', activateCropMode);
+    applyCropBtn.addEventListener('click', applyCrop);
+    resetCropBtn.addEventListener('click', resetCropMode);
+
+    function activateCropMode() {
+        if (!originalImageBase64) {
+            showNotification("Please upload an image first to crop.", "warning");
+            return;
+        }
+        isCropping = true;
+        statusMessage.textContent = "Draw a rectangle to crop the image.";
+        cropImageBtn.classList.add('hidden');
+        applyCropBtn.classList.remove('hidden');
+        resetCropBtn.classList.remove('hidden');
+        imagePreview.style.cursor = 'crosshair';
+        cropSelection.classList.remove('hidden');
+        cropOverlay.classList.remove('hidden');
+
+        // Bind cropping events
+        imagePreviewContainer.addEventListener('mousedown', startCropSelection);
+        imagePreviewContainer.addEventListener('mousemove', dragCropSelection);
+        imagePreviewContainer.addEventListener('mouseup', endCropSelection);
+
+        showNotification("Crop mode activated. Draw a rectangle.", "info");
+    }
+
+    function resetCropMode() {
+        isCropping = false;
+        cropStartX = null;
+        cropStartY = null;
+        cropEndX = null;
+        cropEndY = null;
+        cropSelection.style.width = '0';
+        cropSelection.style.height = '0';
+        cropSelection.classList.add('hidden');
+        cropOverlay.classList.add('hidden');
+        cropImageBtn.classList.remove('hidden');
+        applyCropBtn.classList.add('hidden');
+        resetCropBtn.classList.add('hidden');
+        imagePreview.style.cursor = 'grab';
+        statusMessage.textContent = "Crop reset. Original image restored.";
+        if (originalImageBase64) {
+            currentImageBase64 = originalImageBase64;
+            displayImage(currentImageBase64);
+        }
+        // Unbind cropping events
+        imagePreviewContainer.removeEventListener('mousedown', startCropSelection);
+        imagePreviewContainer.removeEventListener('mousemove', dragCropSelection);
+        imagePreviewContainer.removeEventListener('mouseup', endCropSelection);
+        showNotification("Crop mode reset.", "info");
+    }
+
+    function startCropSelection(e) {
+        if (!isCropping) return;
+        const rect = imagePreviewContainer.getBoundingClientRect();
+        cropStartX = e.clientX - rect.left;
+        cropStartY = e.clientY - rect.top;
+        cropSelection.style.left = `${cropStartX}px`;
+        cropSelection.style.top = `${cropStartY}px`;
+        cropSelection.style.width = '0px';
+        cropSelection.style.height = '0px';
+        cropSelection.classList.remove('hidden');
+    }
+
+    function dragCropSelection(e) {
+        if (!isCropping || cropStartX === null) return;
+        const rect = imagePreviewContainer.getBoundingClientRect();
+        cropEndX = e.clientX - rect.left;
+        cropEndY = e.clientY - rect.top;
+
+        const width = cropEndX - cropStartX;
+        const height = cropEndY - cropStartY;
+
+        cropSelection.style.width = `${Math.abs(width)}px`;
+        cropSelection.style.height = `${Math.abs(height)}px`;
+        cropSelection.style.left = `${Math.min(cropStartX, cropEndX)}px`;
+        cropSelection.style.top = `${Math.min(cropStartY, cropEndY)}px`;
+    }
+
+    async function endCropSelection(e) {
+        if (!isCropping || cropStartX === null) return;
+        cropEndX = e.clientX - imagePreviewContainer.getBoundingClientRect().left;
+        cropEndY = e.clientY - imagePreviewContainer.getBoundingClientRect().top;
+
+        // Ensure valid crop area
+        const x1 = Math.min(cropStartX, cropEndX);
+        const y1 = Math.min(cropStartY, cropEndY);
+        const x2 = Math.max(cropStartX, cropEndX);
+        const y2 = Math.max(cropStartY, cropEndY);
+
+        if (x2 - x1 < 10 || y2 - y1 < 10) { // Minimum crop size
+            showNotification("Please draw a larger crop area.", "warning");
+            cropSelection.style.width = '0';
+            cropSelection.style.height = '0';
+            return;
+        }
+        applyCropBtn.disabled = false;
+    }
+
+    async function applyCrop() {
+        if (!originalImageBase64 || cropStartX === null) {
+            showNotification("Please draw a crop rectangle first.", "warning");
+            return;
+        }
+
+        const imgElement = imagePreview;
+        const imgRect = imgElement.getBoundingClientRect();
+        const containerRect = imagePreviewContainer.getBoundingClientRect();
+
+        // Calculate crop coordinates relative to the original image's natural size
+        // This is tricky because the displayed image might be scaled and panned.
+        // We need the actual pixel coordinates on the *original* image.
+
+        // Get the current display size of the image within the container
+        const displayedWidth = imgElement.clientWidth;
+        const displayedHeight = imgElement.clientHeight;
+
+        // Get the actual image's bounding box relative to the container for accurate scaling
+        const imgDisplayX = imgRect.left - containerRect.left;
+        const imgDisplayY = imgRect.top - containerRect.top;
+
+        // Crop selection coordinates relative to the image itself (not the container)
+        const cropX1RelToImg = Math.min(cropStartX, cropEndX) - imgDisplayX;
+        const cropY1RelToImg = Math.min(cropStartY, cropEndY) - imgDisplayY;
+        const cropX2RelToImg = Math.max(cropStartX, cropEndX) - imgDisplayX;
+        const cropY2RelToImg = Math.max(cropStartY, cropEndY) - imgDisplayY;
+
+        // Clamp to image boundaries
+        const finalCropX1 = Math.max(0, cropX1RelToImg);
+        const finalCropY1 = Math.max(0, cropY1RelToImg);
+        const finalCropX2 = Math.min(displayedWidth, cropX2RelToImg);
+        const finalCropY2 = Math.min(displayedHeight, cropY2RelToImg);
+
+        // Calculate scaling factors from displayed image size to original image natural size
+        const naturalWidth = imgElement.naturalWidth;
+        const naturalHeight = imgElement.naturalHeight;
+        const scaleX = naturalWidth / displayedWidth;
+        const scaleY = naturalHeight / displayedHeight;
+
+        // Convert cropped coordinates back to original image pixel values
+        const x1 = Math.round(finalCropX1 * scaleX);
+        const y1 = Math.round(finalCropY1 * scaleY);
+        const x2 = Math.round(finalCropX2 * scaleX);
+        const y2 = Math.round(finalCropY2 * scaleY);
+
+        if (x2 <= x1 || y2 <= y1) {
+            showNotification("Invalid crop area selected.", "warning");
+            return;
+        }
+
+        // Create a temporary canvas to draw the cropped image
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = naturalWidth;
+        tempCanvas.height = naturalHeight;
+        const ctx = tempCanvas.getContext('2d');
+
+        const img = new Image();
+        img.src = originalImageBase64;
+        img.onload = async () => {
+            ctx.drawImage(img, 0, 0); // Draw original image onto canvas
+
+            // Get cropped image data from canvas
+            const croppedImageData = ctx.getImageData(x1, y1, x2 - x1, y2 - y1);
+
+            // Create a new canvas for the cropped image
+            const croppedCanvas = document.createElement('canvas');
+            croppedCanvas.width = x2 - x1;
+            croppedCanvas.height = y2 - y1;
+            const croppedCtx = croppedCanvas.getContext('2d');
+            croppedCtx.putImageData(croppedImageData, 0, 0);
+
+            const newCroppedBase64 = croppedCanvas.toDataURL('image/png');
+            originalImageBase64 = newCroppedBase64; // Set the cropped image as the new original
+            currentImageBase64 = newCroppedBase64;
+            displayImage(currentImageBase64);
+            resetFiltersUI(); // Reset filters after cropping
+            resetCropMode(); // Hide crop UI elements
+            statusMessage.textContent = "Image cropped. Ready for diagnosis.";
+            showNotification("Image cropped successfully.", "success");
+            await diagnoseImage(currentImageBase64); // Re-diagnose with the new cropped image
+        };
+    }
+
+    // Initial setup
+    document.addEventListener('DOMContentLoaded', () => {
+        // Attach event listener for image upload after DOM is loaded
+        imageUpload.addEventListener('change', handleImageUpload);
+
+        // Check if there's a pre-selected image from history (via query param)
+        const urlParams = new URLSearchParams(window.location.search);
+        const imageFilename = urlParams.get('image');
+        if (imageFilename) {
+            // Use the UPLOADS_BASE_URL variable
+            const imageUrl = `${UPLOADS_BASE_URL}${imageFilename}`;
+            fetch(imageUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    const file = new File([blob], imageFilename, { type: blob.type });
+                    handleImageUpload(null, file);
+                })
+                .catch(error => {
+                    console.error("Error fetching image from URL:", error);
+                    showNotification("Failed to load image from history.", "error");
+                });
+        }
+    });
+
+    // Compare Original Button functionality
+    compareOriginalBtn.addEventListener('mousedown', () => {
+        if (originalImageBase64) {
+            // Save current state before switching to original
+            savedZoomLevel = zoomLevel;
+            savedPanLeft = parseFloat(imagePreview.style.left || '0');
+            savedPanTop = parseFloat(imagePreview.style.top || '0');
+
+            imagePreview.src = originalImageBase64;
+            zoomLevel = 1.0; // Reset zoom to 1.0x for original
+            resetPan(); // Reset pan for original
+            updateZoomLabel();
+            applyZoomPan(); // Apply changes
+        }
+    });
+
+    compareOriginalBtn.addEventListener('mouseup', () => {
+        if (currentImageBase64) {
+            imagePreview.src = currentImageBase64;
+            zoomLevel = savedZoomLevel; // Revert zoom to saved
+            imagePreview.style.left = `${savedPanLeft}px`; // Revert pan to saved
+            imagePreview.style.top = `${savedPanTop}px`;
+            updateZoomLabel();
+            applyZoomPan(); // Apply changes
+        }
+    });
+
+</script>
+{% endblock %}

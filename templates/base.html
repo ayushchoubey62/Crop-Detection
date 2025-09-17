@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Disease Detection</title>
+    <!-- Corrected Tailwind CSS CDN link -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .dark-mode {
+            background-color: #1A1A1A;
+            color: #E0E0E0;
+        }
+        .light-mode {
+            background-color: #F5F5F5;
+            color: #212121;
+        }
+        .dark-mode .bg-surface { background-color: #2C2C2C; }
+        .light-mode .bg-surface { background-color: #FFFFFF; }
+
+        .dark-mode .text-primary { color: #BB86FC; }
+        .light-mode .text-primary { color: #6200EE; }
+
+        .dark-mode .btn-primary {
+            background-color: #03DAC6; /* Teal */
+            color: #1A1A1A; /* Dark text for contrast */
+        }
+        .dark-mode .btn-primary:hover {
+            background-color: #00B8A9; /* Darker Teal */
+        }
+        .light-mode .btn-primary {
+            background-color: #6200EE; /* Deep Purple */
+            color: #FFFFFF;
+        }
+        .light-mode .btn-primary:hover {
+            background-color: #5300d8; /* Darker Purple */
+        }
+
+        .dark-mode .input-field {
+            background-color: #3A3A3A;
+            color: #E0E0E0;
+            border-color: #555555;
+        }
+        .light-mode .input-field {
+            background-color: #FFFFFF;
+            color: #212121;
+            border-color: #CCCCCC;
+        }
+
+        .dark-mode .card {
+            background-color: #2C2C2C;
+            border-color: #555555;
+        }
+        .light-mode .card {
+            background-color: #FFFFFF;
+            border-color: #CCCCCC;
+        }
+
+        .dark-mode .section-title {
+            color: #BB86FC; /* Primary color */
+        }
+        .light-mode .section-title {
+            color: #6200EE; /* Primary color */
+        }
+
+        /* Specific styles for diagnosis page */
+        .dark-mode .diagnosis-bg { background-color: #263238; }
+        .light-mode .diagnosis-bg { background-color: #E0F2F7; }
+
+        .dark-mode .diagnosis-title { color: #E0E0E0; }
+        .light-mode .diagnosis-title { color: #212121; }
+
+        .dark-mode .image-canvas-bg { background-color: #2C2C2C; }
+        .light-mode .image-canvas-bg { background-color: #FFFFFF; }
+
+        .dark-mode .text-area-bg { background-color: #2C2C2C; color: #E0E0E0; }
+        .light-mode .text-area-bg { background-color: #FFFFFF; color: #212121; }
+
+        /* History Page specific styles */
+        .dark-mode .treeview-header {
+            background-color: #BB86FC; /* Primary */
+            color: #1A1A1A; /* Dark text */
+        }
+        .light-mode .treeview-header {
+            background-color: #6200EE; /* Primary */
+            color: #FFFFFF;
+        }
+        .dark-mode .treeview-row {
+            background-color: #2C2C2C; /* Surface */
+            color: #E0E0E0;
+        }
+        .light-mode .treeview-row {
+            background-color: #FFFFFF; /* Surface */
+            color: #212121;
+        }
+        .dark-mode .treeview-selected {
+            background-color: #BB86FC; /* Primary */
+            color: #FFFFFF;
+        }
+        .light-mode .treeview-selected {
+            background-color: #6200EE; /* Primary */
+            color: #FFFFFF;
+        }
+        .dark-mode .treeview-border { border-color: #555555; }
+        .light-mode .treeview-border { border-color: #CCCCCC; }
+
+        /* Help Page specific */
+        .dark-mode .help-title { color: #81C784; } /* Light green */
+        .light-mode .help-title { color: #2E7D32; } /* Dark green */
+        .dark-mode .help-text { color: #A5D6A7; } /* Lighter green */
+        .light-mode .help-text { color: #1B5E20; } /* Even darker green */
+
+        /* About Page specific */
+        .dark-mode .about-bg { background-color: #263238; }
+        .light-mode .about-bg { background-color: #E0F2F7; }
+        .dark-mode .about-title { color: #E0E0E0; }
+        .light-mode .about-title { color: #212121; }
+        .dark-mode .about-text { color: #A5D6A7; }
+        .light-mode .about-text { color: #1B5E20; }
+        .dark-mode .about-disclaimer { color: #CF6679; } /* Error color */
+        .light-mode .about-disclaimer { color: #B00020; } /* Error color */
+    </style>
+</head>
+<body class="{{ 'dark-mode' if dark_mode else 'light-mode' }} min-h-screen flex flex-col">
+    <nav class="bg-surface shadow-md p-4 flex justify-between items-center z-10 sticky top-0">
+        <div class="flex items-center space-x-4">
+            <img src="{{ url_for('static', filename='icons8-chaff-48.png') }}" alt="Logo" class="h-8 w-8 rounded-full">
+            <a href="/" class="text-xl font-bold text-primary">Crop Diagnosis</a>
+        </div>
+        <div class="flex items-center space-x-6">
+            <a href="/diagnose" class="hover:text-primary transition-colors duration-300">Diagnose</a>
+            <a href="/history" class="hover:text-primary transition-colors duration-300">History</a>
+            <a href="/feedback" class="hover:text-primary transition-colors duration-300">Feedback</a>
+            <a href="/help" class="hover:text-primary transition-colors duration-300">Help</a>
+            <a href="/about" class="hover:text-primary transition-colors duration-300">About</a>
+            <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300">
+                <span class="text-xl" id="themeIcon">{{ '🌙' if dark_mode else '☀️' }}</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-grow p-4 md:p-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-surface shadow-inner p-4 text-center text-sm text-gray-600 dark:text-gray-400 mt-auto">
+        &copy; {{ now.year }} Crop Disease Detection App. All rights reserved.
+    </footer>
+
+    <div id="notification" class="fixed top-20 left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white font-bold text-center transition-all duration-300 ease-out opacity-0 z-50 min-w-[300px]" style="pointer-events: none;"></div>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
+        let isDarkMode = {{ 'true' if dark_mode else 'false' }};
+
+        function applyTheme(darkMode) {
+            if (darkMode) {
+                body.classList.add('dark-mode');
+                body.classList.remove('light-mode');
+                themeIcon.textContent = '🌙';
+            } else {
+                body.classList.add('light-mode');
+                body.classList.remove('dark-mode');
+                themeIcon.textContent = '☀️';
+            }
+        }
+
+        themeToggle.addEventListener('click', async () => {
+            isDarkMode = !isDarkMode;
+            applyTheme(isDarkMode);
+            try {
+                const response = await fetch('/toggle_theme', { method: 'POST' });
+                const data = await response.json();
+                if (!data.success) {
+                    console.error('Failed to toggle theme on server.');
+                }
+            } catch (error) {
+                console.error('Error toggling theme:', error);
+            }
+            showNotification(`${isDarkMode ? 'Dark' : 'Light'} Mode Enabled`, 'info');
+        });
+
+        // Initialize theme on page load
+        applyTheme(isDarkMode);
+
+        // Notification system
+        const notificationDiv = document.getElementById('notification');
+        let notificationTimer;
+
+        function showNotification(message, type = 'info', duration = 3000) {
+            clearTimeout(notificationTimer);
+
+            let bgColor, textColor;
+            switch (type) {
+                case 'success':
+                    bgColor = '#4CAF50'; // Green
+                    textColor = 'white';
+                    break;
+                case 'warning':
+                    bgColor = '#FFC107'; // Amber
+                    textColor = 'black';
+                    break;
+                case 'error':
+                    bgColor = '#F44336'; // Red
+                    textColor = 'white';
+                    break;
+                case 'info':
+                default:
+                    bgColor = '#2196F3'; // Blue
+                    textColor = 'white';
+                    break;
+            }
+
+            notificationDiv.style.backgroundColor = bgColor;
+            notificationDiv.style.color = textColor;
+            notificationDiv.textContent = message;
+            notificationDiv.style.opacity = '1';
+            notificationDiv.style.transform = 'translate(-50%, 0)';
+
+            notificationTimer = setTimeout(() => {
+                notificationDiv.style.opacity = '0';
+                notificationDiv.style.transform = 'translate(-50%, -20px)';
+            }, duration);
+        }
+    </script>
+</body>
+</html>

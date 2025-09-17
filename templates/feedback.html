@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto p-4 diagnosis-bg rounded-lg shadow-xl max-w-2xl">
+    <h1 class="text-3xl font-bold mb-6 diagnosis-title">User Feedback & Support</h1>
+
+    <form id="feedbackForm" class="space-y-6">
+        <!-- Feedback Type -->
+        <div class="card p-4 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-3 section-title">Feedback Type</h2>
+            <div class="flex flex-wrap gap-4">
+                <label class="inline-flex items-center">
+                    <input type="radio" name="feedback_type" value="suggestion" class="form-radio text-primary h-5 w-5" checked>
+                    <span class="ml-2 text-gray-700 dark:text-gray-300">Suggestion</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" name="feedback_type" value="bug" class="form-radio text-primary h-5 w-5">
+                    <span class="ml-2 text-gray-700 dark:text-gray-300">Bug Report</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" name="feedback_type" value="feature" class="form-radio text-primary h-5 w-5">
+                    <span class="ml-2 text-gray-700 dark:text-gray-300">Feature Request</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" name="feedback_type" value="general" class="form-radio text-primary h-5 w-5">
+                    <span class="ml-2 text-gray-700 dark:text-gray-300">General Feedback</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Contact Email -->
+        <div class="card p-4 rounded-lg shadow-md">
+            <label for="email" class="block text-xl font-semibold mb-3 section-title">Contact Email (optional):</label>
+            <input type="email" id="email" name="email" class="input-field w-full p-3 rounded-md border" placeholder="your.email@example.com">
+        </div>
+
+        <!-- Rating -->
+        <div id="ratingSection" class="card p-4 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-3 section-title">Rating</h2>
+            <div class="flex flex-wrap items-center justify-between">
+                {% set ratings = [
+                    (1, 'Poor'), (2, 'Fair'), (3, 'Good'), (4, 'Very Good'), (5, 'Excellent')
+                ] %}
+                {% for value, label in ratings %}
+                <label class="flex flex-col items-center cursor-pointer p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <input type="radio" name="rating" value="{{ value }}" class="form-radio text-primary h-5 w-5" {% if value == 3 %}checked{% endif %}>
+                    <span class="mt-1 text-gray-700 dark:text-gray-300">{{ value }}</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ label }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Your Feedback -->
+        <div class="card p-4 rounded-lg shadow-md flex flex-col">
+            <label for="feedbackText" class="block text-xl font-semibold mb-3 section-title">Your Feedback:</label>
+            <textarea id="feedbackText" name="feedback_text" rows="8" class="input-field w-full p-3 rounded-md border flex-grow" placeholder="Please describe your feedback in detail..."></textarea>
+        </div>
+
+        <!-- Attach Screenshot -->
+        <div class="card p-4 rounded-lg shadow-md">
+            <label class="inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="attachScreenshot" name="attach_screenshot" class="form-checkbox text-primary h-5 w-5">
+                <span class="ml-2 text-gray-700 dark:text-gray-300">Attach screenshot (if applicable)</span>
+            </label>
+            <input type="file" id="screenshotFile" name="screenshot" accept="image/*" class="hidden" onchange="handleScreenshotFile(event)">
+            <button type="button" id="selectScreenshotBtn" class="btn-primary px-4 py-2 rounded-md mt-3" disabled>Select Screenshot</button>
+            <span id="screenshotFilename" class="text-sm text-gray-500 dark:text-gray-400 ml-3"></span>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end space-x-4">
+            <button type="submit" id="submitFeedbackBtn" class="btn-primary px-6 py-2 rounded-md">Submit Feedback</button>
+            <button type="button" id="resetFormBtn" class="btn-primary px-6 py-2 rounded-md">Reset Form</button>
+            <a href="/" class="btn-primary px-6 py-2 rounded-md">Back to Home</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    const feedbackForm = document.getElementById('feedbackForm');
+    const feedbackTypeRadios = document.querySelectorAll('input[name="feedback_type"]');
+    const emailEntry = document.getElementById('email');
+    const ratingSection = document.getElementById('ratingSection');
+    const feedbackText = document.getElementById('feedbackText');
+    const attachScreenshotCheckbox = document.getElementById('attachScreenshot');
+    const screenshotFile = document.getElementById('screenshotFile');
+    const selectScreenshotBtn = document.getElementById('selectScreenshotBtn');
+    const screenshotFilenameLabel = document.getElementById('screenshotFilename');
+    const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
+    const resetFormBtn = document.getElementById('resetFormBtn');
+
+    let currentScreenshotPath = null;
+
+    // Initial placeholder text and color
+    feedbackText.style.color = 'grey';
+
+    // Event Listeners
+    feedbackTypeRadios.forEach(radio => {
+        radio.addEventListener('change', updateFeedbackUI);
+    });
+    attachScreenshotCheckbox.addEventListener('change', toggleScreenshotOption);
+    selectScreenshotBtn.addEventListener('click', () => screenshotFile.click());
+    resetFormBtn.addEventListener('click', resetForm);
+    feedbackForm.addEventListener('submit', submitFeedback);
+
+    // Placeholder text behavior
+    feedbackText.addEventListener('focus', () => {
+        if (feedbackText.value === getPlaceholderText()) {
+            feedbackText.value = '';
+            feedbackText.style.color = ''; // Use default text color
+        }
+    });
+
+    feedbackText.addEventListener('blur', () => {
+        if (!feedbackText.value.trim()) {
+            feedbackText.value = getPlaceholderText();
+            feedbackText.style.color = 'grey';
+        }
+    });
+
+    function getPlaceholderText() {
+        const feedbackType = document.querySelector('input[name="feedback_type"]:checked').value;
+        const placeholders = {
+            "suggestion": "Please describe your suggestion for improvement...",
+            "bug": "Please describe the bug you encountered, including steps to reproduce...",
+            "feature": "Please describe the feature you'd like to see added...",
+            "general": "Please share your general feedback about the application..."
+        };
+        return placeholders[feedbackType];
+    }
+
+    function updateFeedbackUI() {
+        const feedbackType = document.querySelector('input[name="feedback_type"]:checked').value;
+        if (feedbackType === "suggestion" || feedbackType === "general") {
+            ratingSection.classList.remove('hidden');
+        } else {
+            ratingSection.classList.add('hidden');
+        }
+        
+        // Update placeholder text if it's the default one
+        if (feedbackText.value.startsWith("Please describe") || !feedbackText.value.trim()) {
+            feedbackText.value = getPlaceholderText();
+            feedbackText.style.color = 'grey';
+        }
+    }
+
+    function toggleScreenshotOption() {
+        if (attachScreenshotCheckbox.checked) {
+            selectScreenshotBtn.disabled = false;
+        } else {
+            selectScreenshotBtn.disabled = true;
+            currentScreenshotPath = null;
+            screenshotFile.value = ''; // Clear the file input
+            screenshotFilenameLabel.textContent = '';
+        }
+    }
+
+    function handleScreenshotFile(event) {
+        const file = event.target.files[0];
+        if (file) {
+            currentScreenshotPath = file;
+            screenshotFilenameLabel.textContent = file.name;
+            showNotification(`Screenshot attached: ${file.name}`, "info");
+        } else {
+            currentScreenshotPath = null;
+            screenshotFilenameLabel.textContent = '';
+            showNotification("Screenshot attachment cancelled.", "info");
+        }
+    }
+
+    function resetForm() {
+        feedbackForm.reset();
+        updateFeedbackUI(); // Reset UI based on default selection
+        emailEntry.value = '';
+        feedbackText.value = getPlaceholderText();
+        feedbackText.style.color = 'grey';
+        attachScreenshotCheckbox.checked = false;
+        toggleScreenshotOption(); // Update screenshot button state
+        showNotification("Feedback form reset.", "info");
+    }
+
+    async function submitFeedback(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const feedback = feedbackText.value.trim();
+        if (feedback === "" || feedback.startsWith("Please describe")) {
+            showNotification("Please enter your feedback before submitting.", "warning");
+            return;
+        }
+
+        const email = emailEntry.value.trim();
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showNotification("Please enter a valid email address.", "warning");
+            return;
+        }
+
+        if (!confirm("Are you sure you want to submit this feedback?")) {
+            return;
+        }
+
+        submitFeedbackBtn.disabled = true;
+        submitFeedbackBtn.textContent = "Submitting...";
+        showNotification("Submitting feedback...", "info");
+
+        try {
+            const formData = new FormData();
+            formData.append('feedback_type', document.querySelector('input[name="feedback_type"]:checked').value);
+            formData.append('feedback_text', feedback);
+            formData.append('email', email);
+            
+            const ratingRadio = document.querySelector('input[name="rating"]:checked');
+            if (ratingRadio) {
+                formData.append('rating', ratingRadio.value);
+            }
+
+            if (attachScreenshotCheckbox.checked && currentScreenshotPath) {
+                formData.append('screenshot', currentScreenshotPath);
+            }
+
+            const response = await fetch('/feedback', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showNotification("Feedback submitted successfully. Thank you!", "success");
+                resetForm();
+            } else {
+                showNotification(`Failed to submit feedback: ${data.error}`, "error");
+            }
+        } catch (error) {
+            console.error("Error submitting feedback:", error);
+            showNotification("An unexpected error occurred during feedback submission.", "error");
+        } finally {
+            submitFeedbackBtn.disabled = false;
+            submitFeedbackBtn.textContent = "Submit Feedback";
+        }
+    }
+
+    // Initial UI update on page load
+    document.addEventListener('DOMContentLoaded', updateFeedbackUI);
+</script>
+{% endblock %}

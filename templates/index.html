@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{# Removed: {% set now = moment().current %} as 'moment' is not defined in this context #}
+
+{% block content %}
+<div class="relative w-full h-[calc(100vh-160px)] flex items-center justify-center overflow-hidden rounded-lg shadow-xl">
+    <img src="{{ url_for('static', filename='futuristic-technology-concept.jpg') }}" alt="Background" class="absolute inset-0 w-full h-full object-cover filter brightness-50">
+    <div class="absolute inset-0 bg-black opacity-25"></div> {# Semi-transparent overlay #}
+
+    <div class="relative z-10 text-center text-white p-6 rounded-lg">
+        <img src="{{ url_for('static', filename='icons8-chaff-48.png') }}" alt="Logo" class="h-24 w-24 mx-auto mb-4 rounded-full">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-2">Welcome to Crop Disease Diagnosis</h1>
+        <p class="text-lg md:text-xl font-light mb-8">AI-powered detection of plant leaf diseases</p>
+
+        <div class="flex flex-col space-y-4 max-w-sm mx-auto">
+            <a href="/diagnose" class="btn-primary py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:shadow-xl transition-all duration-300">Diagnose Crop</a>
+            <a href="/history" class="btn-primary py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:shadow-xl transition-all duration-300">View History</a>
+            <a href="/feedback" class="btn-primary py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:shadow-xl transition-all duration-300">Provide Feedback</a>
+            <a href="/help" class="btn-primary py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:shadow-xl transition-all duration-300">Help & Guide</a>
+            <a href="/about" class="btn-primary py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:shadow-xl transition-all duration-300">About</a>
+        </div>
+
+        <p class="mt-12 text-md italic opacity-80">Grow smarter &bull; Stay healthier</p>
+    </div>
+</div>
+{% endblock %}

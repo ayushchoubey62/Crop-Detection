@@ -1,0 +1,9 @@
+Flask
+tensorflow
+keras
+numpy
+Pillow
+fpdf
+opencv-python-headless
+werkzeug
+gunicorn

@@ -1,87 +1,109 @@
 {% extends "base.html" %}
-{% block content %}
-<div class="container mx-auto p-4 diagnosis-bg rounded-lg shadow-xl">
-    <h1 class="text-3xl font-bold mb-6 diagnosis-title">Diagnosis History</h1>
 
-    <!-- Filter and Sort Controls -->
+{% block content %}
+<div class="container mx-auto p-4 diagnosis-bg rounded-lg shadow-xl min-h-screen">
+    
+    <h1 class="text-3xl font-bold mb-6 diagnosis-title">{{ _('Diagnosis History') }}</h1>
+
     <div class="card p-4 mb-6 rounded-lg shadow-md flex flex-wrap items-center gap-4">
-        <h2 class="text-xl font-semibold section-title">Controls</h2>
+        <h2 class="text-xl font-semibold section-title">{{ _('Controls') }}</h2>
+        
         <div class="flex items-center space-x-2 ml-auto">
-            <label for="sortBy" class="text-gray-700 dark:text-gray-300">Sort by:</label>
-            <select id="sortBy" class="input-field p-2 rounded-md">
-                <option value="recent">Most Recent</option>
-                <option value="oldest">Oldest First</option>
-                <option value="highest_confidence">Highest Confidence</option>
-                <option value="lowest_confidence">Lowest Confidence</option>
+            <label for="sortBy" class="text-gray-700 dark:text-gray-300">{{ _('Sort by:') }}</label>
+            <select id="sortBy" onchange="applyFilters()" class="input-field p-2 rounded-md">
+                <option value="recent">{{ _('Most Recent') }}</option>
+                <option value="oldest">{{ _('Oldest First') }}</option>
+                <option value="highest_confidence">{{ _('Highest Confidence') }}</option>
+                <option value="lowest_confidence">{{ _('Lowest Confidence') }}</option>
             </select>
         </div>
+
         <div class="flex items-center space-x-2">
-            <label for="filterByCrop" class="text-gray-700 dark:text-gray-300">Filter by crop:</label>
-            <select id="filterByCrop" class="input-field p-2 rounded-md">
-                <option value="all">All Crops</option>
-                {% for label in class_labels.keys() %}
-                    {% set crop_type = label.split('_')[0] %}
-                    <option value="{{ crop_type | lower }}">{{ crop_type }}</option>
-                {% endfor %}
-            </select>
+            <label for="filterByCrop" class="text-gray-700 dark:text-gray-300">{{ _('Filter by crop:') }}</label>
+            <select id="filterByCrop" onchange="applyFilters()" class="input-field p-2 rounded-md">
+                <option value="all">{{ _('All Crops') }}</option>
+                </select>
         </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- History List -->
+        
         <div class="md:col-span-1 card p-4 rounded-lg shadow-md overflow-y-auto max-h-[600px]">
-            <h2 class="text-xl font-semibold mb-4 section-title">Recent Diagnoses</h2>
+            <h2 class="text-xl font-semibold mb-4 section-title">{{ _('Recent Diagnoses') }}</h2>
             <ul id="historyList" class="space-y-2">
-                {% if history %}
-                    {% for item in history %}
-                        <li class="history-item p-3 rounded-md cursor-pointer hover:bg-primary/20 transition-colors duration-200"
-                            data-filename="{{ item.image_path.split('/')[-1] if item.image_path else '' }}"
-                            data-timestamp="{{ item.timestamp }}"
-                            data-crop="{{ item.diagnosis.crop_type | lower }}"
-                            data-confidence="{{ item.diagnosis.confidence | replace('%', '') | float }}"
-                        >
-                            <p class="font-semibold text-lg">{{ item.diagnosis.crop_type }} - {{ item.diagnosis.disease_name }}</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ item.timestamp }}</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Confidence: {{ item.diagnosis.confidence }}</p>
-                        </li>
-                    {% endfor %}
-                {% else %}
-                    <p class="text-gray-500 dark:text-gray-400">No diagnosis history yet.</p>
-                {% endif %}
+                <p class="text-center text-gray-500 mt-4">{{ _('Loading history...') }}</p>
             </ul>
         </div>
 
-        <!-- Diagnosis Details -->
         <div class="md:col-span-2 card p-4 rounded-lg shadow-md flex flex-col">
-            <h2 class="text-xl font-semibold mb-4 section-title">Diagnosis Details</h2>
+            <h2 class="text-xl font-semibold mb-4 section-title">{{ _('Diagnosis Details') }}</h2>
+            
             <div id="detailContent" class="flex-grow">
-                <div id="detailImageContainer" class="mb-4 flex justify-center items-center bg-gray-100 dark:bg-gray-800 rounded-md p-2" style="min-height: 200px;">
-                    <img id="detailImage" src="" alt="Diagnosis Image" class="max-w-full max-h-64 object-contain rounded-md" style="display: none;">
-                    <p id="noDetailImageText" class="text-gray-500 dark:text-gray-400">Select an item to see details</p>
+                <div id="detailImageContainer" class="mb-4 flex justify-center items-center bg-gray-100 dark:bg-gray-800 rounded-md p-2 relative" style="min-height: 250px;">
+                    <img id="detailImage" src="" alt="Diagnosis Image" class="max-w-full max-h-64 object-contain rounded-md" style="display: none;" onerror="handleImageError(this)">
+                    
+                    <div id="noDetailImageText" class="text-gray-500 dark:text-gray-400 flex flex-col items-center">
+                        <svg class="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span>{{ _('Select an item to view details') }}</span>
+                    </div>
                 </div>
-                <div id="detailText" class="p-4 border rounded-md overflow-y-auto text-area-bg text-gray-800 dark:text-gray-200" style="min-height: 250px;">
-                    <p>Select a diagnosis from the list to view its details.</p>
+
+                <div id="detailText" class="p-4 border border-gray-200 dark:border-gray-600 rounded-md overflow-y-auto text-area-bg text-gray-800 dark:text-gray-200" style="min-height: 250px;">
+                    <p class="text-center text-gray-500 mt-10">{{ _('Select an item to view details') }}</p>
                 </div>
             </div>
+
             <div class="flex flex-wrap justify-end gap-2 mt-4">
-                <button id="viewImageBtn" class="btn-primary px-4 py-2 rounded-md" disabled>View Full Image</button>
-                <button id="reDiagnoseBtn" class="btn-primary px-4 py-2 rounded-md" disabled>Re-diagnose</button>
-                <button id="deleteSelectedBtn" class="btn-primary px-4 py-2 rounded-md" disabled>Delete Selected</button>
+                <button id="viewImageBtn" class="btn-primary px-4 py-2 rounded-md transition-colors" disabled>{{ _('View Full Image') }}</button>
+                <button id="reDiagnoseBtn" class="btn-primary px-4 py-2 rounded-md transition-colors" disabled>{{ _('Re-diagnose') }}</button>
+                <button id="deleteSelectedBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors" disabled>{{ _('Delete Selected') }}</button>
             </div>
         </div>
     </div>
 
-    <!-- Global History Management Buttons -->
     <div class="flex flex-wrap justify-center gap-4 mt-6">
-        <button id="exportAllHistoryBtn" class="btn-primary px-6 py-2 rounded-md">Export All History</button>
+        <button onclick="exportAllHistory()" class="btn-primary px-6 py-2 rounded-md shadow hover:opacity-90">{{ _('Export All History') }}</button>
+        
         <input type="file" id="importHistoryFile" accept=".json" class="hidden" onchange="handleImportHistory(event)">
-        <button onclick="document.getElementById('importHistoryFile').click()" class="btn-primary px-6 py-2 rounded-md">Import History</button>
-        <button id="clearAllHistoryBtn" class="btn-primary px-6 py-2 rounded-md">Clear All History</button>
-        <a href="/" class="btn-primary px-6 py-2 rounded-md">Back to Home</a>
+        <button onclick="document.getElementById('importHistoryFile').click()" class="btn-primary px-6 py-2 rounded-md shadow hover:opacity-90">{{ _('Import History') }}</button>
+        
+        <button onclick="clearAllHistory()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md shadow hover:opacity-90">{{ _('Clear All History') }}</button>
+        
+        <a href="/" class="btn-primary px-6 py-2 rounded-md shadow hover:opacity-90 no-underline">{{ _('Back to Home') }}</a>
     </div>
 </div>
 
 <script>
+    // --- 1. INJECT SERVER DATA SAFELY (Fixed Slash Issue) ---
+    const serverHistory = [
+        {% if history %}
+            {% for item in history %}
+            {
+                source: 'server',
+                // Use filename as ID if available, otherwise random
+                id: "{{ item.image_path.replace('\\', '/').split('/')[-1] if item.image_path else 'unknown_' ~ loop.index }}",
+                timestamp: "{{ item.timestamp }}",
+                result: {
+                    crop_type: "{{ item.diagnosis.get('crop_type', 'Unknown') }}",
+                    disease_name: "{{ item.diagnosis.get('disease_name', 'Unknown') }}",
+                    confidence: "{{ item.diagnosis.get('confidence', '0%') }}"
+                },
+                // CRITICAL FIX: Normalize backslashes to forward slashes before splitting
+                image_filename: "{{ item.image_path.replace('\\', '/').split('/')[-1] if item.image_path else '' }}",
+                
+                info: {
+                    description: {{ item.get('info', {}).get('description', 'No description available.') | tojson }},
+                    symptoms: {{ item.get('info', {}).get('symptoms', 'No symptoms available.') | tojson }}
+                },
+                treatments: {{ item.get('treatment_suggestions', []) | tojson }}
+            },
+            {% endfor %}
+        {% endif %}
+    ];
+</script>
+
+<script>
+    // DOM Elements
     const historyList = document.getElementById('historyList');
     const detailImage = document.getElementById('detailImage');
     const noDetailImageText = document.getElementById('noDetailImageText');
@@ -89,290 +111,348 @@
     const viewImageBtn = document.getElementById('viewImageBtn');
     const reDiagnoseBtn = document.getElementById('reDiagnoseBtn');
     const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
-    const sortBySelect = document.getElementById('sortBy');
-    const filterByCropSelect = document.getElementById('filterByCrop');
-    const exportAllHistoryBtn = document.getElementById('exportAllHistoryBtn');
-    const clearAllHistoryBtn = document.getElementById('clearAllHistoryBtn');
+    const filterSelect = document.getElementById('filterByCrop');
+    const sortSelect = document.getElementById('sortBy');
 
-    let selectedHistoryItem = null; // Stores the full data of the selected item
+    let allHistoryData = [];
+    let selectedItem = null;
 
-    // Event Listeners for sorting and filtering
-    sortBySelect.addEventListener('change', refreshHistoryDisplay);
-    filterByCropSelect.addEventListener('change', refreshHistoryDisplay);
-
-    historyList.addEventListener('click', async (event) => {
-        const listItem = event.target.closest('.history-item');
-        if (listItem) {
-            // Remove 'selected' class from previously selected item
-            const currentSelected = historyList.querySelector('.history-item.bg-primary\\/30');
-            if (currentSelected) {
-                currentSelected.classList.remove('bg-primary/30', 'dark:bg-primary/40');
-            }
-            // Add 'selected' class to the clicked item
-            listItem.classList.add('bg-primary/30', 'dark:bg-primary/40');
-
-            const filename = listItem.dataset.filename;
-            await fetchHistoryDetails(filename);
-        }
-    });
-
-    async function fetchHistoryDetails(filename) {
-        try {
-            const response = await fetch(`/get_history_details/${filename}`);
-            const data = await response.json();
-
-            if (data.success) {
-                selectedHistoryItem = data; // Store full data
-                displayDetails(data);
-                enableDetailButtons(data);
-            } else {
-                showNotification(`Error fetching details: ${data.error}`, 'error');
-                clearDetailDisplay();
-            }
-        } catch (error) {
-            console.error("Error fetching history details:", error);
-            showNotification("Failed to load history details.", "error");
-            clearDetailDisplay();
-        }
+    // --- Helper: Handle Missing Images ---
+    function handleImageError(img) {
+        img.style.display = 'none';
+        document.getElementById('noDetailImageText').style.display = 'flex';
+        document.getElementById('noDetailImageText').querySelector('span').textContent = "Image File Not Found";
     }
 
-    function displayDetails(data) {
-        const diagnosis = data.details;
-        const info = data.info;
-        const treatments = data.treatment_suggestions;
-        const imageUrl = data.image_url;
+    // --- 2. INITIALIZE & MERGE DATA ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // A. Load Offline Data
+        const localData = JSON.parse(localStorage.getItem('crop_diagnosis_history') || '[]');
+        localData.forEach((item, index) => {
+            item.source = 'local';
+            if(!item.id) item.id = `local_${index}_${Date.now()}`;
+        });
 
-        // Display image
-        if (imageUrl) {
-            detailImage.src = imageUrl;
+        // B. Merge with Server Data
+        allHistoryData = [...serverHistory, ...localData];
+
+        // C. Default Sort (Newest First)
+        allHistoryData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+        // D. Render
+        renderList(allHistoryData);
+        populateFilter();
+    });
+
+    // --- 3. RENDER LIST (Left Side) ---
+    function renderList(data) {
+        historyList.innerHTML = '';
+        if (data.length === 0) {
+            historyList.innerHTML = '<p class="text-center text-gray-500 mt-10">No history records found.</p>';
+            return;
+        }
+
+        data.forEach(item => {
+            const li = document.createElement('li');
+            // Old UI Style Classes
+            li.className = "history-item p-3 rounded-md cursor-pointer hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors duration-200 border-b border-gray-100 dark:border-gray-700";
+            li.onclick = () => displayDetails(item, li);
+
+            const isHealthy = item.result.disease_name.toLowerCase().includes('healthy');
+            const icon = isHealthy ? '🌿' : '⚠️';
+            const sourceIcon = item.source === 'server' ? '☁️' : '💾';
+            
+            li.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="font-semibold text-lg text-gray-800 dark:text-gray-200">${item.result.crop_type} - ${item.result.disease_name}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            ${new Date(item.timestamp).toLocaleString()} &nbsp;|&nbsp; ${sourceIcon}
+                        </p>
+                    </div>
+                    <span class="text-xl">${icon}</span>
+                </div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">Confidence: ${item.result.confidence}</p>
+            `;
+            historyList.appendChild(li);
+        });
+    }
+
+    // --- 4. DISPLAY DETAILS (Right Side - New Design) ---
+    function displayDetails(item, element) {
+        selectedItem = item;
+
+        // Visual Highlight Logic
+        document.querySelectorAll('.history-item').forEach(el => {
+            el.classList.remove('bg-purple-200', 'dark:bg-purple-900', 'border-l-4', 'border-purple-600');
+        });
+        element.classList.add('bg-purple-200', 'dark:bg-purple-900', 'border-l-4', 'border-purple-600');
+
+        // --- SMART IMAGE LOGIC ---
+        let imgSrc = null;
+        if (item.source === 'local' && item.image_data) {
+            imgSrc = item.image_data; // Base64 for offline
+        } else if (item.image_url) {
+            imgSrc = item.image_url; // Direct URL
+        } else if (item.image_filename) {
+            // Correctly build path from filename extracted by Python
+            imgSrc = `/static/uploads/${item.image_filename}`;
+        }
+
+        if (imgSrc) {
+            detailImage.src = imgSrc;
             detailImage.style.display = 'block';
             noDetailImageText.style.display = 'none';
         } else {
-            detailImage.src = '';
             detailImage.style.display = 'none';
-            noDetailImageText.style.display = 'block';
+            noDetailImageText.style.display = 'flex';
         }
 
-        // Display text details
-        let html = `
-            <h3 class="text-xl font-bold mb-2 text-primary">DIAGNOSIS DETAILS</h3>
-            <p><strong>Crop Type:</strong> ${diagnosis.crop_type}</p>
-            <p><strong>Disease:</strong> ${diagnosis.disease_name} ${diagnosis.disease_name.toLowerCase().includes('healthy') ? '✅' : '⚠️'}</p>
-            <p><strong>Confidence:</strong> <span class="${getConfidenceColorClass(diagnosis.confidence)}">${diagnosis.confidence}</span></p>
-            <p><strong>Date:</strong> ${selectedHistoryItem.timestamp}</p>
-            <p><strong>Image File:</strong> ${selectedHistoryItem.image_path ? selectedHistoryItem.image_path.split('/').pop() : 'N/A'}</p>
-            <hr class="my-4 border-gray-300 dark:border-gray-600">
+        // --- NEW RESULT DESIGN HTML ---
+        const badgeColor = parseFloat(item.result.confidence) > 75 ? 'text-green-600 bg-green-100 dark:bg-green-900 dark:text-green-300' : 'text-orange-600 bg-orange-100 dark:bg-orange-900 dark:text-orange-300';
+        
+        // [NEW CODE TO PASTE]
+        const treatments = item.treatments && item.treatments.length > 0 
+            ? item.treatments.map(t => {
+                // Handle both old format (string) and new format (object with link)
+                let text = t.text || t;
+                let link = t.link || "";
+                // Tailwind styling added for consistency
+                let linkTag = link ? ` <a href="${link}" target="_blank" class="ml-1 text-blue-600 hover:underline text-xs font-bold">(Buy Here)</a>` : "";
+        
+                return `<li class="flex items-start mb-2 text-sm text-gray-700 dark:text-gray-300">
+                            <span class="text-green-500 mr-2 flex-shrink-0">✓</span>
+                            <span>${text}${linkTag}</span>
+                        </li>`;
+            }).join('') 
+            : '<li class="text-gray-500 italic text-sm">No specific treatments available.</li>';
 
-            <h3 class="text-xl font-bold mb-2 text-primary">Disease Information</h3>
-            <p><strong>Description:</strong> ${info.description}</p>
-            <p class="mt-2"><strong>Symptoms:</strong> ${info.symptoms}</p>
-            <hr class="my-4 border-gray-300 dark:border-gray-600">
+        detailText.innerHTML = `
+            <div class="animate-enter">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white">${item.result.disease_name}</h3>
+                        <span class="inline-block px-3 py-1 mt-2 rounded-full text-xs font-bold ${badgeColor}">
+                            Confidence: ${item.result.confidence}
+                        </span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-gray-500 dark:text-gray-400 block">${new Date(item.timestamp).toLocaleDateString()}</span>
+                        <span class="text-xs font-bold text-purple-600 block mt-1">${item.source.toUpperCase()}</span>
+                    </div>
+                </div>
 
-            <h3 class="text-xl font-bold mb-2 text-primary">Treatment Suggestions</h3>
-            <ul class="list-disc pl-5">
+                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-100 dark:border-gray-600 mb-6">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 dark:text-gray-300 font-medium">Crop Type:</span>
+                        <span class="font-bold text-gray-800 dark:text-white">${item.result.crop_type}</span>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="flex items-center text-lg font-bold text-blue-600 dark:text-blue-400 mb-2">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        About this Condition
+                    </h4>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border-l-4 border-blue-500 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                        ${item.info.description || 'No description available.'}
+                        <div class="mt-3 font-semibold text-blue-700 dark:text-blue-300">Symptoms:</div>
+                        <div>${item.info.symptoms || 'N/A'}</div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="flex items-center text-lg font-bold text-green-600 dark:text-green-400 mb-2">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Recommended Action
+                    </h4>
+                    <ul class="text-sm text-gray-700 dark:text-gray-300 list-none pl-1">
+                        ${treatments}
+                    </ul>
+                </div>
+            </div>
         `;
-        if (treatments && treatments.length > 0) {
-            treatments.forEach(s => {
-                html += `<li>${s}</li>`;
-            });
-        } else {
-            html += `<li>No specific treatment suggestions available.</li>`;
-        }
-        html += `</ul>`;
 
-        detailText.innerHTML = html;
-    }
-
-    function getConfidenceColorClass(confidence) {
-        const confVal = parseFloat(confidence.replace('%', ''));
-        if (confVal > 75) return 'text-green-500 font-semibold';
-        if (confVal > 50) return 'text-orange-500 font-semibold';
-        return 'text-red-500 font-semibold';
-    }
-
-    function enableDetailButtons(data) {
-        viewImageBtn.disabled = !(data.image_url);
-        reDiagnoseBtn.disabled = !(data.image_url);
+        // Enable buttons
+        viewImageBtn.disabled = false;
+        reDiagnoseBtn.disabled = false;
         deleteSelectedBtn.disabled = false;
     }
 
-    function clearDetailDisplay() {
-        selectedHistoryItem = null;
-        detailImage.src = '';
-        detailImage.style.display = 'none';
-        noDetailImageText.style.display = 'block';
-        detailText.innerHTML = '<p>Select a diagnosis from the list to view its details.</p>';
-        viewImageBtn.disabled = true;
-        reDiagnoseBtn.disabled = true;
-        deleteSelectedBtn.disabled = true;
+    // --- 5. FILTERS & SORTING ---
+    function populateFilter() {
+        filterSelect.innerHTML = '<option value="all">All Crops</option>';
+        const crops = new Set();
+        allHistoryData.forEach(item => crops.add(item.result.crop_type));
+        
+        Array.from(crops).sort().forEach(crop => {
+            const opt = document.createElement('option');
+            opt.value = crop;
+            opt.textContent = crop;
+            filterSelect.appendChild(opt);
+        });
     }
 
-    viewImageBtn.addEventListener('click', () => {
-        if (selectedHistoryItem && selectedHistoryItem.image_url) {
-            window.open(selectedHistoryItem.image_url, '_blank');
-            showNotification("Opening full image.", "info");
-        } else {
-            showNotification("No image available for this record.", "warning");
-        }
-    });
+    function applyFilters() {
+        const crop = filterSelect.value;
+        const sort = sortSelect.value;
 
-    reDiagnoseBtn.addEventListener('click', () => {
-        if (selectedHistoryItem && selectedHistoryItem.image_url) {
-            // Redirect to diagnose page with image filename as query parameter
-            const filename = selectedHistoryItem.image_url.split('/').pop();
-            window.location.href = `/diagnose?image=${filename}`;
-        } else {
-            showNotification("No image available to re-diagnose.", "warning");
-        }
-    });
-
-    deleteSelectedBtn.addEventListener('click', async () => {
-        if (selectedHistoryItem) {
-            if (confirm("Are you sure you want to delete this diagnosis record?")) {
-                try {
-                    const filename = selectedHistoryItem.image_url.split('/').pop();
-                    const response = await fetch(`/delete_history_item/${filename}`, { method: 'POST' });
-                    const data = await response.json();
-                    if (data.success) {
-                        showNotification("Record deleted successfully.", "success");
-                        refreshHistoryDisplay();
-                        clearDetailDisplay();
-                    } else {
-                        showNotification(`Error deleting record: ${data.message}`, 'error');
-                    }
-                } catch (error) {
-                    console.error("Error deleting history item:", error);
-                    showNotification("Failed to delete record.", "error");
-                }
-            }
-        } else {
-            showNotification("No item selected to delete.", "warning");
-        }
-    });
-
-    clearAllHistoryBtn.addEventListener('click', async () => {
-        if (confirm("Are you sure you want to clear ALL diagnosis history? This action cannot be undone.")) {
-            try {
-                const response = await fetch('/clear_all_history', { method: 'POST' });
-                const data = await response.json();
-                if (data.success) {
-                    showNotification("All history cleared successfully.", "success");
-                    refreshHistoryDisplay();
-                    clearDetailDisplay();
-                } else {
-                    showNotification(`Error clearing history: ${data.message}`, 'error');
-                }
-            } catch (error) {
-                    console.error("Error clearing all history:", error);
-                    showNotification("Failed to clear all history.", "error");
-                }
-            }
+        let filtered = allHistoryData.filter(item => {
+            return crop === 'all' || item.result.crop_type === crop;
         });
 
-    exportAllHistoryBtn.addEventListener('click', async () => {
-        try {
-            const response = await fetch('/export_all_history');
-            if (response.ok) {
-                const blob = await response.blob();
-                const contentDisposition = response.headers.get('Content-Disposition');
-                let filename = 'crop_diagnosis_history.json';
-                if (contentDisposition && contentDisposition.indexOf('filename=') !== -1) {
-                    filename = contentDisposition.split('filename=')[1].split(';')[0].replace(/"/g, '');
-                }
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                showNotification("All history exported successfully!", "success");
-            } else {
-                const errorData = await response.json();
-                showNotification(`Failed to export history: ${errorData.error}`, "error");
-            }
-        } catch (error) {
-            console.error("Error exporting all history:", error);
-            showNotification("An error occurred while exporting history.", "error");
+        filtered.sort((a, b) => {
+            const dateA = new Date(a.timestamp);
+            const dateB = new Date(b.timestamp);
+            const confA = parseFloat(a.result.confidence);
+            const confB = parseFloat(b.result.confidence);
+
+            if (sort === 'recent') return dateB - dateA;
+            if (sort === 'oldest') return dateA - dateB;
+            if (sort === 'highest_confidence') return confB - confA;
+            if (sort === 'lowest_confidence') return confA - confB;
+        });
+
+        renderList(filtered);
+    }
+
+    // --- 6. BUTTON ACTIONS ---
+    
+    viewImageBtn.onclick = () => {
+        if(detailImage.src && detailImage.style.display !== 'none') {
+            const w = window.open("");
+            w.document.write(`<img src="${detailImage.src}" style="max-width:100%; display:block; margin:auto;">`);
+        } else {
+            showNotification("No image to view.", "warning");
         }
-    });
+    };
+
+    reDiagnoseBtn.onclick = () => {
+        // If image is on server, we can pass filename. Otherwise just go to diagnose page.
+        if (selectedItem && selectedItem.image_filename) {
+            window.location.href = `/diagnose?image=${selectedItem.image_filename}`;
+        } else {
+            window.location.href = '/diagnose';
+        }
+    };
+
+    deleteSelectedBtn.onclick = async () => {
+        if(!selectedItem) return;
+        if(!confirm("Are you sure you want to delete this record?")) return;
+
+        try {
+            // A. Local Deletion
+            if(selectedItem.source === 'local') {
+                const localData = JSON.parse(localStorage.getItem('crop_diagnosis_history') || '[]');
+                const newLocal = localData.filter(i => new Date(i.timestamp).getTime() !== new Date(selectedItem.timestamp).getTime());
+                localStorage.setItem('crop_diagnosis_history', JSON.stringify(newLocal));
+            } 
+            // B. Server Deletion
+            else if(selectedItem.source === 'server') {
+                 // Use filename from path
+                 const filename = selectedItem.image_filename;
+                 const response = await fetch(`/delete_history_item/${filename}`, { method: 'POST' });
+                 const resData = await response.json();
+                 if(!resData.success) {
+                     showNotification("Server delete failed: " + resData.message, 'error');
+                     return;
+                 }
+            }
+
+            // Remove from UI array
+            allHistoryData = allHistoryData.filter(i => i !== selectedItem);
+            applyFilters();
+            
+            // Reset Detail View
+            detailImage.style.display = 'none';
+            document.getElementById('noDetailImageText').style.display = 'flex';
+            detailText.innerHTML = '<p class="text-center text-gray-500 mt-10">Select an item...</p>';
+            viewImageBtn.disabled = true; reDiagnoseBtn.disabled = true; deleteSelectedBtn.disabled = true;
+
+            showNotification("Record deleted successfully.", "success");
+
+        } catch (e) {
+            console.error(e);
+            showNotification("Error deleting record.", "error");
+        }
+    };
+    
+    // --- 7. GLOBAL ACTIONS ---
+    
+    function exportAllHistory() {
+        if(allHistoryData.length === 0) {
+            showNotification("No history to export", "warning");
+            return;
+        }
+        
+        // Create a filename with the current date (e.g., crop_history_2025-01-07.json)
+        const dateStr = new Date().toISOString().split('T')[0];
+        const filename = `crop_history_${dateStr}.json`;
+
+        const blob = new Blob([JSON.stringify(allHistoryData, null, 2)], {type: "application/json"});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename; // <--- Updated line
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        showNotification("Export successful!", "success");
+    }
 
     function handleImportHistory(event) {
         const file = event.target.files[0];
-        if (!file) return;
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if(Array.isArray(imported)) {
+                    // --- FIX: Normalize the data keys ---
+                    const normalizedData = imported.map(item => {
+                        // If item has 'image_path' (from server export) but no 'image_filename', fix it
+                        if (item.image_path && !item.image_filename) {
+                            item.image_filename = item.image_path;
+                        }
+                        return item;
+                    });
 
-        if (confirm("Do you want to append this history to your existing history? Click Cancel to overwrite existing history.")) {
-            importHistory(file, false); // Append
-        } else {
-            importHistory(file, true); // Overwrite
+                    const currentLocal = JSON.parse(localStorage.getItem('crop_diagnosis_history') || '[]');
+                    const newLocal = [...currentLocal, ...normalizedData];
+                    localStorage.setItem('crop_diagnosis_history', JSON.stringify(newLocal));
+                    
+                    showNotification("Import successful! Reloading...", "success");
+                    setTimeout(() => window.location.reload(), 1000);
+                }
+            } catch(err) {
+                console.error(err);
+                showNotification("Invalid JSON File", "error");
+            }
+        };
+        reader.readAsText(file);
+    }
+    
+    async function clearAllHistory() {
+        if(confirm("Clear ALL history? This removes both Local and Server records.")) {
+            // 1. Clear Local
+            localStorage.removeItem('crop_diagnosis_history');
+
+            // 2. Clear Server (Fire and forget, or wait)
+            try {
+                await fetch('/clear_all_history', { method: 'POST' });
+            } catch(e) {
+                console.log("Server clear warning:", e);
+            }
+
+            window.location.reload();
         }
     }
-
-    async function importHistory(file, overwrite) {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('overwrite', overwrite);
-
-        try {
-            const response = await fetch('/import_history', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await response.json();
-            if (data.success) {
-                showNotification(data.message, "success");
-                refreshHistoryDisplay();
-                clearDetailDisplay();
-            } else {
-                showNotification(`Import failed: ${data.error}`, "error");
-            }
-        } catch (error) {
-            console.error("Error importing history:", error);
-            showNotification("An error occurred during import.", "error");
-        }
-    }
-
-    function refreshHistoryDisplay() {
-        const historyItems = Array.from(document.querySelectorAll('#historyList .history-item'));
-        
-        // Filter
-        const filterCrop = filterByCropSelect.value;
-        historyItems.forEach(item => {
-            const itemCrop = item.dataset.crop;
-            if (filterCrop === 'all' || itemCrop === filterCrop) {
-                item.style.display = '';
-            } else {
-                item.style.display = 'none';
-            }
-        });
-
-        // Sort
-        const sortBy = sortBySelect.value;
-        const sortedItems = Array.from(historyList.children).filter(item => item.style.display !== 'none'); // Only sort visible items
-
-        sortedItems.sort((a, b) => {
-            if (sortBy === 'recent') {
-                return new Date(b.dataset.timestamp) - new Date(a.dataset.timestamp);
-            } else if (sortBy === 'oldest') {
-                return new Date(a.dataset.timestamp) - new Date(b.dataset.timestamp);
-            } else if (sortBy === 'highest_confidence') {
-                return parseFloat(b.dataset.confidence) - parseFloat(a.dataset.confidence);
-            } else if (sortBy === 'lowest_confidence') {
-                return parseFloat(a.dataset.confidence) - parseFloat(b.dataset.confidence);
-            }
-            return 0;
-        });
-
-        historyList.innerHTML = ''; // Clear current list
-        sortedItems.forEach(item => historyList.appendChild(item)); // Re-add sorted items
-        
-        if (historyList.children.length === 0) {
-            historyList.innerHTML = '<p class="text-gray-500 dark:text-gray-400">No diagnosis history yet.</p>';
-        }
-    }
-
-    // Initial refresh on page load
-    document.addEventListener('DOMContentLoaded', refreshHistoryDisplay);
 </script>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-enter { animation: fadeIn 0.3s ease-out forwards; }
+</style>
 {% endblock %}

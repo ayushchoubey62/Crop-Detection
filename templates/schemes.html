@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Government Schemes{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    
+    <div class="text-center mb-10">
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">{{ _('Government Schemes & Subsidies') }}</h1>
+        <p class="text-gray-600 dark:text-gray-400">{{ _('Find financial aid, insurance, and subsidies tailored for you.') }}</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md mb-8 border border-gray-100 dark:border-gray-700">
+        <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('State') }}</label>
+                <select name="state" class="w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                    <option value="All" {% if selected_state == 'All' %}selected{% endif %}>{{ _('All India') }}</option>
+
+                    <option value="Andhra Pradesh" {% if selected_state == 'Andhra Pradesh' %}selected{% endif %}>{{ _('Andhra Pradesh') }}</option>
+                    <option value="Arunachal Pradesh" {% if selected_state == 'Arunachal Pradesh' %}selected{% endif %}>{{ _('Arunachal Pradesh') }}</option>
+                    <option value="Assam" {% if selected_state == 'Assam' %}selected{% endif %}>{{ _('Assam') }}</option>
+                    <option value="Bihar" {% if selected_state == 'Bihar' %}selected{% endif %}>{{ _('Bihar') }}</option>
+                    <option value="Chhattisgarh" {% if selected_state == 'Chhattisgarh' %}selected{% endif %}>{{ _('Chhattisgarh') }}</option>
+                    <option value="Goa" {% if selected_state == 'Goa' %}selected{% endif %}>{{ _('Goa') }}</option>
+                    <option value="Gujarat" {% if selected_state == 'Gujarat' %}selected{% endif %}>{{ _('Gujarat') }}</option>
+                    <option value="Haryana" {% if selected_state == 'Haryana' %}selected{% endif %}>{{ _('Haryana') }}</option>
+                    <option value="Himachal Pradesh" {% if selected_state == 'Himachal Pradesh' %}selected{% endif %}>{{ _('Himachal Pradesh') }}</option>
+                    <option value="Jharkhand" {% if selected_state == 'Jharkhand' %}selected{% endif %}>{{ _('Jharkhand') }}</option>
+                    <option value="Karnataka" {% if selected_state == 'Karnataka' %}selected{% endif %}>{{ _('Karnataka') }}</option>
+                    <option value="Kerala" {% if selected_state == 'Kerala' %}selected{% endif %}>{{ _('Kerala') }}</option>
+                    <option value="Madhya Pradesh" {% if selected_state == 'Madhya Pradesh' %}selected{% endif %}>{{ _('Madhya Pradesh') }}</option>
+                    <option value="Maharashtra" {% if selected_state == 'Maharashtra' %}selected{% endif %}>{{ _('Maharashtra') }}</option>
+                    <option value="Manipur" {% if selected_state == 'Manipur' %}selected{% endif %}>{{ _('Manipur') }}</option>
+                    <option value="Meghalaya" {% if selected_state == 'Meghalaya' %}selected{% endif %}>{{ _('Meghalaya') }}</option>
+                    <option value="Mizoram" {% if selected_state == 'Mizoram' %}selected{% endif %}>{{ _('Mizoram') }}</option>
+                    <option value="Nagaland" {% if selected_state == 'Nagaland' %}selected{% endif %}>{{ _('Nagaland') }}</option>
+                    <option value="Odisha" {% if selected_state == 'Odisha' %}selected{% endif %}>{{ _('Odisha') }}</option>
+                    <option value="Punjab" {% if selected_state == 'Punjab' %}selected{% endif %}>{{ _('Punjab') }}</option>
+                    <option value="Rajasthan" {% if selected_state == 'Rajasthan' %}selected{% endif %}>{{ _('Rajasthan') }}</option>
+                    <option value="Sikkim" {% if selected_state == 'Sikkim' %}selected{% endif %}>{{ _('Sikkim') }}</option>
+                    <option value="Tamil Nadu" {% if selected_state == 'Tamil Nadu' %}selected{% endif %}>{{ _('Tamil Nadu') }}</option>
+                    <option value="Telangana" {% if selected_state == 'Telangana' %}selected{% endif %}>{{ _('Telangana') }}</option>
+                    <option value="Tripura" {% if selected_state == 'Tripura' %}selected{% endif %}>{{ _('Tripura') }}</option>
+                    <option value="Uttar Pradesh" {% if selected_state == 'Uttar Pradesh' %}selected{% endif %}>{{ _('Uttar Pradesh') }}</option>
+                    <option value="Uttarakhand" {% if selected_state == 'Uttarakhand' %}selected{% endif %}>{{ _('Uttarakhand') }}</option>
+                    <option value="West Bengal" {% if selected_state == 'West Bengal' %}selected{% endif %}>{{ _('West Bengal') }}</option>
+
+                    <option value="Andaman and Nicobar Islands" {% if selected_state == 'Andaman and Nicobar Islands' %}selected{% endif %}>{{ _('Andaman & Nicobar Islands') }}</option>
+                    <option value="Chandigarh" {% if selected_state == 'Chandigarh' %}selected{% endif %}>{{ _('Chandigarh') }}</option>
+                    <option value="Dadra and Nagar Haveli" {% if selected_state == 'Dadra and Nagar Haveli' %}selected{% endif %}>{{ _('Dadra & Nagar Haveli and Daman & Diu') }}</option>
+                    <option value="Delhi" {% if selected_state == 'Delhi' %}selected{% endif %}>{{ _('Delhi') }}</option>
+                    <option value="Jammu and Kashmir" {% if selected_state == 'Jammu and Kashmir' %}selected{% endif %}>{{ _('Jammu & Kashmir') }}</option>
+                    <option value="Ladakh" {% if selected_state == 'Ladakh' %}selected{% endif %}>{{ _('Ladakh') }}</option>
+                    <option value="Lakshadweep" {% if selected_state == 'Lakshadweep' %}selected{% endif %}>{{ _('Lakshadweep') }}</option>
+                    <option value="Puducherry" {% if selected_state == 'Puducherry' %}selected{% endif %}>{{ _('Puducherry') }}</option>
+                    
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Crop Type') }}</label>
+                <select name="crop" class="w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                    <option value="All" {% if selected_crop == 'All' %}selected{% endif %}>{{ _('All Crops') }}</option>
+
+                    <option value="Apple" {% if selected_crop == 'Apple' %}selected{% endif %}>{{ _('Apple') }}</option>
+                    <option value="Corn" {% if selected_crop == 'Corn' %}selected{% endif %}>{{ _('Corn (Maize)') }}</option>
+                    <option value="Grape" {% if selected_crop == 'Grape' %}selected{% endif %}>{{ _('Grape') }}</option>
+                    <option value="Potato" {% if selected_crop == 'Potato' %}selected{% endif %}>{{ _('Potato') }}</option>
+                    <option value="Tomato" {% if selected_crop == 'Tomato' %}selected{% endif %}>{{ _('Tomato') }}</option>
+                    <option value="Soybean" {% if selected_crop == 'Soybean' %}selected{% endif %}>{{ _('Soybean') }}</option>
+                    <option value="Orange" {% if selected_crop == 'Orange' %}selected{% endif %}>{{ _('Orange') }}</option>
+                    <option value="Strawberry" {% if selected_crop == 'Strawberry' %}selected{% endif %}>{{ _('Strawberry') }}</option>
+                </select>
+            </div>
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition">
+                {{ _('Find Schemes') }}
+            </button>
+        </form>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        {% for scheme in schemes %}
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition duration-300 overflow-hidden border-l-4 
+            {% if scheme.is_expired %}border-red-500{% elif scheme.is_urgent %}border-orange-500{% else %}border-green-500{% endif %}">
+            
+            <div class="p-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            {{ scheme.ministry }}
+                        </span>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mt-1">{{ scheme.name }}</h3>
+                    </div>
+                    {% if scheme.is_expired %}
+                        <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-bold">{{ _('Expired') }}</span>
+                    {% elif scheme.is_urgent %}
+                        <span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full font-bold animate-pulse">{{ _('Ending Soon') }}</span>
+                    {% else %}
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-bold">{{ _('Active') }}</span>
+                    {% endif %}
+                </div>
+
+                <p class="text-gray-600 dark:text-gray-300 mt-3 text-sm">
+                    {{ scheme.description }}
+                </p>
+
+                <div class="mt-4 bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                    <p class="text-green-700 dark:text-green-400 font-semibold text-sm">
+                        💰 {{ _('Benefit') }}: {{ scheme.benefit }}
+                    </p>
+                </div>
+
+                <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <div class="text-sm">
+                        <p class="text-gray-500 dark:text-gray-400">{{ _('Deadline') }}</p>
+                        {% if scheme.is_expired %}
+                            <p class="font-bold text-red-500">{{ scheme.deadline }}</p>
+                        {% elif scheme.is_urgent %}
+                            <p class="font-bold text-orange-500">{{ scheme.deadline }} ({{ scheme.days_left }} days left)</p>
+                        {% else %}
+                            <p class="font-bold text-gray-700 dark:text-gray-300">{{ scheme.deadline }}</p>
+                        {% endif %}
+                    </div>
+                    <a href="{{ scheme.link }}" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition">
+                        {{ _('Apply Now') }} <i class="fas fa-external-link-alt ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not schemes %}
+    <div class="text-center py-10">
+        <div class="text-gray-400 text-5xl mb-4">📂</div>
+        <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-400">{{ _('No schemes found matching your filters.') }}</h3>
+        <p class="text-gray-500">{{ _('Try selecting "All" to see Global Schemes.') }}</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

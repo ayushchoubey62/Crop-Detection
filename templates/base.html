@@ -1,11 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ session.get('language', 'en') }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crop Disease Detection</title>
-    <!-- Corrected Tailwind CSS CDN link -->
+    <title>{{ _('CropDoctor AI') }}</title>
+
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#6200EE"> 
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // CRITICAL CHANGE: Register from root '/' to fix Scope issues
+                navigator.serviceWorker.register("/service-worker.js")
+                    .then(reg => console.log('Offline Mode (PWA) Registered!', reg))
+                    .catch(err => console.error('Service Worker Registration Failed:', err));
+            });
+        }
+    </script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -124,111 +142,260 @@
         .light-mode .about-text { color: #1B5E20; }
         .dark-mode .about-disclaimer { color: #CF6679; } /* Error color */
         .light-mode .about-disclaimer { color: #B00020; } /* Error color */
+
+        /* Hides scrollbar for horizontal scrolling nav */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 <body class="{{ 'dark-mode' if dark_mode else 'light-mode' }} min-h-screen flex flex-col">
-    <nav class="bg-surface shadow-md p-4 flex justify-between items-center z-10 sticky top-0">
-        <div class="flex items-center space-x-4">
-            <img src="{{ url_for('static', filename='icons8-chaff-48.png') }}" alt="Logo" class="h-8 w-8 rounded-full">
-            <a href="/" class="text-xl font-bold text-primary">Crop Diagnosis</a>
+    
+    <nav class="bg-surface shadow-md p-4 flex justify-between items-center z-50 sticky top-0 backdrop-blur-md bg-opacity-95 transition-all duration-300">
+        
+        <div class="flex items-center space-x-3 flex-shrink-0">
+            <img src="{{ url_for('static', filename='icons8-chaff-48.png') }}" alt="Logo" class="h-8 w-8 rounded-full shadow-sm">
+            <a href="/" class="text-xl font-bold text-primary tracking-tight">{{ _('CropDoctor AI') }}</a>
         </div>
-        <div class="flex items-center space-x-6">
-            <a href="/diagnose" class="hover:text-primary transition-colors duration-300">Diagnose</a>
-            <a href="/history" class="hover:text-primary transition-colors duration-300">History</a>
-            <a href="/feedback" class="hover:text-primary transition-colors duration-300">Feedback</a>
-            <a href="/help" class="hover:text-primary transition-colors duration-300">Help</a>
-            <a href="/about" class="hover:text-primary transition-colors duration-300">About</a>
-            <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300">
+
+        <div class="flex items-center space-x-1 md:space-x-6 overflow-x-auto no-scrollbar ml-4">
+            
+            <a href="/diagnose" 
+               class="px-3 py-2 rounded-md transition-colors duration-300 {{ 'bg-primary/10 text-primary font-bold' if request.path == '/diagnose' else 'hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+               {{ _('Diagnose') }}
+            </a>
+
+            <a href="/history" 
+               class="px-3 py-2 rounded-md transition-colors duration-300 {{ 'bg-primary/10 text-primary font-bold' if request.path == '/history' else 'hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+               {{ _('History') }}
+            </a>
+
+            <a href="/feedback" 
+               class="px-3 py-2 rounded-md transition-colors duration-300 {{ 'bg-primary/10 text-primary font-bold' if request.path == '/feedback' else 'hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+               {{ _('Feedback') }}
+            </a>
+
+            <a href="/help" 
+               class="px-3 py-2 rounded-md transition-colors duration-300 {{ 'bg-primary/10 text-primary font-bold' if request.path == '/help' else 'hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+               {{ _('Help') }}
+            </a>
+
+            <a href="/community" 
+               class="px-3 py-2 rounded-md transition-colors duration-300 {{ 'bg-primary/10 text-primary font-bold' if request.path == '/community' else 'hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+               {{ _('Community') }}
+            </a>
+
+            <a href="/about" 
+               class="px-3 py-2 rounded-md transition-colors duration-300 {{ 'bg-primary/10 text-primary font-bold' if request.path == '/about' else 'hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+               {{ _('About') }}
+            </a>
+
+            <a href="/library" 
+               class="px-3 py-2 rounded-md transition-colors duration-300 {{ 'bg-primary/10 text-primary font-bold' if request.path == '/library' else 'hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+               {{ _('Library') }}
+            </a>
+
+            <a href="{{ url_for('schemes_page') }}" 
+                class="px-3 py-2 rounded-md transition-colors duration-300 {{ 'bg-primary/10 text-primary font-bold' if request.endpoint == 'schemes_page' else 'hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                {{ _('Schemes') }}
+            </a>
+
+            <div class="relative ml-2">
+                <select onchange="window.location.href='/set_language/' + this.value" 
+                        class="bg-gray-100 dark:bg-gray-700 text-sm rounded p-1 text-gray-800 dark:text-gray-200 border-none outline-none focus:ring-2 focus:ring-green-500">
+                    <option value="en" {% if session.get('language') == 'en' %}selected{% endif %}>🇬🇧 English</option>
+                    <option value="hi" {% if session.get('language') == 'hi' %}selected{% endif %}>🇮🇳 Hindi</option>
+                    <option value="mr" {% if session.get('language') == 'mr' %}selected{% endif %}>🇮🇳 Marathi</option>
+                    <option value="kn" {% if session.get('language') == 'kn' %}selected{% endif %}>🇮🇳 Kannada</option>
+                </select>
+            </div>
+
+            <button id="themeToggle" class="p-2 ml-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 flex-shrink-0">
                 <span class="text-xl" id="themeIcon">{{ '🌙' if dark_mode else '☀️' }}</span>
             </button>
         </div>
     </nav>
-
     <main class="flex-grow p-4 md:p-8">
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-surface shadow-inner p-4 text-center text-sm text-gray-600 dark:text-gray-400 mt-auto">
-        &copy; {{ now.year }} Crop Disease Detection App. All rights reserved.
-    </footer>
+    
+    <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-12 transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            
+            <div class="col-span-1 md:col-span-1">
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="bg-green-600 p-1.5 rounded-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    </div>
+                    <span class="text-xl font-bold text-gray-800 dark:text-white tracking-tight">{{ _('Crop Doctor AI') }}</span>
+                </div>
+                <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6">
+                    {{ _('Empowering farmers with advanced AI to detect crop diseases early, estimate yields, and protect harvests.') }}
+                </p>
+                <div class="flex space-x-4">
+                    <a href="https://www.linkedin.com/in/ayush-choubey-b2a366281" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-green-600 transition-colors">
+                        <span class="sr-only">LinkedIn</span>
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        </svg>
+                    </a>
+                    <a href="https://github.com/ayushchoubey62" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-green-600 transition-colors">
+                        <span class="sr-only">GitHub</span>
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
+                    </a>
+                </div>
+            </div>
 
-    <div id="notification" class="fixed top-20 left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white font-bold text-center transition-all duration-300 ease-out opacity-0 z-50 min-w-[300px]" style="pointer-events: none;"></div>
+            <div>
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-wider uppercase mb-4">{{ _('Product') }}</h3>
+                <ul class="space-y-3">
+                    <li><a href="{{ url_for('diagnose_page') }}" class="text-base text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">{{ _('Smart Diagnosis') }}</a></li>
+                    <li><a href="{{ url_for('history_page') }}" class="text-base text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">{{ _('History Log') }}</a></li>
+                    <li><a href="{{ url_for('community_page') }}" class="text-base text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">{{ _('Community Forum') }}</a></li>
+                    <li><a href="{{ url_for('feedback_page') }}" class="text-base text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">{{ _('Feedback') }}</a></li>
+                </ul>
+            </div>
 
-    <script>
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = document.getElementById('themeIcon');
-        const body = document.body;
-        let isDarkMode = {{ 'true' if dark_mode else 'false' }};
+            <div>
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-wider uppercase mb-4">{{ _('Resources') }}</h3>
+                <ul class="space-y-3">
+                    <li><a href="{{ url_for('help_page') }}" class="text-base text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">{{ _('Help Center') }}</a></li>
+                    <li><a href="{{ url_for('schemes_page') }}" class="text-base text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">{{ _('Government Schemes') }}</a></li>
+                    <li><a href="{{ url_for('library_page') }}" class="text-base text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">{{ _('Disease Library') }}</a></li>
+                    <li><a href="{{ url_for('about_page') }}" class="text-base text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">{{ _('About Us') }}</a></li>
+                </ul>
+            </div>
 
-        function applyTheme(darkMode) {
-            if (darkMode) {
-                body.classList.add('dark-mode');
-                body.classList.remove('light-mode');
-                themeIcon.textContent = '🌙';
-            } else {
-                body.classList.add('light-mode');
-                body.classList.remove('dark-mode');
-                themeIcon.textContent = '☀️';
-            }
+            <div>
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-wider uppercase mb-4">{{ _('Support') }}</h3>
+                <ul class="space-y-3">
+                    <li>
+                        <a href="mailto:ayushchoubey800@gmail.com" class="flex items-center text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                            <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            ayushchoubey800@gmail.com
+                        </a>
+                    </li>
+                    <li>
+                        <a href="tel:+916264626513" class="flex items-center text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                            <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                            +91 62646 26513
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="text-base text-gray-400 dark:text-gray-500 text-center md:text-left">
+                    &copy; <span id="currentYear"></span> {{ _('Crop Doctor AI') }}. {{ _('All rights reserved.') }}
+                </p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="{{ url_for('privacy_page') }}" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 text-sm transition-colors">{{ _('Privacy Policy') }}</a>
+                    <a href="{{ url_for('terms_page') }}" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 text-sm transition-colors">{{ _('Terms of Service') }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<div id="notification" class="fixed top-20 left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white font-bold text-center transition-all duration-300 ease-out opacity-0 z-50 min-w-[300px]" style="pointer-events: none;"></div>
+
+<script>
+    // --- 1. SETUP DOM ELEMENTS ---
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const body = document.body;
+    const yearSpan = document.getElementById('currentYear');
+    const notificationDiv = document.getElementById('notification');
+    let notificationTimer;
+
+    // Set Year
+    if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+
+    // --- 2. ROBUST THEME LOGIC ---
+    function applyTheme(isDark) {
+        if (isDark) {
+            body.classList.add('dark-mode');
+            body.classList.remove('light-mode');
+            document.documentElement.classList.add('dark'); // Tailwind support
+            if(themeIcon) themeIcon.textContent = '🌙';
+            localStorage.setItem('theme', 'dark'); // SAVE to browser
+        } else {
+            body.classList.add('light-mode');
+            body.classList.remove('dark-mode');
+            document.documentElement.classList.remove('dark'); // Tailwind support
+            if(themeIcon) themeIcon.textContent = '☀️';
+            localStorage.setItem('theme', 'light'); // SAVE to browser
         }
+    }
 
-        themeToggle.addEventListener('click', async () => {
-            isDarkMode = !isDarkMode;
-            applyTheme(isDarkMode);
+    // --- 3. AUTO-INIT (The Fix) ---
+    (function initTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const serverTheme = {{ 'true' if dark_mode else 'false' }}; // Keep your server logic as fallback
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme === 'dark') {
+            applyTheme(true);
+        } else if (savedTheme === 'light') {
+            applyTheme(false);
+        } else if (serverTheme) {
+            applyTheme(true);
+        } else {
+            applyTheme(systemPrefersDark);
+        }
+    })();
+
+    // --- 4. TOGGLE LISTENER ---
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', async () => {
+            const isCurrentDark = body.classList.contains('dark-mode');
+            const newMode = !isCurrentDark;
+            
+            applyTheme(newMode); // Apply immediately
+            
+            showNotification(`${newMode ? 'Dark' : 'Light'} Mode Enabled`, 'info');
+
+            // Optional: Sync with Server (Keep your existing logic)
             try {
-                const response = await fetch('/toggle_theme', { method: 'POST' });
-                const data = await response.json();
-                if (!data.success) {
-                    console.error('Failed to toggle theme on server.');
-                }
+                await fetch('/toggle_theme', { method: 'POST' });
             } catch (error) {
-                console.error('Error toggling theme:', error);
+                console.error('Error syncing theme:', error);
             }
-            showNotification(`${isDarkMode ? 'Dark' : 'Light'} Mode Enabled`, 'info');
         });
+    }
 
-        // Initialize theme on page load
-        applyTheme(isDarkMode);
+    // --- 5. GLOBAL NOTIFICATION SYSTEM ---
+    window.showNotification = function(message, type = 'info', duration = 3000) {
+        if (!notificationDiv) return;
+        clearTimeout(notificationTimer);
 
-        // Notification system
-        const notificationDiv = document.getElementById('notification');
-        let notificationTimer;
-
-        function showNotification(message, type = 'info', duration = 3000) {
-            clearTimeout(notificationTimer);
-
-            let bgColor, textColor;
-            switch (type) {
-                case 'success':
-                    bgColor = '#4CAF50'; // Green
-                    textColor = 'white';
-                    break;
-                case 'warning':
-                    bgColor = '#FFC107'; // Amber
-                    textColor = 'black';
-                    break;
-                case 'error':
-                    bgColor = '#F44336'; // Red
-                    textColor = 'white';
-                    break;
-                case 'info':
-                default:
-                    bgColor = '#2196F3'; // Blue
-                    textColor = 'white';
-                    break;
-            }
-
-            notificationDiv.style.backgroundColor = bgColor;
-            notificationDiv.style.color = textColor;
-            notificationDiv.textContent = message;
-            notificationDiv.style.opacity = '1';
-            notificationDiv.style.transform = 'translate(-50%, 0)';
-
-            notificationTimer = setTimeout(() => {
-                notificationDiv.style.opacity = '0';
-                notificationDiv.style.transform = 'translate(-50%, -20px)';
-            }, duration);
+        let bgColor, textColor;
+        switch (type) {
+            case 'success': bgColor = '#4CAF50'; textColor = 'white'; break; // Green
+            case 'warning': bgColor = '#FFC107'; textColor = 'black'; break; // Amber
+            case 'error':   bgColor = '#F44336'; textColor = 'white'; break; // Red
+            default:        bgColor = '#2196F3'; textColor = 'white'; break; // Blue (Info)
         }
-    </script>
+
+        notificationDiv.style.backgroundColor = bgColor;
+        notificationDiv.style.color = textColor;
+        notificationDiv.textContent = message;
+        notificationDiv.style.opacity = '1';
+        notificationDiv.style.transform = 'translate(-50%, 0)';
+
+        notificationTimer = setTimeout(() => {
+            notificationDiv.style.opacity = '0';
+            notificationDiv.style.transform = 'translate(-50%, -20px)';
+        }, duration);
+    };
+</script>
 </body>
 </html>

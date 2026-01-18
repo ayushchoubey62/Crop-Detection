@@ -1,0 +1,1578 @@
+# Hindi translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-12 20:42+0530\n"
+"PO-Revision-Date: 2026-01-12 20:51+0530\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: hi\n"
+"Language-Team: hi <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: templates/base.html:169
+msgid "Diagnose"
+msgstr "निदान"
+
+#: templates/base.html:174
+msgid "History"
+msgstr "इतिहास"
+
+#: templates/base.html:179 templates/base.html:261 templates/help.html:96
+#: templates/index.html:54
+msgid "Feedback"
+msgstr "प्रतिक्रिया"
+
+#: templates/base.html:184
+msgid "Help"
+msgstr "सहायता"
+
+#: templates/base.html:189
+msgid "Community"
+msgstr "समुदाय"
+
+#: templates/base.html:194 templates/index.html:59
+msgid "About"
+msgstr "हमारे बारे में"
+
+#: templates/base.html:199
+msgid "Library"
+msgstr "लाइब्रेरी"
+
+#: templates/base.html:204
+msgid "Schemes"
+msgstr "योजनाएं"
+
+#: templates/base.html:236 templates/base.html:297
+msgid "Crop Doctor AI"
+msgstr "क्रॉप डॉक्टर एआई"
+
+#: templates/base.html:239
+msgid ""
+"Empowering farmers with advanced AI to detect crop diseases early, "
+"estimate yields, and protect harvests."
+msgstr "किसानों को फसल रोगों का जल्द पता लगाने, उपज का अनुमान लगाने और फसलों की सुरक्षा के लिए उन्नत एआई के साथ सशक्त बनाना।"
+
+#: templates/base.html:256
+msgid "Product"
+msgstr "उत्पाद"
+
+#: templates/base.html:258
+msgid "Smart Diagnosis"
+msgstr "स्मार्ट निदान"
+
+#: templates/base.html:259
+msgid "History Log"
+msgstr "इतिहास लॉग"
+
+#: templates/base.html:260
+msgid "Community Forum"
+msgstr "समुदाय मंच"
+
+#: templates/base.html:266
+msgid "Resources"
+msgstr "संसाधन"
+
+#: templates/base.html:268
+msgid "Help Center"
+msgstr "सहायता केंद्र"
+
+#: templates/base.html:269
+msgid "Government Schemes"
+msgstr "सरकारी योजनाएं"
+
+#: templates/base.html:270 templates/index.html:37
+msgid "Disease Library"
+msgstr "रोग पुस्तकालय"
+
+#: templates/base.html:271
+msgid "About Us"
+msgstr "हमारे बारे में"
+
+#: templates/base.html:276
+msgid "Support"
+msgstr "समर्थन"
+
+#: templates/base.html:297
+msgid "All rights reserved."
+msgstr "सर्वाधिकार सुरक्षित।"
+
+#: templates/base.html:300
+msgid "Privacy Policy"
+msgstr "गोपनीयता नीति"
+
+#: templates/base.html:301 templates/terms.html:5
+msgid "Terms of Service"
+msgstr "सेवा की शर्तें"
+
+#: templates/community.html:18
+msgid "Community & Expert Hub"
+msgstr "समुदाय और विशेषज्ञ केंद्र"
+
+#: templates/community.html:20
+msgid "Connect with experts and other farmers to solve crop issues."
+msgstr "फसल संबंधी समस्याओं को हल करने के लिए विशेषज्ञों और अन्य किसानों से जुड़ें।"
+
+#: templates/community.html:26
+msgid "Are you a Doctor? Join as Expert"
+msgstr "क्या आप डॉक्टर हैं? विशेषज्ञ के रूप में शामिल हों"
+
+#: templates/community.html:35
+msgid "Total Issues"
+msgstr "कुल समस्याएं"
+
+#: templates/community.html:45
+msgid "Expert Verified"
+msgstr "विशेषज्ञ द्वारा सत्यापित"
+
+#: templates/community.html:55
+msgid "Pending Review"
+msgstr "समीक्षा लंबित"
+
+#: templates/community.html:63
+msgid "Search crops, diseases, or questions..."
+msgstr "फसलें, रोग या प्रश्न खोजें..."
+
+#: templates/community.html:70
+msgid "All Posts"
+msgstr "सभी पोस्ट"
+
+#: templates/community.html:71
+msgid "Verified"
+msgstr "सत्यापित"
+
+#: templates/community.html:72
+msgid "Pending"
+msgstr "लंबित"
+
+#: templates/community.html:200
+msgid "No posts found"
+msgstr "कोई पोस्ट नहीं मिली"
+
+#: templates/community.html:201
+msgid "Try adjusting your search filters."
+msgstr "अपने खोज फिल्टर को समायोजित करने का प्रयास करें।"
+
+#: templates/community.html:212
+msgid "Join as an Expert"
+msgstr "विशेषज्ञ के रूप में शामिल हों"
+
+#: templates/community.html:214
+msgid "Verify your identity to get the"
+msgstr "अपनी पहचान सत्यापित करें और"
+
+#: templates/community.html:214
+msgid "Green Badge"
+msgstr "ग्रीन बैज"
+
+#: templates/community.html:214
+msgid "and help farmers."
+msgstr "किसानों की मदद करें।"
+
+#: templates/community.html:219
+msgid "Full Name"
+msgstr "पूरा नाम"
+
+#: templates/community.html:224
+msgid "I am a..."
+msgstr "मैं एक..."
+
+#: templates/community.html:226
+msgid "Doctor / Pathologist (Dr.)"
+msgstr "डॉक्टर / पैथोलॉजिस्ट (डॉ.)"
+
+#: templates/community.html:227
+msgid "Medical/Agri Shop Owner"
+msgstr "मेडिकल/एग्री शॉप मालिक"
+
+#: templates/community.html:228
+msgid "Agronomist / Scientist"
+msgstr "कृषिविज्ञानी / वैज्ञानिक"
+
+#: templates/community.html:233
+msgid "Email Address"
+msgstr "ईमेल पता"
+
+#: templates/community.html:238
+msgid "Verification Details"
+msgstr "सत्यापन विवरण"
+
+#: templates/community.html:243
+msgid "Submit Application"
+msgstr "आवेदन जमा करें"
+
+#: templates/diagnose.html:32 templates/index.html:14
+msgid "Crop Disease Diagnosis"
+msgstr "फसल रोग निदान"
+
+#: templates/diagnose.html:35
+msgid "Image Tools"
+msgstr "छवि उपकरण"
+
+#: templates/diagnose.html:38
+msgid "Upload Image"
+msgstr "छवि अपलोड करें"
+
+#: templates/diagnose.html:39
+msgid "Clear Image"
+msgstr "छवि साफ़ करें"
+
+#: templates/diagnose.html:43
+msgid "Live Preview"
+msgstr "लाइव पूर्वावलोकन"
+
+#: templates/diagnose.html:49
+msgid "Field Mode (Offline)"
+msgstr "फील्ड मोड (ऑफलाइन)"
+
+#: templates/diagnose.html:54
+msgid "Crop Image"
+msgstr "छवि क्रॉप करें"
+
+#: templates/diagnose.html:55
+msgid "Apply Crop"
+msgstr "क्रॉप लागू करें"
+
+#: templates/diagnose.html:56
+msgid "Reset Crop"
+msgstr "क्रॉप रीसेट करें"
+
+#: templates/diagnose.html:58
+msgid "Ready to upload image"
+msgstr "छवि अपलोड करने के लिए तैयार"
+
+#: templates/diagnose.html:65
+msgid "Image Preview"
+msgstr "छवि पूर्वावलोकन"
+
+#: templates/diagnose.html:68
+msgid "No image uploaded"
+msgstr "कोई छवि अपलोड नहीं की गई"
+
+#: templates/diagnose.html:73
+msgid "Compare Original"
+msgstr "मूल से तुलना करें"
+
+#: templates/diagnose.html:79
+msgid "Diagnosis Results"
+msgstr "निदान परिणाम"
+
+#: templates/diagnose.html:81
+msgid "No diagnosis available. Upload an image to start."
+msgstr "कोई निदान उपलब्ध नहीं है। शुरू करने के लिए एक छवि अपलोड करें।"
+
+#: templates/diagnose.html:87 templates/help.html:76
+msgid "Image Enhancement Tools"
+msgstr "छवि वृद्धि उपकरण"
+
+#: templates/diagnose.html:90
+msgid "Basic Adjustments"
+msgstr "बुनियादी समायोजन"
+
+#: templates/diagnose.html:92
+msgid "Brightness"
+msgstr "चमक"
+
+#: templates/diagnose.html:97
+msgid "Contrast"
+msgstr "कंट्रास्ट"
+
+#: templates/diagnose.html:102
+msgid "Saturation"
+msgstr "संतृप्ति"
+
+#: templates/diagnose.html:109
+msgid "Advanced Adjustments"
+msgstr "उन्नत समायोजन"
+
+#: templates/diagnose.html:111
+msgid "Edge Enhance"
+msgstr "किनारा वृद्धि"
+
+#: templates/diagnose.html:116
+msgid "Blur Reduce"
+msgstr "धुंधलापन कम करें"
+
+#: templates/diagnose.html:121
+msgid "Color Balance"
+msgstr "रंग संतुलन"
+
+#: templates/diagnose.html:128
+msgid "Presets"
+msgstr "प्रीसेट"
+
+#: templates/diagnose.html:130
+msgid "Auto Contrast"
+msgstr "ऑटो कंट्रास्ट"
+
+#: templates/diagnose.html:131
+msgid "Sharpen"
+msgstr "तेज करें (Sharpen)"
+
+#: templates/diagnose.html:132
+msgid "Grayscale"
+msgstr "ग्रेस्केल"
+
+#: templates/diagnose.html:133
+msgid "Reset Filters"
+msgstr "फिल्टर रीसेट करें"
+
+#: templates/diagnose.html:140
+msgid "Save Report"
+msgstr "रिपोर्ट सहेजें"
+
+#: templates/diagnose.html:141
+msgid "Print Report"
+msgstr "रिपोर्ट प्रिंट करें"
+
+#: templates/diagnose.html:142 templates/feedback.html:74
+#: templates/help.html:33 templates/history.html:72
+msgid "Back to Home"
+msgstr "होम पर वापस जाएं"
+
+#: templates/diagnose.html:375
+msgid "Image uploaded. Analyzing..."
+msgstr "छवि अपलोड की गई। विश्लेषण किया जा रहा है..."
+
+#: templates/diagnose.html:596
+msgid "Analyzing on device (Offline)..."
+msgstr "डिवाइस पर विश्लेषण (ऑफलाइन)..."
+
+#: templates/diagnose.html:714
+msgid "Offline Analysis Complete"
+msgstr "ऑफलाइन विश्लेषण पूर्ण"
+
+#: templates/diagnose.html:1521
+msgid "Environmental Risk Analysis"
+msgstr "पर्यावरण जोखिम विश्लेषण"
+
+#: templates/diagnose.html:1523
+msgid "Live Data"
+msgstr "लाइव डेटा"
+
+#: templates/diagnose.html:1528
+msgid ""
+"Pathogens spread differently depending on the weather. Check your farm's "
+"current risk status."
+msgstr "मौसम के आधार पर रोगजनक अलग-अलग तरह से फैलते हैं। अपने खेत की वर्तमान जोखिम स्थिति की जाँच करें।"
+
+#: templates/diagnose.html:1532
+msgid "Enter Farm Location (e.g. Pune)"
+msgstr "खेत का स्थान दर्ज करें (जैसे पुणे)"
+
+#: templates/diagnose.html:1536
+msgid "Analyze Risk"
+msgstr "जोखिम का विश्लेषण करें"
+
+#: templates/feedback.html:4
+msgid "User Feedback & Support"
+msgstr "उपयोगकर्ता प्रतिक्रिया और सहायता"
+
+#: templates/feedback.html:9
+msgid "Feedback Type"
+msgstr "प्रतिक्रिया का प्रकार"
+
+#: templates/feedback.html:13
+msgid "Suggestion"
+msgstr "सुझाव"
+
+#: templates/feedback.html:17
+msgid "Bug Report"
+msgstr "बग रिपोर्ट"
+
+#: templates/feedback.html:21
+msgid "Feature Request"
+msgstr "सुविधा अनुरोध"
+
+#: templates/feedback.html:25
+msgid "General Feedback"
+msgstr "सामान्य प्रतिक्रिया"
+
+#: templates/feedback.html:32
+msgid "Contact Email (optional):"
+msgstr "संपर्क ईमेल (वैकल्पिक):"
+
+#: templates/feedback.html:38
+msgid "Rating"
+msgstr "रेटिंग"
+
+#: templates/feedback.html:41
+msgid "Poor"
+msgstr "खराब"
+
+#: templates/feedback.html:41
+msgid "Fair"
+msgstr "ठीक"
+
+#: templates/feedback.html:41
+msgid "Good"
+msgstr "अच्छा"
+
+#: templates/feedback.html:41
+msgid "Very Good"
+msgstr "बहुत अच्छा"
+
+#: templates/feedback.html:41
+msgid "Excellent"
+msgstr "उत्कृष्ट"
+
+#: templates/feedback.html:55
+msgid "Your Feedback:"
+msgstr "आपकी प्रतिक्रिया:"
+
+#: templates/feedback.html:56
+msgid "Please describe your feedback in detail..."
+msgstr "कृपया अपनी प्रतिक्रिया का विस्तार से वर्णन करें..."
+
+#: templates/feedback.html:63
+msgid "Attach screenshot (if applicable)"
+msgstr "स्क्रीनशॉट संलग्न करें (यदि लागू हो)"
+
+#: templates/feedback.html:66
+msgid "Select Screenshot"
+msgstr "स्क्रीनशॉट चुनें"
+
+#: templates/feedback.html:72
+msgid "Submit Feedback"
+msgstr "प्रतिक्रिया जमा करें"
+
+#: templates/feedback.html:73
+msgid "Reset Form"
+msgstr "फॉर्म रीसेट करें"
+
+#: templates/help.html:7
+msgid "Crop Disease Diagnosis Guide"
+msgstr "फसल रोग निदान गाइड"
+
+#: templates/help.html:8
+msgid "Comprehensive user manual and troubleshooting guide"
+msgstr "व्यापक उपयोगकर्ता मैनुअल और समस्या निवारण गाइड"
+
+#: templates/help.html:14
+msgid "Search the guide..."
+msgstr "गाइड में खोजें..."
+
+#: templates/help.html:15
+msgid "Search"
+msgstr "खोजें"
+
+#: templates/help.html:20
+msgid "Table of Contents"
+msgstr "विषय - सूची"
+
+#: templates/help.html:34
+msgid "Print This Guide"
+msgstr "यह गाइड प्रिंट करें"
+
+#: templates/help.html:47
+msgid "Getting Started"
+msgstr "शुरू करना"
+
+#: templates/help.html:49
+msgid "Welcome to Crop Disease Diagnosis"
+msgstr "फसल रोग निदान में आपका स्वागत है"
+
+#: templates/help.html:49
+msgid ""
+"This AI-powered application helps farmers and agricultural professionals "
+"identify diseases in crop leaves through image analysis."
+msgstr "यह एआई-संचालित एप्लिकेशन किसानों और कृषि पेशेवरों को छवि विश्लेषण के माध्यम से फसल के पत्तों में बीमारियों की पहचान करने में मदद करता है।"
+
+#: templates/help.html:50
+msgid "System Requirements"
+msgstr "सिस्टम आवश्यकताएं"
+
+#: templates/help.html:50
+msgid ""
+"• Modern web browser\\n• Internet connection\\n• Sufficient device "
+"storage for image uploads\\n• Webcam or camera for live capture (browser "
+"support dependent)"
+msgstr "• आधुनिक वेब ब्राउज़र\\n• इंटरनेट कनेक्शन\\n• छवि अपलोड के लिए पर्याप्त डिवाइस स्टोरेज\\n• लाइव कैप्चर के लिए वेबकैम या कैमरा (ब्राउज़र पर निर्भर)"
+
+#: templates/help.html:51
+msgid "First Time Setup"
+msgstr "पहली बार सेटअप"
+
+#: templates/help.html:51
+msgid ""
+"1. Ensure your browser is up-to-date.\\n2. No specific software "
+"installation is required for the web app.\\n3. Make sure you have a "
+"stable internet connection."
+msgstr "1. सुनिश्चित करें कि आपका ब्राउज़र अप-टू-डेट है।\\n2. वेब ऐप के लिए किसी विशिष्ट सॉफ़्टवेयर इंस्टॉलेशन की आवश्यकता नहीं है।\\n3. सुनिश्चित करें कि आपके पास एक स्थिर इंटरनेट कनेक्शन है।"
+
+#: templates/help.html:56
+msgid "Image Capture Guidelines"
+msgstr "छवि कैप्चर दिशानिर्देश"
+
+#: templates/help.html:58
+msgid "Optimal Image Quality"
+msgstr "इष्टतम छवि गुणवत्ता"
+
+#: templates/help.html:58
+msgid ""
+"• Capture in well-lit conditions\\n• Focus on the leaf surface\\n• "
+"Include both healthy and affected areas\\n• Avoid shadows and glare"
+msgstr "• अच्छी रोशनी वाली स्थितियों में कैप्चर करें\\n• पत्ती की सतह पर ध्यान दें\\n• स्वस्थ और प्रभावित दोनों क्षेत्रों को शामिल करें\\n• परछाई और चमक से बचें"
+
+#: templates/help.html:59
+msgid "Recommended Practices"
+msgstr "अनुशंसित प्रथाएं"
+
+#: templates/help.html:59
+msgid ""
+"- Place leaf on neutral background\\n- Include scale reference if "
+"possible\\n- Capture multiple angles for severe cases"
+msgstr "- पत्ती को तटस्थ पृष्ठभूमि पर रखें\\n- यदि संभव हो तो स्केल संदर्भ शामिल करें\\n- गंभीर मामलों के लिए कई कोणों से कैप्चर करें"
+
+#: templates/help.html:60
+msgid "Common Mistakes"
+msgstr "सामान्य गलतियाँ"
+
+#: templates/help.html:60
+msgid ""
+"× Blurry or out-of-focus images\\n× Images with multiple leaves\\n× "
+"Extreme close-ups without context\\n× Poor lighting conditions"
+msgstr "× धुंधली या आउट-ऑफ-फोकस छवियां\\n× कई पत्तियों वाली छवियां\\n× संदर्भ के बिना अत्यधिक क्लोज़-अप\\n× खराब रोशनी की स्थिति"
+
+#: templates/help.html:65
+msgid "Diagnosis Process"
+msgstr "निदान प्रक्रिया"
+
+#: templates/help.html:67
+msgid "Step-by-Step Guide"
+msgstr "चरण-दर-चरण गाइड"
+
+#: templates/help.html:67
+msgid ""
+"1. Navigate to Diagnosis page.\\n2. Upload an image or use your device "
+"camera.\\n3. Adjust image using enhancement tools if needed.\\n4. View "
+"the diagnosis results, including confidence score and details.\\n5. Save "
+"or print the comprehensive report."
+msgstr "1. निदान पृष्ठ पर जाएं।\\n2. एक छवि अपलोड करें या एक कैप्चर करने के लिए अपने डिवाइस के कैमरे का उपयोग करें।\\n3. यदि आवश्यक हो तो संवर्धन टूल का उपयोग करके छवि को समायोजित करें।\\n4. आत्मविश्वास स्कोर और विवरण सहित निदान परिणाम देखें।\\n5. व्यापक रिपोर्ट सहेजें या प्रिंट करें।"
+
+#: templates/help.html:68
+msgid "Understanding Results"
+msgstr "परिणाम समझना"
+
+#: templates/help.html:68
+msgid ""
+"• Confidence scores indicate prediction reliability.\\n• Multiple results"
+" may appear for similar diseases.\\n• Low confidence suggests retaking "
+"the image with better quality."
+msgstr "• आत्मविश्वास स्कोर भविष्यवाणी की विश्वसनीयता का संकेत देते हैं।\\n• समान बीमारियों के लिए कई परिणाम दिखाई दे सकते हैं।\\n• कम आत्मविश्वास बेहतर गुणवत्ता के साथ छवि को फिर से लेने का सुझाव देता है।"
+
+#: templates/help.html:69
+msgid "Troubleshooting Diagnosis"
+msgstr "निदान समस्या निवारण"
+
+#: templates/help.html:69
+msgid ""
+"If you get poor results:\\n- Try different image adjustments.\\n- Capture"
+" a clearer image.\\n- Ensure the image is of a single crop leaf."
+msgstr "यदि आपको खराब परिणाम मिलते हैं:\\n- विभिन्न छवि समायोजन का प्रयास करें।\\n- एक स्पष्ट छवि कैप्चर करें।\\n- सुनिश्चित करें कि छवि एक एकल फसल पत्ती की है।"
+
+#: templates/help.html:74
+msgid "Advanced Features"
+msgstr "उन्नत सुविधाएं"
+
+#: templates/help.html:76
+msgid ""
+"• Brightness/Contrast adjustment\\n• Color saturation controls\\n• "
+"Sharpening filters\\n• Cropping functionality\\n• Auto-contrast and "
+"grayscale presets"
+msgstr "• चमक/कंट्रास्ट समायोजन\\n• रंग संतृप्ति नियंत्रण\\n• शार्पनिंग फिल्टर\\n• क्रॉपिंग कार्यक्षमता\\n• ऑटो-कंट्रास्ट और ग्रेस्केल प्रीसेट"
+
+#: templates/help.html:77
+msgid "History Management"
+msgstr "इतिहास प्रबंधन"
+
+#: templates/help.html:77
+msgid ""
+"• View past diagnoses.\\n• Filter by date/crop type.\\n• Export complete "
+"history to JSON.\\n• Import history from JSON.\\n• Re-diagnose or view "
+"image from history."
+msgstr "• पिछले निदान देखें।\\n• दिनांक/फसल प्रकार द्वारा फ़िल्टर करें।\\n• JSON में पूरा इतिहास निर्यात करें।\\n• JSON से इतिहास आयात करें।\\n• पुन: निदान करें या इतिहास से छवि देखें।"
+
+#: templates/help.html:78
+msgid "Feedback System"
+msgstr "प्रतिक्रिया प्रणाली"
+
+#: templates/help.html:78
+msgid ""
+"• Submit suggestions, bug reports, or feature requests.\\n• Optionally "
+"attach screenshots.\\n• Rate your overall experience."
+msgstr "• सुझाव, बग रिपोर्ट, या सुविधा अनुरोध जमा करें।\\n• वैकल्पिक रूप से स्क्रीनशॉट संलग्न करें।\\n• अपने समग्र अनुभव को रेट करें।"
+
+#: templates/help.html:83
+msgid "Troubleshooting"
+msgstr "समस्या निवारण"
+
+#: templates/help.html:85
+msgid "Common Issues"
+msgstr "सामान्य मुद्दे"
+
+#: templates/help.html:85
+msgid ""
+"• Image upload failed: Check file size and format.\\n• Slow performance: "
+"Ensure a stable internet connection; large images take longer.\\n• "
+"Incorrect results: Verify image quality and ensure it is a single crop "
+"leaf."
+msgstr "• छवि अपलोड विफल: फ़ाइल आकार और प्रारूप की जाँच करें।\\n• धीमा प्रदर्शन: एक स्थिर इंटरनेट कनेक्शन सुनिश्चित करें; बड़ी छवियों में अधिक समय लगता है।\\n• गलत परिणाम: छवि गुणवत्ता सत्यापित करें और सुनिश्चित करें कि यह एक एकल फसल पत्ती है।"
+
+#: templates/help.html:86
+msgid "Error Messages"
+msgstr "त्रुटि संदेश"
+
+#: templates/help.html:86
+msgid ""
+"- Invalid image: Try a different format (JPG, PNG, BMP).\\n- Low "
+"confidence: Retake image with better lighting/focus.\\n- Server error: "
+"Contact support or try again later."
+msgstr "- अमान्य छवि: एक अलग प्रारूप (JPG, PNG, BMP) का प्रयास करें।\\n- कम आत्मविश्वास: बेहतर रोशनी/फोकस के साथ छवि को फिर से लें।\\n- सर्वर त्रुटि: समर्थन से संपर्क करें या बाद में पुनः प्रयास करें।"
+
+#: templates/help.html:87
+msgid "FAQ"
+msgstr "अक्सर पूछे जाने वाले प्रश्न"
+
+#: templates/help.html:87
+msgid ""
+"Q: Can I use this for any crop?\\nA: Currently supports 15 major crops "
+"(see full list in About page).\\n\\nQ: How accurate are the results?\\nA:"
+" Accuracy depends on image quality and model training data. Average "
+"accuracy is high in controlled conditions."
+msgstr "प्रश्न: क्या मैं इसका उपयोग किसी भी फसल के लिए कर सकता हूं?\\nउत्तर: वर्तमान में 15 प्रमुख फसलों का समर्थन करता है (हमारे बारे में पृष्ठ में पूरी सूची देखें)।\\n\\nप्रश्न: परिणाम कितने सटीक हैं?\\nउत्तर: सटीकता छवि गुणवत्ता और मॉडल प्रशिक्षण डेटा पर निर्भर करती है। नियंत्रित स्थितियों में औसत सटीकता अधिक है।"
+
+#: templates/help.html:92
+msgid "Support & Resources"
+msgstr "सहायता और संसाधन"
+
+#: templates/help.html:94
+msgid "Contact Information"
+msgstr "संपर्क जानकारी"
+
+#: templates/help.html:94
+msgid ""
+"• Email: support@cropdiagnosis.com (placeholder)\\n• For real support, "
+"use the Feedback page or check our official website (if available)."
+msgstr "• ईमेल: support@cropdiagnosis.com (प्लेसहोल्डर)\\n• वास्तविक समर्थन के लिए, प्रतिक्रिया पृष्ठ का उपयोग करें या हमारी आधिकारिक वेबसाइट देखें (यदि उपलब्ध हो)।"
+
+#: templates/help.html:95
+msgid "Additional Resources"
+msgstr "अतिरिक्त संसाधन"
+
+#: templates/help.html:95
+msgid ""
+"- Video tutorials (if available)\\n- Community forums (if available)\\n- "
+"External agricultural resources."
+msgstr "- वीडियो ट्यूटोरियल (यदि उपलब्ध हो)\\n- सामुदायिक मंच (यदि उपलब्ध हो)\\n- बाहरी कृषि संसाधन।"
+
+#: templates/help.html:96
+msgid ""
+"We value your input! Please report any issues or suggestions through the "
+"dedicated Feedback page in the navigation menu."
+msgstr "हम आपकी राय को महत्व देते हैं! कृपया नेविगेशन मेनू में समर्पित प्रतिक्रिया पृष्ठ के माध्यम से किसी भी मुद्दे या सुझाव की रिपोर्ट करें।"
+
+#: templates/history.html:6
+msgid "Diagnosis History"
+msgstr "निदान इतिहास"
+
+#: templates/history.html:9
+msgid "Controls"
+msgstr "नियंत्रण"
+
+#: templates/history.html:12
+msgid "Sort by:"
+msgstr "इसके द्वारा क्रमबद्ध करें:"
+
+#: templates/history.html:14
+msgid "Most Recent"
+msgstr "सबसे हालिया"
+
+#: templates/history.html:15
+msgid "Oldest First"
+msgstr "सबसे पुराना पहले"
+
+#: templates/history.html:16
+msgid "Highest Confidence"
+msgstr "उच्चतम आत्मविश्वास"
+
+#: templates/history.html:17
+msgid "Lowest Confidence"
+msgstr "न्यूनतम आत्मविश्वास"
+
+#: templates/history.html:22
+msgid "Filter by crop:"
+msgstr "फसल द्वारा फ़िल्टर करें:"
+
+#: templates/history.html:24 templates/schemes.html:63
+msgid "All Crops"
+msgstr "सभी फसलें"
+
+#: templates/history.html:32
+msgid "Recent Diagnoses"
+msgstr "हाल के निदान"
+
+#: templates/history.html:34
+msgid "Loading history..."
+msgstr "इतिहास लोड हो रहा है..."
+
+#: templates/history.html:39
+msgid "Diagnosis Details"
+msgstr "निदान विवरण"
+
+#: templates/history.html:47 templates/history.html:52
+msgid "Select an item to view details"
+msgstr "विवरण देखने के लिए एक आइटम चुनें"
+
+#: templates/history.html:57
+msgid "View Full Image"
+msgstr "पूरी छवि देखें"
+
+#: templates/history.html:58
+msgid "Re-diagnose"
+msgstr "पुन: निदान करें"
+
+#: templates/history.html:59
+msgid "Delete Selected"
+msgstr "चयनित हटाएं"
+
+#: templates/history.html:65
+msgid "Export All History"
+msgstr "सभी इतिहास निर्यात करें"
+
+#: templates/history.html:68
+msgid "Import History"
+msgstr "इतिहास आयात करें"
+
+#: templates/history.html:70
+msgid "Clear All History"
+msgstr "सभी इतिहास साफ़ करें"
+
+#: templates/index.html:15
+msgid "AI-powered detection & Real-time Risk Analysis"
+msgstr "एआई-संचालित पहचान और रीयल-टाइम जोखिम विश्लेषण"
+
+#: templates/index.html:22
+msgid "Diagnose Crop"
+msgstr "फसल का निदान करें"
+
+#: templates/index.html:27
+msgid "View History"
+msgstr "इतिहास देखें"
+
+#: templates/index.html:32
+msgid "Community Experts"
+msgstr "सामुदायिक विशेषज्ञ"
+
+#: templates/index.html:44
+msgid "Govt Schemes"
+msgstr "सरकारी योजनाएं"
+
+#: templates/index.html:49
+msgid "Help & Guide"
+msgstr "सहायता और गाइड"
+
+#: templates/index.html:67
+msgid "Live Disease Forecast"
+msgstr "लाइव रोग पूर्वानुमान"
+
+#: templates/index.html:71
+msgid "Enter City (e.g. Pune)"
+msgstr "शहर दर्ज करें (जैसे पुणे)"
+
+#: templates/index.html:75
+msgid "Check"
+msgstr "जाँच करें"
+
+#: templates/index.html:84
+msgid "Risk"
+msgstr "जोखिम"
+
+#: templates/index.html:90
+msgid "Grow smarter • Stay healthier"
+msgstr "होशियार बनें • स्वस्थ रहें"
+
+#: templates/index.html:99
+msgid "Please enter a city!"
+msgstr "कृपया एक शहर दर्ज करें!"
+
+#: templates/index.html:141
+msgid "Failed to connect to weather service."
+msgstr "मौसम सेवा से जुड़ने में विफल।"
+
+#: templates/schemes.html:9
+msgid "Government Schemes & Subsidies"
+msgstr "सरकारी योजनाएं और सब्सिडी"
+
+#: templates/schemes.html:10
+msgid "Find financial aid, insurance, and subsidies tailored for you."
+msgstr "अपने लिए वित्तीय सहायता, बीमा और सब्सिडी खोजें।"
+
+#: templates/schemes.html:16
+msgid "State"
+msgstr "राज्य"
+
+#: templates/schemes.html:18
+msgid "All India"
+msgstr "अखिल भारतीय"
+
+#: templates/schemes.html:20
+msgid "Andhra Pradesh"
+msgstr "आंध्र प्रदेश"
+
+#: templates/schemes.html:21
+msgid "Arunachal Pradesh"
+msgstr "अरुणाचल प्रदेश"
+
+#: templates/schemes.html:22
+msgid "Assam"
+msgstr "असम"
+
+#: templates/schemes.html:23
+msgid "Bihar"
+msgstr "बिहार"
+
+#: templates/schemes.html:24
+msgid "Chhattisgarh"
+msgstr "छत्तीसगढ़"
+
+#: templates/schemes.html:25
+msgid "Goa"
+msgstr "गोवा"
+
+#: templates/schemes.html:26
+msgid "Gujarat"
+msgstr "गुजरात"
+
+#: templates/schemes.html:27
+msgid "Haryana"
+msgstr "हरियाणा"
+
+#: templates/schemes.html:28
+msgid "Himachal Pradesh"
+msgstr "हिमाचल प्रदेश"
+
+#: templates/schemes.html:29
+msgid "Jharkhand"
+msgstr "झारखंड"
+
+#: templates/schemes.html:30
+msgid "Karnataka"
+msgstr "कर्नाटक"
+
+#: templates/schemes.html:31
+msgid "Kerala"
+msgstr "केरल"
+
+#: templates/schemes.html:32
+msgid "Madhya Pradesh"
+msgstr "मध्य प्रदेश"
+
+#: templates/schemes.html:33
+msgid "Maharashtra"
+msgstr "महाराष्ट्र"
+
+#: templates/schemes.html:34
+msgid "Manipur"
+msgstr "मणिपुर"
+
+#: templates/schemes.html:35
+msgid "Meghalaya"
+msgstr "मेघालय"
+
+#: templates/schemes.html:36
+msgid "Mizoram"
+msgstr "मिजोरम"
+
+#: templates/schemes.html:37
+msgid "Nagaland"
+msgstr "नागालैंड"
+
+#: templates/schemes.html:38
+msgid "Odisha"
+msgstr "ओडिशा"
+
+#: templates/schemes.html:39
+msgid "Punjab"
+msgstr "पंजाब"
+
+#: templates/schemes.html:40
+msgid "Rajasthan"
+msgstr "राजस्थान"
+
+#: templates/schemes.html:41
+msgid "Sikkim"
+msgstr "सिक्किम"
+
+#: templates/schemes.html:42
+msgid "Tamil Nadu"
+msgstr "तमिलनाडु"
+
+#: templates/schemes.html:43
+msgid "Telangana"
+msgstr "तेलंगाना"
+
+#: templates/schemes.html:44
+msgid "Tripura"
+msgstr "त्रिपुरा"
+
+#: templates/schemes.html:45
+msgid "Uttar Pradesh"
+msgstr "उत्तर प्रदेश"
+
+#: templates/schemes.html:46
+msgid "Uttarakhand"
+msgstr "उत्तराखंड"
+
+#: templates/schemes.html:47
+msgid "West Bengal"
+msgstr "पश्चिम बंगाल"
+
+#: templates/schemes.html:49
+msgid "Andaman & Nicobar Islands"
+msgstr "अंडमान और निकोबार द्वीप समूह"
+
+#: templates/schemes.html:50
+msgid "Chandigarh"
+msgstr "चंडीगढ़"
+
+#: templates/schemes.html:51
+msgid "Dadra & Nagar Haveli and Daman & Diu"
+msgstr "दादरा और नगर हवेली और दमन और दीव"
+
+#: templates/schemes.html:52
+msgid "Delhi"
+msgstr "दिल्ली"
+
+#: templates/schemes.html:53
+msgid "Jammu & Kashmir"
+msgstr "जम्मू और कश्मीर"
+
+#: templates/schemes.html:54
+msgid "Ladakh"
+msgstr "लद्दाख"
+
+#: templates/schemes.html:55
+msgid "Lakshadweep"
+msgstr "लक्षद्वीप"
+
+#: templates/schemes.html:56
+msgid "Puducherry"
+msgstr "पुडुचेरी"
+
+#: templates/schemes.html:61
+msgid "Crop Type"
+msgstr "फसल का प्रकार"
+
+#: templates/schemes.html:65
+msgid "Apple"
+msgstr "सेब"
+
+#: templates/schemes.html:66
+msgid "Corn (Maize)"
+msgstr "मक्का"
+
+#: templates/schemes.html:67
+msgid "Grape"
+msgstr "अंगूर"
+
+#: templates/schemes.html:68
+msgid "Potato"
+msgstr "आलू"
+
+#: templates/schemes.html:69
+msgid "Tomato"
+msgstr "टमाटर"
+
+#: templates/schemes.html:70
+msgid "Soybean"
+msgstr "सोयाबीन"
+
+#: templates/schemes.html:71
+msgid "Orange"
+msgstr "संतरा"
+
+#: templates/schemes.html:72
+msgid "Strawberry"
+msgstr "स्ट्रॉबेरी"
+
+#: templates/schemes.html:76
+msgid "Find Schemes"
+msgstr "योजनाएं खोजें"
+
+#: templates/schemes.html:95
+msgid "Expired"
+msgstr "समाप्त"
+
+#: templates/schemes.html:97
+msgid "Ending Soon"
+msgstr "जल्द समाप्त हो रहा है"
+
+#: templates/schemes.html:99
+msgid "Active"
+msgstr "सक्रिय"
+
+#: templates/schemes.html:109
+msgid "Benefit"
+msgstr "लाभ"
+
+#: templates/schemes.html:115
+msgid "Deadline"
+msgstr "अंतिम तिथि"
+
+#: templates/schemes.html:125
+msgid "Apply Now"
+msgstr "अभी आवेदन करें"
+
+#: templates/schemes.html:136
+msgid "No schemes found matching your filters."
+msgstr "आपके फ़िल्टर से मेल खाने वाली कोई योजना नहीं मिली।"
+
+#: templates/schemes.html:137
+msgid "Try selecting \"All\" to see Global Schemes."
+msgstr "वैश्विक योजनाएं देखने के लिए \"सभी\" का चयन करने का प्रयास करें।"
+
+#: templates/terms.html:6
+msgid "Last Updated:"
+msgstr "अंतिम अपडेट:"
+
+#: templates/terms.html:9
+msgid "Acceptance of Terms"
+msgstr "शर्तों की स्वीकृति"
+
+#: templates/terms.html:10
+msgid ""
+"By accessing and using Crop Doctor AI, you accept and agree to be bound "
+"by the terms and provision of this agreement."
+msgstr "क्रॉप डॉक्टर एआई तक पहुँचने और उपयोग करने से, आप इस समझौते के नियमों और प्रावधानों से बाध्य होने के लिए स्वीकार और सहमत होते हैं।"
+
+#: templates/terms.html:12
+msgid "Educational Use Only (Disclaimer)"
+msgstr "केवल शैक्षिक उपयोग (अस्वीकरण)"
+
+#: templates/terms.html:14
+msgid "This is an AI-assisted diagnostic tool."
+msgstr "यह एक एआई-सहायता प्राप्त निदान उपकरण है।"
+
+#: templates/terms.html:15
+msgid ""
+"The results provided by Crop Doctor AI are for informational purposes "
+"only. While we strive for accuracy, this tool should not replace "
+"professional agricultural advice or lab testing. We are not liable for "
+"any crop loss or financial damage resulting from reliance on this tool."
+msgstr "क्रॉप डॉक्टर एआई द्वारा प्रदान किए गए परिणाम केवल सूचनात्मक उद्देश्यों के लिए हैं। जबकि हम सटीकता के लिए प्रयास करते हैं, इस उपकरण को पेशेवर कृषि सलाह या लैब परीक्षण की जगह नहीं लेनी चाहिए। हम इस उपकरण पर निर्भरता से होने वाले किसी भी फसल के नुकसान या वित्तीय क्षति के लिए उत्तरदायी नहीं हैं।"
+
+#: templates/terms.html:18
+msgid "User Conduct"
+msgstr "उपयोगकर्ता आचरण"
+
+#: templates/terms.html:19
+msgid ""
+"You agree not to upload malicious code, illegal content, or images that "
+"do not belong to you."
+msgstr "आप दुर्भावनापूर्ण कोड, अवैध सामग्री, या ऐसी छवियां अपलोड नहीं करने के लिए सहमत हैं जो आपकी नहीं हैं।"
+
+#: templates/terms.html:21
+msgid "Changes to Terms"
+msgstr "शर्तों में बदलाव"
+
+#: templates/terms.html:22
+msgid ""
+"We reserve the right to modify these terms at any time. Continued use of "
+"the service constitutes acceptance of new terms."
+msgstr "हम किसी भी समय इन शर्तों को संशोधित करने का अधिकार सुरक्षित रखते हैं। सेवा का निरंतर उपयोग नई शर्तों की स्वीकृति का गठन करता है।"
+
+#: templates/privacy.html:11
+msgid "Information We Collect"
+msgstr "जानकारी जो हम एकत्र करते हैं"
+
+#: templates/privacy.html:12
+msgid "We strictly limit the data we collect. When you use Crop Doctor AI, we may process:"
+msgstr "हम जो डेटा एकत्र करते हैं उसे सख्ती से सीमित करते हैं। जब आप क्रॉप डॉक्टर एआई का उपयोग करते हैं, तो हम संसाधित कर सकते हैं:"
+
+#: templates/privacy.html:14
+msgid "Images:"
+msgstr "छवियां:"
+
+#: templates/privacy.html:14
+msgid "Photos of crops you upload for diagnosis."
+msgstr "निदान के लिए आपके द्वारा अपलोड की गई फसलों की तस्वीरें।"
+
+#: templates/privacy.html:15
+msgid "Device Data:"
+msgstr "डिवाइस डेटा:"
+
+#: templates/privacy.html:15
+msgid "Basic information for analytics (e.g., browser type)."
+msgstr "विश्लेषण के लिए बुनियादी जानकारी (जैसे, ब्राउज़र प्रकार)।"
+
+#: templates/privacy.html:19
+msgid "How We Use Your Images"
+msgstr "हम आपकी छवियों का उपयोग कैसे करते हैं"
+
+#: templates/privacy.html:20
+msgid "Your privacy is our priority. Images uploaded for diagnosis are processed temporarily to provide results."
+msgstr "आपकी गोपनीयता हमारी प्राथमिकता है। निदान के लिए अपलोड की गई छवियों को परिणाम प्रदान करने के लिए अस्थायी रूप से संसाधित किया जाता है।"
+
+#: templates/privacy.html:23
+msgid "Important Note:"
+msgstr "महत्वपूर्ण नोट:"
+
+#: templates/privacy.html:24
+msgid "We do not sell your personal photos. Images are used solely for generating the disease diagnosis report."
+msgstr "हम आपकी व्यक्तिगत तस्वीरें नहीं बेचते हैं। छवियों का उपयोग केवल रोग निदान रिपोर्ट तैयार करने के लिए किया जाता है।"
+
+#: templates/privacy.html:28
+msgid "Local Storage"
+msgstr "स्थानीय भंडारण"
+
+#: templates/privacy.html:29
+msgid "To improve performance (Offline Mode), some data models and history logs are stored locally on your device's browser. You can clear this anytime via your browser settings."
+msgstr "प्रदर्शन (ऑफलाइन मोड) को बेहतर बनाने के लिए, कुछ डेटा मॉडल और इतिहास लॉग आपके डिवाइस के ब्राउज़र पर स्थानीय रूप से संग्रहीत किए जाते हैं। आप इसे अपनी ब्राउज़र सेटिंग के माध्यम से कभी भी साफ़ कर सकते हैं।"
+
+#: templates/privacy.html:33
+msgid "Contact Us"
+msgstr "संपर्क करें"
+
+#: templates/privacy.html:34
+msgid "If you have questions about this policy, please contact us at"
+msgstr "यदि इस नीति के बारे में आपके कोई प्रश्न हैं, तो कृपया हमसे संपर्क करें"
+
+#: venv/Lib/site-packages/click/_termui_impl.py:613
+#, python-brace-format
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/Lib/site-packages/click/_termui_impl.py:617
+#, python-brace-format
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1114
+#: venv/Lib/site-packages/click/core.py:1151
+#, python-brace-format
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1170
+msgid "Options"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1245
+#, python-brace-format
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/core.py:1264
+#, python-brace-format
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1448
+msgid "Aborted!"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1822
+msgid "Commands"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1853
+msgid "Missing command."
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1931
+#, python-brace-format
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:2355
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:2378
+#, python-brace-format
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/core.py:2567
+#, python-brace-format
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3015
+#, python-brace-format
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3018
+#, python-brace-format
+msgid "default: {default}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3022
+msgid "required"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3082
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/Lib/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/Lib/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/Lib/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:50
+#: venv/Lib/site-packages/click/exceptions.py:89
+#, python-brace-format
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:81
+#, python-brace-format
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:130
+#, python-brace-format
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:132
+#, python-brace-format
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:196
+#, python-brace-format
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:203
+#, python-brace-format
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:223
+#, python-brace-format
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:235
+#, python-brace-format
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:289
+#, python-brace-format
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/parser.py:199
+#, python-brace-format
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/Lib/site-packages/click/parser.py:381
+#, python-brace-format
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/Lib/site-packages/click/parser.py:444
+#, python-brace-format
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/shell_completion.py:332
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/Lib/site-packages/click/shell_completion.py:339
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:165
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:181
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:183
+#, python-brace-format
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:194
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:253
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:872
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:332
+#, python-brace-format
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:369
+#, python-brace-format
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/types.py:460
+#, python-brace-format
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/types.py:482
+#, python-brace-format
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:538
+#, python-brace-format
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:719
+#, python-brace-format
+msgid "{value!r} is not a valid boolean. Recognized values: {states}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:747
+#, python-brace-format
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:937
+msgid "file"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:939
+msgid "directory"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:941
+msgid "path"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:988
+#, python-brace-format
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:997
+#, python-brace-format
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1005
+#, python-brace-format
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1014
+#, python-brace-format
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1023
+#, python-brace-format
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1032
+#, python-brace-format
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1099
+#, python-brace-format
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:407
+#, python-format
+msgid "Content purported to be compressed with %s but failed to decompress."
+msgstr ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:571
+#, python-format
+msgid "Unsupported value for qop: %s."
+msgstr ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:575
+#: venv/Lib/site-packages/httplib2/__init__.py:653
+#, python-format
+msgid "Unsupported value for algorithm: %s.algorithm"
+msgstr ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:648
+msgid "The challenge doesn't contain a server nonce, or this one is empty."
+msgstr ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:658
+#, python-format
+msgid "Unsupported value for pw-algorithm: %s.pw-algorithm"
+msgstr ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:1471
+msgid "Redirected but the response is missing a Location: header."
+msgstr ""
+
+msgid "Dr. Crop is thinking"
+msgstr "डॉ. क्रॉप सोच रहे हैं..."
+
+# --- About Page ---
+#: templates/about.html
+msgid "About Crop Disease Detection App"
+msgstr "फसल रोग पहचान ऐप के बारे में"
+
+msgid "Application Overview"
+msgstr "एप्लिकेशन अवलोकन"
+
+msgid "The Crop Disease Detection App is an innovative tool designed to assist farmers and agricultural enthusiasts in identifying common plant leaf diseases using advanced machine learning models. Our goal is to provide quick, accessible, and preliminary diagnoses to help in timely intervention and better crop management."
+msgstr "फसल रोग पहचान ऐप एक अभिनव उपकरण है जिसे किसानों और कृषि उत्साही लोगों को उन्नत मशीन लर्निंग मॉडल का उपयोग करके सामान्य पौधों की पत्तियों के रोगों की पहचान करने में सहायता करने के लिए डिज़ाइन किया गया है।"
+
+msgid "Key Features:"
+msgstr "प्रमुख विशेषताऐं:"
+
+msgid "AI-powered disease detection for various crops."
+msgstr "विभिन्न फसलों के लिए एआई-संचालित रोग पहचान।"
+
+msgid "Image upload and live camera capture capabilities (browser dependent)."
+msgstr "छवि अपलोड और लाइव कैमरा कैप्चर क्षमताएं (ब्राउज़र पर निर्भर)।"
+
+msgid "Image enhancement tools for better analysis."
+msgstr "बेहतर विश्लेषण के लिए छवि सुधार उपकरण।"
+
+msgid "Detailed diagnosis reports with confidence scores and treatment suggestions."
+msgstr "विश्वास स्कोर और उपचार सुझावों के साथ विस्तृत निदान रिपोर्ट।"
+
+msgid "History tracking of past diagnoses."
+msgstr "पिछले निदानों का इतिहास ट्रैकिंग।"
+
+msgid "User feedback system for continuous improvement."
+msgstr "निरंतर सुधार के लिए उपयोगकर्ता प्रतिक्रिया प्रणाली।"
+
+msgid "Development Information:"
+msgstr "विकास जानकारी:"
+
+msgid "Developed by: [AYUSH CHOUBEY]"
+msgstr "विकसित: [आयुष चौबे]"
+
+msgid "Version: 1.0.0"
+msgstr "संस्करण: 1.0.0"
+
+msgid "Release Date: January 13, 2026"
+msgstr "रिलीज़ की तारीख: 13 जनवरी, 2026"
+
+msgid "Technologies Used:"
+msgstr "प्रयुक्त प्रौद्योगिकियां:"
+
+msgid "Contact Us:"
+msgstr "संपर्क करें:"
+
+msgid "For support or inquiries, please contact:"
+msgstr "समर्थन या पूछताछ के लिए, कृपया संपर्क करें:"
+
+msgid "Visit our website/repository:"
+msgstr "हमारी वेबसाइट/रिपॉजिटरी पर जाएं:"
+
+msgid "Disclaimer:"
+msgstr "अस्वीकरण:"
+
+msgid "This application is a diagnostic aid and should not replace professional agricultural advice. Always consult with a qualified agronomist or plant pathologist for definitive diagnoses and treatment plans."
+msgstr "यह एप्लिकेशन एक नैदानिक ​​सहायता है और इसे पेशेवर कृषि सलाह का स्थान नहीं लेना चाहिए। निश्चित निदान और उपचार योजनाओं के लिए हमेशा एक योग्य कृषि विज्ञानी से परामर्श लें।"
+
+# --- Library Page ---
+#: templates/library.html
+msgid "Plant Disease Encyclopedia"
+msgstr "पादप रोग विश्वकोश"
+
+msgid "Browse our comprehensive database of crop diseases, symptoms, and treatments. Educate yourself to prevent outbreaks before they happen."
+msgstr "फसल रोगों, लक्षणों और उपचारों के हमारे व्यापक डेटाबेस को ब्राउज़ करें। प्रकोप होने से पहले उन्हें रोकने के लिए खुद को शिक्षित करें।"
+
+msgid "Search for 'Apple', 'Blight', or 'Rust'..."
+msgstr "'सेब', 'ब्लाईट', या 'रस्ट' खोजें..."
+
+msgid "KEY SYMPTOMS"
+msgstr "मुख्य लक्षण"
+
+msgid "Read Full Guide"
+msgstr "पूरी गाइड पढ़ें"
+
+msgid "Healthy"
+msgstr "स्वस्थ"
+
+msgid "Disease"
+msgstr "रोग"
+
+msgid "CropDoctor AI"
+msgstr "क्रॉप डॉक्टर एआई"
+
+msgid "Grow Smarter • Harvest Better"
+msgstr "होशियार बनें • बेहतर उपज पाएं"
+
+msgid "Listen"
+msgstr "सुने"
+
+msgid "Type or speak..."
+msgstr "टाइप करें या बोलें..."

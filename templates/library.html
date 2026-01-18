@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
+    
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight transition-colors duration-300">
+            {{ _('Plant Disease Encyclopedia') }}
+        </h1>
+        <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto transition-colors duration-300">
+            {{ _('Browse our comprehensive database of crop diseases, symptoms, and treatments. Educate yourself to prevent outbreaks before they happen.') }}
+        </p>
+    </div>
+
+    <div class="max-w-xl mx-auto mb-12 relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <input type="text" id="searchInput" onkeyup="filterLibrary()" 
+               class="block w-full pl-10 pr-3 py-4 border border-gray-300 dark:border-gray-600 rounded-full leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition shadow-sm" 
+               placeholder="{{ _('Search for \'Apple\', \'Blight\', or \'Rust\'...') }}">
+    </div>
+
+    <div id="libraryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for key, info in diseases.items() %}
+        <div class="disease-card bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 dark:border-gray-700 flex flex-col">
+            <div class="h-2 bg-green-500"></div> <div class="p-6 flex-grow">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white disease-name transition-colors duration-300">
+                        {{ key.replace('_', ' ') }}
+                    </h3>
+                    {% if 'healthy' in key.lower() %}
+                        <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-200 rounded-full border border-green-200 dark:border-green-800">{{ _('Healthy') }}</span>
+                    {% else %}
+                        <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-200 rounded-full border border-red-200 dark:border-red-800">{{ _('Disease') }}</span>
+                    {% endif %}
+                </div>
+                
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-3 transition-colors duration-300">
+                    {{ info['description'] }}
+                </p>
+                
+                <div class="mt-auto">
+                    <h4 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">{{ _('Key Symptoms') }}</h4>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 italic transition-colors duration-300">
+                        {{ info['symptoms'][:100] }}...
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 dark:bg-gray-700/50 px-6 py-3 border-t border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                <button onclick="openModal('{{ key }}')" class="text-green-600 dark:text-green-400 font-semibold text-sm hover:text-green-800 dark:hover:text-green-300 flex items-center transition-colors">
+                    {{ _('Read Full Guide') }} <span class="ml-1">→</span>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div id="noResults" class="hidden text-center py-12">
+        <p class="text-xl text-gray-500 dark:text-gray-400">{{ _('No diseases found matching your search.') }}</p>
+    </div>
+
+</div>
+
+<div id="infoModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" aria-hidden="true" onclick="closeModal()"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        
+        <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-200 dark:border-gray-700">
+            <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 transition-colors duration-300">
+                <h3 class="text-2xl leading-6 font-bold text-gray-900 dark:text-white mb-4" id="modalTitle"></h3>
+                <div class="mt-2 space-y-4">
+                    <div>
+                        <h4 class="font-bold text-green-600 dark:text-green-400 text-sm uppercase">{{ _('Description') }}</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 leading-relaxed" id="modalDesc"></p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-blue-600 dark:text-blue-400 text-sm uppercase">{{ _('Symptoms') }}</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 leading-relaxed" id="modalSymp"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-100 dark:border-gray-700">
+                <button type="button" onclick="closeModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                    {{ _('Close') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Search Filter Logic
+    function filterLibrary() {
+        let input = document.getElementById('searchInput');
+        let filter = input.value.toUpperCase();
+        let grid = document.getElementById('libraryGrid');
+        let cards = grid.getElementsByClassName('disease-card');
+        let noResults = document.getElementById('noResults');
+        let visibleCount = 0;
+
+        for (let i = 0; i < cards.length; i++) {
+            let name = cards[i].getElementsByClassName('disease-name')[0];
+            if (name.innerText.toUpperCase().indexOf(filter) > -1) {
+                cards[i].style.display = "";
+                visibleCount++;
+            } else {
+                cards[i].style.display = "none";
+            }
+        }
+        
+        if (visibleCount === 0) {
+            noResults.classList.remove('hidden');
+        } else {
+            noResults.classList.add('hidden');
+        }
+    }
+
+    // Modal Logic
+    const diseaseData = {{ diseases | tojson }};
+
+    function openModal(key) {
+        const info = diseaseData[key];
+        document.getElementById('modalTitle').textContent = key.replace(/_/g, ' ');
+        document.getElementById('modalDesc').textContent = info.description;
+        document.getElementById('modalSymp').textContent = info.symptoms;
+        
+        const modal = document.getElementById('infoModal');
+        modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('infoModal').classList.add('hidden');
+    }
+    
+    document.addEventListener('keydown', function(event) {
+        if (event.key === "Escape") {
+            closeModal();
+        }
+    });
+</script>
+{% endblock %}

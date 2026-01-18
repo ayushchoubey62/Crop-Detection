@@ -1,44 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container mx-auto p-4 diagnosis-bg rounded-lg shadow-xl max-w-2xl">
-    <h1 class="text-3xl font-bold mb-6 diagnosis-title">User Feedback & Support</h1>
+    <h1 class="text-3xl font-bold mb-6 diagnosis-title">{{ _('User Feedback & Support') }}</h1>
 
     <form id="feedbackForm" class="space-y-6">
         <!-- Feedback Type -->
         <div class="card p-4 rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold mb-3 section-title">Feedback Type</h2>
+            <h2 class="text-xl font-semibold mb-3 section-title">{{ _('Feedback Type') }}</h2>
             <div class="flex flex-wrap gap-4">
                 <label class="inline-flex items-center">
                     <input type="radio" name="feedback_type" value="suggestion" class="form-radio text-primary h-5 w-5" checked>
-                    <span class="ml-2 text-gray-700 dark:text-gray-300">Suggestion</span>
+                    <span class="ml-2 text-gray-700 dark:text-gray-300">{{ _('Suggestion') }}</span>
                 </label>
                 <label class="inline-flex items-center">
                     <input type="radio" name="feedback_type" value="bug" class="form-radio text-primary h-5 w-5">
-                    <span class="ml-2 text-gray-700 dark:text-gray-300">Bug Report</span>
+                    <span class="ml-2 text-gray-700 dark:text-gray-300">{{ _('Bug Report') }}</span>
                 </label>
                 <label class="inline-flex items-center">
                     <input type="radio" name="feedback_type" value="feature" class="form-radio text-primary h-5 w-5">
-                    <span class="ml-2 text-gray-700 dark:text-gray-300">Feature Request</span>
+                    <span class="ml-2 text-gray-700 dark:text-gray-300">{{ _('Feature Request') }}</span>
                 </label>
                 <label class="inline-flex items-center">
                     <input type="radio" name="feedback_type" value="general" class="form-radio text-primary h-5 w-5">
-                    <span class="ml-2 text-gray-700 dark:text-gray-300">General Feedback</span>
+                    <span class="ml-2 text-gray-700 dark:text-gray-300">{{ _('General Feedback') }}</span>
                 </label>
             </div>
         </div>
 
         <!-- Contact Email -->
         <div class="card p-4 rounded-lg shadow-md">
-            <label for="email" class="block text-xl font-semibold mb-3 section-title">Contact Email (optional):</label>
+            <label for="email" class="block text-xl font-semibold mb-3 section-title">{{ _('Contact Email (optional):') }}</label>
             <input type="email" id="email" name="email" class="input-field w-full p-3 rounded-md border" placeholder="your.email@example.com">
         </div>
 
         <!-- Rating -->
         <div id="ratingSection" class="card p-4 rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold mb-3 section-title">Rating</h2>
+            <h2 class="text-xl font-semibold mb-3 section-title">{{ _('Rating') }}</h2>
             <div class="flex flex-wrap items-center justify-between">
                 {% set ratings = [
-                    (1, 'Poor'), (2, 'Fair'), (3, 'Good'), (4, 'Very Good'), (5, 'Excellent')
+                    (1, _('Poor')), (2, _('Fair')), (3, _('Good')), (4, _('Very Good')), (5, _('Excellent'))
                 ] %}
                 {% for value, label in ratings %}
                 <label class="flex flex-col items-center cursor-pointer p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -52,26 +52,26 @@
 
         <!-- Your Feedback -->
         <div class="card p-4 rounded-lg shadow-md flex flex-col">
-            <label for="feedbackText" class="block text-xl font-semibold mb-3 section-title">Your Feedback:</label>
-            <textarea id="feedbackText" name="feedback_text" rows="8" class="input-field w-full p-3 rounded-md border flex-grow" placeholder="Please describe your feedback in detail..."></textarea>
+            <label for="feedbackText" class="block text-xl font-semibold mb-3 section-title">{{ _('Your Feedback:') }}</label>
+            <textarea id="feedbackText" name="feedback_text" rows="8" class="input-field w-full p-3 rounded-md border flex-grow" placeholder="">{{ _('Please describe your feedback in detail...') }}</textarea>
         </div>
 
         <!-- Attach Screenshot -->
         <div class="card p-4 rounded-lg shadow-md">
             <label class="inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="attachScreenshot" name="attach_screenshot" class="form-checkbox text-primary h-5 w-5">
-                <span class="ml-2 text-gray-700 dark:text-gray-300">Attach screenshot (if applicable)</span>
+                <span class="ml-2 text-gray-700 dark:text-gray-300">{{ _('Attach screenshot (if applicable)') }}</span>
             </label>
             <input type="file" id="screenshotFile" name="screenshot" accept="image/*" class="hidden" onchange="handleScreenshotFile(event)">
-            <button type="button" id="selectScreenshotBtn" class="btn-primary px-4 py-2 rounded-md mt-3" disabled>Select Screenshot</button>
+            <button type="button" id="selectScreenshotBtn" class="btn-primary px-4 py-2 rounded-md mt-3" disabled>{{ _('Select Screenshot') }}</button>
             <span id="screenshotFilename" class="text-sm text-gray-500 dark:text-gray-400 ml-3"></span>
         </div>
 
         <!-- Buttons -->
         <div class="flex justify-end space-x-4">
-            <button type="submit" id="submitFeedbackBtn" class="btn-primary px-6 py-2 rounded-md">Submit Feedback</button>
-            <button type="button" id="resetFormBtn" class="btn-primary px-6 py-2 rounded-md">Reset Form</button>
-            <a href="/" class="btn-primary px-6 py-2 rounded-md">Back to Home</a>
+            <button type="submit" id="submitFeedbackBtn" class="btn-primary px-6 py-2 rounded-md">{{ _('Submit Feedback') }}</button>
+            <button type="button" id="resetFormBtn" class="btn-primary px-6 py-2 rounded-md">{{ _('Reset Form') }}</button>
+            <a href="/" class="btn-primary px-6 py-2 rounded-md">{{ _('Back to Home') }}</a>
         </div>
     </form>
 </div>

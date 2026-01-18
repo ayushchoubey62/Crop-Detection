@@ -1,120 +1,149 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container mx-auto p-4 diagnosis-bg rounded-lg shadow-xl">
-    <h1 class="text-3xl font-bold mb-6 diagnosis-title">Crop Disease Diagnosis</h1>
 
-    <!-- Image Tools Section -->
+<style>
+    /* Custom Keyframe for "Fade In Up" */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* The class to apply the animation */
+    .animate-enter {
+        opacity: 0; /* Start hidden */
+        animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Stagger delays so items appear one by one */
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
+    .delay-400 { animation-delay: 0.4s; }
+    .delay-500 { animation-delay: 0.5s; }
+</style>
+
+<div class="container mx-auto p-4 diagnosis-bg rounded-lg shadow-xl">
+    <h1 class="text-3xl font-bold mb-6 diagnosis-title">{{ _('Crop Disease Diagnosis') }}</h1>
+
     <div class="card p-4 mb-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4 section-title">Image Tools</h2>
+        <h2 class="text-xl font-semibold mb-4 section-title">{{ _('Image Tools') }}</h2>
         <div class="flex flex-wrap items-center gap-4">
-            <input type="file" id="imageUpload" accept="image/*" class="hidden"> {# Removed onchange attribute here #}
-            <button onclick="document.getElementById('imageUpload').click()" class="btn-primary px-4 py-2 rounded-md">Upload Image</button>
-            <button id="clearImageBtn" class="btn-primary px-4 py-2 rounded-md" disabled>Clear Image</button>
+            <input type="file" id="imageUpload" accept="image/*" class="hidden"> 
+            <button onclick="document.getElementById('imageUpload').click()" class="btn-primary px-4 py-2 rounded-md">{{ _('Upload Image') }}</button>
+            <button id="clearImageBtn" class="btn-primary px-4 py-2 rounded-md" disabled>{{ _('Clear Image') }}</button>
 
             <label class="flex items-center space-x-2 cursor-pointer">
                 <input type="checkbox" id="livePreviewToggle" class="form-checkbox h-5 w-5 text-primary rounded" checked>
-                <span class="text-gray-700 dark:text-gray-300">Live Preview</span>
+                <span class="text-gray-700 dark:text-gray-300">{{ _('Live Preview') }}</span>
             </label>
 
-            <button id="cropImageBtn" class="btn-primary px-4 py-2 rounded-md" disabled>Crop Image</button>
-            <button id="applyCropBtn" class="btn-primary px-4 py-2 rounded-md hidden">Apply Crop</button>
-            <button id="resetCropBtn" class="btn-primary px-4 py-2 rounded-md hidden">Reset Crop</button>
+            <div class="flex items-center space-x-2 bg-yellow-50 dark:bg-yellow-900 px-3 py-2 rounded-md border border-yellow-200 dark:border-yellow-700">
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" id="fieldModeToggle" class="form-checkbox h-5 w-5 text-yellow-600 rounded">
+                    <span class="font-bold text-gray-700 dark:text-gray-300 select-none">{{ _('Field Mode (Offline)') }}</span>
+                </label>
+                <span id="modelStatus" class="text-xs text-gray-500 hidden md:inline ml-1"></span>
+            </div>
 
-            <span id="statusMessage" class="text-sm text-gray-600 dark:text-gray-400 ml-auto">Ready to upload image</span>
+            <button id="cropImageBtn" class="btn-primary px-4 py-2 rounded-md" disabled>{{ _('Crop Image') }}</button>
+            <button id="applyCropBtn" class="btn-primary px-4 py-2 rounded-md hidden">{{ _('Apply Crop') }}</button>
+            <button id="resetCropBtn" class="btn-primary px-4 py-2 rounded-md hidden">{{ _('Reset Crop') }}</button>
+
+            <span id="statusMessage" class="text-sm text-gray-600 dark:text-gray-400 ml-auto">{{ _('Ready to upload image') }}</span>
             <span id="loadingIndicator" class="text-xl ml-2 hidden"></span>
         </div>
     </div>
 
-    <!-- Main Content Area -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <!-- Image Preview Section -->
         <div class="card p-4 rounded-lg shadow-md flex flex-col">
-            <h2 class="text-xl font-semibold mb-4 section-title">Image Preview</h2>
+            <h2 class="text-xl font-semibold mb-4 section-title">{{ _('Image Preview') }}</h2>
             <div class="relative flex-grow border rounded-md overflow-hidden image-canvas-bg flex items-center justify-center p-2">
                 <img id="imagePreview" src="" alt="Image Preview" class="max-w-full max-h-full object-contain cursor-grab active:cursor-grabbing" style="display: none;">
-                <p id="noImageText" class="text-gray-500 dark:text-gray-400">No image uploaded</p>
+                <p id="noImageText" class="text-gray-500 dark:text-gray-400">{{ _('No image uploaded') }}</p>
                 <div id="cropOverlay" class="absolute inset-0 border-2 border-red-500 border-dashed hidden pointer-events-none"></div>
                 <div id="cropSelection" class="absolute border-2 border-red-500 bg-red-500 bg-opacity-20 hidden cursor-crosshair"></div>
             </div>
             <div class="flex justify-between items-center mt-2">
-                <button id="compareOriginalBtn" class="btn-primary px-3 py-1 rounded-md text-sm" disabled>Compare Original</button>
+                <button id="compareOriginalBtn" class="btn-primary px-3 py-1 rounded-md text-sm" disabled>{{ _('Compare Original') }}</button>
                 <span id="zoomLevel" class="text-sm text-gray-600 dark:text-gray-400">Zoom: 1.0x</span>
             </div>
         </div>
 
-        <!-- Diagnosis Results Section -->
         <div class="card p-4 rounded-lg shadow-md flex flex-col">
-            <h2 class="text-xl font-semibold mb-4 section-title">Diagnosis Results</h2>
+            <h2 class="text-xl font-semibold mb-4 section-title">{{ _('Diagnosis Results') }}</h2>
             <div id="diagnosisResults" class="flex-grow p-4 border rounded-md overflow-y-auto text-area-bg text-gray-800 dark:text-gray-200">
-                <p>No diagnosis available. Upload an image to start.</p>
+                <p>{{ _('No diagnosis available. Upload an image to start.') }}</p>
             </div>
         </div>
     </div>
 
-    <!-- Image Enhancement Tools Section -->
     <div class="card p-4 mb-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4 section-title">Image Enhancement Tools</h2>
+        <h2 class="text-xl font-semibold mb-4 section-title">{{ _('Image Enhancement Tools') }}</h2>
         <div class="flex flex-col md:flex-row md:space-x-8">
-            <!-- Basic Adjustments -->
             <div class="flex-1 mb-4 md:mb-0">
-                <h3 class="font-medium mb-2 text-gray-700 dark:text-gray-300">Basic Adjustments</h3>
+                <h3 class="font-medium mb-2 text-gray-700 dark:text-gray-300">{{ _('Basic Adjustments') }}</h3>
                 <div class="grid grid-cols-3 items-center gap-2 mb-2">
-                    <label for="brightness" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">Brightness:</label>
+                    <label for="brightness" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">{{ _('Brightness') }}:</label>
                     <input type="range" id="brightness" min="0.1" max="2.0" step="0.1" value="1.0" class="col-span-2 w-full">
                     <span id="brightnessValue" class="text-sm text-gray-600 dark:text-gray-400 text-right">1.0</span>
                 </div>
                 <div class="grid grid-cols-3 items-center gap-2 mb-2">
-                    <label for="contrast" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">Contrast:</label>
+                    <label for="contrast" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">{{ _('Contrast') }}:</label>
                     <input type="range" id="contrast" min="0.1" max="2.0" step="0.1" value="1.0" class="col-span-2 w-full">
                     <span id="contrastValue" class="text-sm text-gray-600 dark:text-gray-400 text-right">1.0</span>
                 </div>
                 <div class="grid grid-cols-3 items-center gap-2 mb-2">
-                    <label for="saturation" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">Saturation:</label>
+                    <label for="saturation" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">{{ _('Saturation') }}:</label>
                     <input type="range" id="saturation" min="0.0" max="2.0" step="0.1" value="1.0" class="col-span-2 w-full">
                     <span id="saturationValue" class="text-sm text-gray-600 dark:text-gray-400 text-right">1.0</span>
                 </div>
             </div>
 
-            <!-- Advanced Adjustments -->
             <div class="flex-1 mb-4 md:mb-0">
-                <h3 class="font-medium mb-2 text-gray-700 dark:text-gray-300">Advanced Adjustments</h3>
+                <h3 class="font-medium mb-2 text-gray-700 dark:text-gray-300">{{ _('Advanced Adjustments') }}</h3>
                 <div class="grid grid-cols-3 items-center gap-2 mb-2">
-                    <label for="edgeEnhance" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">Edge Enhance:</label>
+                    <label for="edgeEnhance" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">{{ _('Edge Enhance') }}:</label>
                     <input type="range" id="edgeEnhance" min="0.0" max="2.0" step="0.1" value="0.0" class="col-span-2 w-full">
                     <span id="edgeEnhanceValue" class="text-sm text-gray-600 dark:text-gray-400 text-right">0.0</span>
                 </div>
                 <div class="grid grid-cols-3 items-center gap-2 mb-2">
-                    <label for="blurReduce" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">Blur Reduce:</label>
+                    <label for="blurReduce" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">{{ _('Blur Reduce') }}:</label>
                     <input type="range" id="blurReduce" min="0.0" max="2.0" step="0.1" value="0.0" class="col-span-2 w-full">
                     <span id="blurReduceValue" class="text-sm text-gray-600 dark:text-gray-400 text-right">0.0</span>
                 </div>
                 <div class="grid grid-cols-3 items-center gap-2 mb-2">
-                    <label for="colorBalance" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">Color Balance:</label>
+                    <label for="colorBalance" class="col-span-1 text-sm text-gray-600 dark:text-gray-400">{{ _('Color Balance') }}:</label>
                     <input type="range" id="colorBalance" min="-1.0" max="1.0" step="0.1" value="0.0" class="col-span-2 w-full">
                     <span id="colorBalanceValue" class="text-sm text-gray-600 dark:text-gray-400 text-right">0.0</span>
                 </div>
             </div>
 
-            <!-- Presets -->
             <div class="flex-1">
-                <h3 class="font-medium mb-2 text-gray-700 dark:text-gray-300">Presets</h3>
+                <h3 class="font-medium mb-2 text-gray-700 dark:text-gray-300">{{ _('Presets') }}</h3>
                 <div class="grid grid-cols-2 gap-2">
-                    <button id="autoContrastBtn" class="btn-primary px-4 py-2 rounded-md text-sm">Auto Contrast</button>
-                    <button id="sharpenBtn" class="btn-primary px-4 py-2 rounded-md text-sm">Sharpen</button>
-                    <button id="grayscaleBtn" class="btn-primary px-4 py-2 rounded-md text-sm">Grayscale</button>
-                    <button id="resetFiltersBtn" class="btn-primary px-4 py-2 rounded-md text-sm">Reset Filters</button>
+                    <button id="autoContrastBtn" class="btn-primary px-4 py-2 rounded-md text-sm">{{ _('Auto Contrast') }}</button>
+                    <button id="sharpenBtn" class="btn-primary px-4 py-2 rounded-md text-sm">{{ _('Sharpen') }}</button>
+                    <button id="grayscaleBtn" class="btn-primary px-4 py-2 rounded-md text-sm">{{ _('Grayscale') }}</button>
+                    <button id="resetFiltersBtn" class="btn-primary px-4 py-2 rounded-md text-sm">{{ _('Reset Filters') }}</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bottom Buttons -->
     <div class="flex justify-end space-x-4">
-        <button id="saveReportBtn" class="btn-primary px-6 py-2 rounded-md" disabled>Save Report</button>
-        <button id="printReportBtn" class="btn-primary px-6 py-2 rounded-md" disabled>Print Report</button>
-        <a href="/" class="btn-primary px-6 py-2 rounded-md">Back to Home</a>
+        <button id="saveReportBtn" class="btn-primary px-6 py-2 rounded-md" disabled>{{ _('Save Report') }}</button>
+        <button id="printReportBtn" class="btn-primary px-6 py-2 rounded-md" disabled>{{ _('Print Report') }}</button>
+        <a href="/" class="btn-primary px-6 py-2 rounded-md">{{ _('Back to Home') }}</a>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
 
 <script>
     const imageUpload = document.getElementById('imageUpload');
@@ -151,6 +180,28 @@
     const grayscaleBtn = document.getElementById('grayscaleBtn');
     const resetFiltersBtn = document.getElementById('resetFiltersBtn');
 
+    // --- OFFLINE MODE (FIELD MODE) VARIABLES ---
+    let tfModel = null;
+    const fieldModeToggle = document.getElementById('fieldModeToggle');
+    const modelStatus = document.getElementById('modelStatus');
+    
+    // Class labels matching the trained Keras model structure
+    const CLASS_LABELS_LIST = [
+        'Apple_Apple_scab', 'Apple_Black_rot', 'Apple_Cedar_apple_rust', 'Apple_healthy',
+        'Blueberry_healthy', 'Cherry_Powdery_mildew', 'Cherry_healthy', 
+        'Corn_Cercospora_leaf_spot_Gray_leaf_spot', 'Corn_Common_rust', 
+        'Corn_Northern_Leaf_Blight', 'Corn_healthy', 'Grape_Black_rot', 
+        'Grape_Esca_Black_Measles', 'Grape_Leaf_blight', 'Grape_healthy', 
+        'Orange_Haunglongbing_Citrus_greening', 'Peach_Bacterial_spot', 'Peach_healthy', 
+        'Pepper_bell_Bacterial_spot', 'Pepper_bell_healthy', 'Potato_Early_blight', 
+        'Potato_Late_blight', 'Potato_healthy', 'Raspberry_healthy', 'Soybean_healthy', 
+        'Squash_Powdery_mildew', 'Strawberry_Leaf_scorch', 'Strawberry_healthy', 
+        'Tomato_Bacterial_spot', 'Tomato_Early_blight', 'Tomato_Late_blight', 
+        'Tomato_Leaf_Mold', 'Tomato_Septoria_leaf_spot', 
+        'Tomato_Spider_mites_Two_spotted_spider_mite', 'Tomato_Target_Spot', 
+        'Tomato_Tomato_Yellow_Leaf_Curl_Virus', 'Tomato_Tomato_mosaic_virus', 'Tomato_healthy'
+    ];
+
     let originalImageBase64 = null;
     let currentImageBase64 = null; // Image with filters applied
     let currentImageFilename = null; // Filename from server for report generation
@@ -178,26 +229,47 @@
     let loadingInterval;
 
     // Embed the Python dictionaries directly as JavaScript objects
-    // Parse the JSON strings to JavaScript objects
     const ALL_DISEASE_INFO = JSON.parse('{{ disease_info | tojson | safe }}');
     const ALL_TREATMENT_SUGGESTIONS = JSON.parse('{{ treatment_suggestions_data | tojson | safe }}');
-    // Pass the uploads_base_url from Flask
     const UPLOADS_BASE_URL = "{{ uploads_base_url }}";
 
 
+    // --- NEW LOADING ANIMATION (Skeleton Loader) ---
+
     function startLoadingAnimation() {
-        let idx = 0;
-        loadingIndicator.classList.remove('hidden');
-        loadingInterval = setInterval(() => {
-            loadingIndicator.textContent = loadingFrames[idx];
-            idx = (idx + 1) % loadingFrames.length;
-        }, 100);
+        // Create a Skeleton Loader HTML structure
+        const skeletonHTML = `
+            <div class="animate-pulse space-y-4">
+                <div class="h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mx-auto"></div>
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mx-auto"></div>
+                
+                <div class="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg mt-6 border border-gray-100 dark:border-gray-600"></div>
+                
+                <div class="space-y-2 mt-4">
+                    <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+                    <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-4/6"></div>
+                    <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                </div>
+            </div>
+            <p class="text-center text-sm text-gray-500 mt-6 animate-bounce">Analyzing leaf structure...</p>
+        `;
+        
+        // Inject skeleton into the results area
+        const resultsDiv = document.getElementById('diagnosisResults');
+        if (resultsDiv) {
+            resultsDiv.innerHTML = skeletonHTML;
+            resultsDiv.classList.remove('hidden');
+        }
+        
+        // Hide the default text spinner if it exists, as we are using the skeleton now
+        const loader = document.getElementById('loadingIndicator');
+        if(loader) loader.classList.add('hidden'); 
     }
 
     function stopLoadingAnimation() {
-        clearInterval(loadingInterval);
-        loadingIndicator.classList.add('hidden');
-        loadingIndicator.textContent = '';
+        const loader = document.getElementById('loadingIndicator');
+        if(loader) loader.classList.add('hidden');
+        // We don't clear innerHTML here because displayDiagnosisResults will overwrite it immediately
     }
 
     function resetFiltersUI() {
@@ -215,52 +287,118 @@
         colorBalanceValueSpan.textContent = '0.0';
     }
 
+    // Global flag to prevent double-downloading
+    let isModelLoading = false;
+
+    // --- 1. Load Offline Model (UPDATED) ---
+    async function loadTfModel() {
+        // Stop if already loaded OR currently loading
+        if (tfModel || isModelLoading) return; 
+        
+        isModelLoading = true;
+        modelStatus.textContent = "Downloading AI Brain... (one time)";
+        
+        try {
+            // CRITICAL CHANGE: Use loadGraphModel because we converted from a SavedModel
+            tfModel = await tf.loadGraphModel('/static/tfjs_model/model.json');
+            
+            // Warmup prediction to initialize the system
+            const warmupResult = tfModel.predict(tf.zeros([1, 150, 150, 3]));
+            if (warmupResult.dispose) warmupResult.dispose();
+
+            modelStatus.textContent = "Offline Ready";
+            modelStatus.className = "text-xs text-green-600 font-bold ml-1";
+            console.log("TF.js Model Loaded");
+        } catch (e) {
+            console.error("Failed to load TF model", e);
+            modelStatus.textContent = "Offline Load Failed";
+            modelStatus.className = "text-xs text-red-500 font-bold ml-1";
+        } finally {
+            // Always reset loading flag, even if it failed
+            isModelLoading = false;
+        }
+    }
+
+    // Toggle Event Listener
+    fieldModeToggle.addEventListener('change', async () => {
+        if (fieldModeToggle.checked) {
+            await loadTfModel();
+            // Double check if it actually loaded (in case of error)
+            if (tfModel) {
+                showNotification("Field Mode Active. Diagnosis runs in browser.", "success");
+            } else {
+                // If load failed, turn the toggle back off to avoid confusion
+                fieldModeToggle.checked = false; 
+                showNotification("Could not load Offline AI. Check connection.", "error");
+            }
+        } else {
+            showNotification("Field Mode Disabled. Using Server.", "info");
+        }
+    });
+
+
+    // --- Main Entry Point: Handle Upload ---
     async function handleImageUpload(event, file = null) {
         console.log("handleImageUpload started.");
-        let selectedFile = file || imageUpload.files[0]; // Use imageUpload.files[0] if event is null (for history load)
-        if (!selectedFile) {
-            console.log("No file selected in handleImageUpload.");
+        
+        // Handle both "Button Click" and "Drag & Drop" inputs
+        let selectedFile = file;
+        if (!selectedFile && imageUpload.files && imageUpload.files.length > 0) {
+            selectedFile = imageUpload.files[0];
+        }
+        
+        if (!selectedFile) return;
+
+        // Validations
+        if (!selectedFile.type.startsWith('image/')) {
+            showNotification("Please upload a valid image file.", "error");
             return;
         }
 
-        if (selectedFile.size < 100 * 1024) { // 100KB
-            showNotification("Image resolution might be too low for accurate diagnosis. Minimum 100KB recommended.", "warning", 5000);
+        if (selectedFile.size < 100 * 1024) {
+            showNotification("Low resolution image. Results may vary.", "warning", 3000);
         }
 
         try {
             const reader = new FileReader();
+            
+            // Success Handler
             reader.onload = async (e) => {
-                console.log("FileReader onload triggered.");
                 originalImageBase64 = e.target.result;
-                currentImageBase64 = originalImageBase64; // Initialize current with original
+                currentImageBase64 = originalImageBase64;
+                
+                // Update UI
                 displayImage(currentImageBase64);
                 resetFiltersUI();
                 enableImageControls();
                 clearDiagnosisResults();
-                statusMessage.textContent = "Image uploaded. Apply filters or click 'Diagnose'.";
+                statusMessage.textContent = "{{ _('Image uploaded. Analyzing...') }}";
 
-                // Automatically start diagnosis after upload
-                console.log("Calling diagnoseImage from handleImageUpload.");
+                // --- TRIGGER DIAGNOSIS ---
                 await diagnoseImage(currentImageBase64);
             };
+
+            // Error Handler (New Safety Feature)
+            reader.onerror = (e) => {
+                console.error("FileReader error:", e);
+                showNotification("Error reading file.", "error");
+                statusMessage.textContent = "File read failed.";
+            };
+
             reader.readAsDataURL(selectedFile);
-            console.log("FileReader readAsDataURL called.");
+            
         } catch (error) {
             console.error("Error in handleImageUpload:", error);
-            showNotification("Failed to read image file.", "error");
-            statusMessage.textContent = "Error uploading image.";
+            showNotification("Failed to initiate upload.", "error");
         }
-        console.log("handleImageUpload finished.");
     }
 
     function displayImage(base64Image) {
         imagePreview.src = base64Image;
         imagePreview.style.display = 'block';
         noImageText.style.display = 'none';
-        // Do not reset zoom/pan here unless explicitly resetting to default view
-        // Zoom/pan state should be managed separately if preserving across image changes (e.g., filter application)
         imagePreview.style.cursor = 'grab';
-        applyZoomPan(); // Apply current zoom/pan state
+        applyZoomPan();
     }
 
     function enableImageControls() {
@@ -294,9 +432,10 @@
         disableImageControls();
         resetFiltersUI();
         resetCropMode();
-        zoomLevel = 1.0; // Reset zoom for new image
-        resetPan(); // Reset pan for new image
+        zoomLevel = 1.0;
+        resetPan();
         updateZoomLabel();
+        imageUpload.value = ""; // Reset file input
         showNotification("Image cleared.", "info");
     }
 
@@ -321,10 +460,17 @@
                 color_balance: colorBalanceSlider.value,
             };
             await sendImageForPreview(originalImageBase64, filters);
-        }, 100); // Debounce for 100ms
+        }, 100);
     }
 
     async function sendImageForPreview(base64Image, filters) {
+        // If offline and field mode is active, skip server-side filtering
+        if(fieldModeToggle.checked && !navigator.onLine) {
+            // Optional: Could implement client-side canvas filters here
+            console.log("Skipping server filters in offline mode");
+            return;
+        }
+
         try {
             const formData = new FormData();
             formData.append('file', dataURLtoBlob(base64Image), 'image.png');
@@ -337,6 +483,12 @@
                 body: formData
             });
             const data = await response.json();
+            if (data.error && data.message) {
+                showNotification("⚠️ " + data.message, "error", 5000);
+                diagnosisResults.innerHTML = `<p class="text-red-500 font-bold">Invalid Image</p><p>${data.message}</p>`;
+                return;
+            }
+            
             if (data.success) {
                 const imageUrl = data.image_url;
                 const imageResponse = await fetch(imageUrl);
@@ -357,13 +509,10 @@
             }
         } catch (error) {
             console.error("Error sending image for preview:", error);
-            showNotification("Failed to generate live preview.", "error");
         }
     }
 
-    // Convert Data URL to Blob for FormData
     function dataURLtoBlob(dataurl) {
-        console.log("dataURLtoBlob called.");
         const arr = dataurl.split(',');
         const mime = arr[0].match(/:(.*?);/)[1];
         const bstr = atob(arr[1]);
@@ -372,51 +521,33 @@
         while (n--) {
             u8arr[n] = bstr.charCodeAt(n);
         }
-        console.log("dataURLtoBlob returning Blob.");
         return new Blob([u8arr], { type: mime });
     }
 
-    brightnessSlider.addEventListener('input', () => {
-        brightnessValueSpan.textContent = parseFloat(brightnessSlider.value).toFixed(1);
-        applyFilters();
-    });
-    contrastSlider.addEventListener('input', () => {
-        contrastValueSpan.textContent = parseFloat(contrastSlider.value).toFixed(1);
-        applyFilters();
-    });
-    saturationSlider.addEventListener('input', () => {
-        saturationValueSpan.textContent = parseFloat(saturationSlider.value).toFixed(1);
-        applyFilters();
-    });
-    edgeEnhanceSlider.addEventListener('input', () => {
-        edgeEnhanceValueSpan.textContent = parseFloat(edgeEnhanceSlider.value).toFixed(1);
-        applyFilters();
-    });
-    blurReduceSlider.addEventListener('input', () => {
-        blurReduceValueSpan.textContent = parseFloat(blurReduceSlider.value).toFixed(1);
-        applyFilters();
-    });
-    colorBalanceSlider.addEventListener('input', () => {
-        colorBalanceValueSpan.textContent = parseFloat(colorBalanceSlider.value).toFixed(1);
-        applyFilters();
+    // Filter Listeners
+    [brightnessSlider, contrastSlider, saturationSlider, edgeEnhanceSlider, blurReduceSlider, colorBalanceSlider].forEach(slider => {
+        slider.addEventListener('input', () => {
+            slider.nextElementSibling.textContent = parseFloat(slider.value).toFixed(1);
+            applyFilters();
+        });
     });
 
     autoContrastBtn.addEventListener('click', async () => {
         if (!originalImageBase64) return;
-        resetFiltersUI(); // Reset sliders for manual adjustments
+        resetFiltersUI();
         await sendImageForPreview(originalImageBase64, { auto_contrast: 'true' });
         showNotification("Auto contrast applied.", "info");
     });
     sharpenBtn.addEventListener('click', async () => {
         if (!originalImageBase64) return;
-        resetFiltersUI(); // Reset sliders for manual adjustments
+        resetFiltersUI();
         await sendImageForPreview(originalImageBase64, { sharpen: 'true' });
         showNotification("Image sharpened.", "info");
     });
     grayscaleBtn.addEventListener('click', async () => {
         if (!originalImageBase64) return;
-        resetFiltersUI(); // Reset sliders for manual adjustments
-        saturationSlider.value = 0.0; // Set saturation slider to 0
+        resetFiltersUI();
+        saturationSlider.value = 0.0;
         saturationValueSpan.textContent = '0.0';
         await sendImageForPreview(originalImageBase64, { grayscale: 'true' });
         showNotification("Image converted to grayscale.", "info");
@@ -425,16 +556,15 @@
         if (!originalImageBase64) return;
         resetFiltersUI();
         currentImageBase64 = originalImageBase64;
-        displayImage(currentImageBase64); // Display original image
+        displayImage(currentImageBase64);
         showNotification("Image filters reset.", "info");
     });
 
     livePreviewToggle.addEventListener('change', () => {
         if (livePreviewToggle.checked) {
-            applyFilters(); // Re-apply filters if enabled
+            applyFilters();
             showNotification("Live preview enabled.", "info");
         } else {
-            // Revert to original image if live preview is disabled
             if (originalImageBase64) {
                 currentImageBase64 = originalImageBase64;
                 displayImage(currentImageBase64);
@@ -443,18 +573,245 @@
         }
     });
 
-    // --- Diagnosis Logic ---
+    // --- MAIN DIAGNOSIS ORCHESTRATOR ---
     async function diagnoseImage(base64Image) {
-        console.log("diagnoseImage started.");
         if (!base64Image) {
             showNotification("No image to diagnose.", "warning");
-            console.log("diagnoseImage: No base64Image provided.");
             return;
         }
 
+        if (fieldModeToggle.checked) {
+            await diagnoseOffline(base64Image);
+        } else {
+            await diagnoseServerSide(base64Image);
+        }
+    }
+
+    
+    // --- 2. OFFLINE DIAGNOSIS LOGIC (FIXED) ---
+    async function diagnoseOffline(base64Image) {
+        if (!tfModel) await loadTfModel();
+        
         startLoadingAnimation();
-        statusMessage.textContent = "Analyzing image...";
-        diagnosisResults.innerHTML = '<p>Processing image...</p>';
+        statusMessage.textContent = "{{ _('Analyzing on device (Offline)...') }}";
+        saveReportBtn.disabled = true; 
+        printReportBtn.disabled = true; 
+
+        try {
+            // STEP 1: Determine the source (Canvas vs Image)
+            let sourceElement = document.getElementById('imageCanvas');
+            
+            // FALLBACK: If no canvas exists, create an Image object from the base64 string
+            if (!sourceElement) {
+                console.log("Canvas not found. Falling back to raw image file.");
+                sourceElement = await new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = "anonymous";
+                    img.src = base64Image;
+                    img.onload = () => resolve(img);
+                    img.onerror = (e) => reject(e);
+                });
+            }
+
+            // STEP 2: Create Tensor from the source
+            const tensor = tf.tidy(() => {
+                return tf.browser.fromPixels(sourceElement)
+                    .resizeBilinear([150, 150]) // Resize to match Python training
+                    .toFloat()
+                    .div(tf.scalar(255.0))      // Normalize 0-1
+                    .expandDims();
+            });
+
+            // STEP 3: Predict & Cleanup
+            const predictionTensor = tfModel.predict(tensor); 
+            const predictions = await predictionTensor.data();
+            
+            predictionTensor.dispose(); 
+            tensor.dispose(); 
+
+            // STEP 4: Process Results
+            let maxConf = -1, maxIdx = -1;
+            for (let i = 0; i < predictions.length; i++) {
+                if (predictions[i] > maxConf) { maxConf = predictions[i]; maxIdx = i; }
+            }
+
+            // Rejection Logic (Low Confidence)
+            if (maxConf < 0.4) {
+                statusMessage.textContent = "Unclear Image";
+                diagnosisResults.innerHTML = `
+                    <div class="p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 text-red-700 dark:text-red-300">
+                        <p class="font-bold">⚠️ Ambiguous Image</p>
+                        <p>We could not confidently identify a crop leaf (Confidence: ${(maxConf*100).toFixed(1)}%). Please try a clearer photo or use Server Mode.</p>
+                    </div>`;
+                stopLoadingAnimation();
+                showNotification("Image unclear", "warning");
+                return; 
+            }
+
+            // Success Logic
+            const fullLabel = CLASS_LABELS_LIST[maxIdx];
+            const confidenceVal = (maxConf * 100).toFixed(2) + "%";
+            
+            const result = {
+                crop_type: fullLabel.split('_')[0],
+                disease_name: fullLabel.includes('healthy') ? "Healthy" : fullLabel.replace(/_/g, ' '),
+                disease_key_for_lookup: fullLabel, 
+                confidence: confidenceVal,
+                note: maxConf < 0.6 ? "Moderate confidence (Offline)" : ""
+            };
+
+            // Info Lookup
+            let lookupKey = fullLabel;
+            if(fullLabel.toLowerCase().includes('healthy')) {
+                if(!ALL_DISEASE_INFO[lookupKey]) lookupKey = 'healthy';
+            }
+
+            // --- NEW CODE: SAVE TO LOCAL STORAGE ---
+            try {
+                // 1. Get info/treatments for offline storage (passed from server via Jinja)
+                // We use the ALL_DISEASE_INFO object you already injected in JS
+                const offlineInfo = ALL_DISEASE_INFO[lookupKey] || ALL_DISEASE_INFO['healthy'];
+                const offlineTreatments = ALL_TREATMENT_SUGGESTIONS[lookupKey] || ALL_TREATMENT_SUGGESTIONS['healthy'] || [];
+
+                // 2. Create the history object
+                const historyItem = {
+                    id: 'offline_' + Date.now(),
+                    timestamp: new Date().toISOString(),
+                    source: 'local',
+                    image_data: base64Image, // Save image base64 directly
+                    diagnosis: result,
+                    // IMPORTANT: We must match the structure the History page expects
+                    info: offlineInfo,
+                    treatments: offlineTreatments,
+                    result: result // Redundant but safe for some UI logic
+                };
+
+                // 3. Save to LocalStorage
+                const existingHistory = JSON.parse(localStorage.getItem('crop_diagnosis_history') || '[]');
+                existingHistory.unshift(historyItem); // Add to top of list
+                
+                // Limit to last 20 offline items to prevent storage full errors
+                if (existingHistory.length > 20) existingHistory.pop();
+                
+                localStorage.setItem('crop_diagnosis_history', JSON.stringify(existingHistory));
+                console.log("Offline result saved to history.");
+                
+            } catch (e) {
+                console.error("Failed to save offline history:", e);
+                // Don't stop execution, just log error
+            }
+            // --- END NEW CODE ---
+
+            currentDiagnosisDetails = result;
+            currentImageFilename = "offline_image.png"; 
+            currentDiseaseInfo = ALL_DISEASE_INFO[lookupKey] || ALL_DISEASE_INFO['healthy'] || {description: "Info unavailable offline", symptoms: ""};
+            currentTreatmentSuggestions = ALL_TREATMENT_SUGGESTIONS[lookupKey] || ALL_TREATMENT_SUGGESTIONS['healthy'] || [];
+
+            stopLoadingAnimation();
+            saveReportBtn.disabled = false;
+            printReportBtn.disabled = false;
+            displayDiagnosisResults(currentDiagnosisDetails, currentDiseaseInfo, currentTreatmentSuggestions);
+            statusMessage.textContent = "{{ _('Offline Analysis Complete') }}";
+            showNotification(`Offline Result: ${result.disease_name}`, "success");
+
+        } catch (error) {
+            console.error("Offline Error:", error);
+            stopLoadingAnimation();
+            statusMessage.textContent = "Offline analysis failed.";
+            diagnosisResults.innerHTML = `<p class="text-red-500 font-bold">OFFLINE ERROR</p><p>Could not run model on this device.</p>`;
+            showNotification("Offline diagnosis failed", "error");
+        }
+    }
+
+    // --- CLIENT-SIDE PDF GENERATION (Works Offline) ---
+    async function generateOfflineReport() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+    
+        // 1. Header
+        doc.setFontSize(20);
+        doc.setTextColor(0, 100, 0); // Green color
+        doc.text("Crop Doctor AI - Diagnosis Report", 105, 20, null, null, "center");
+    
+        // 2. Meta Data
+        let cursorY = 40;
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, cursorY); cursorY +=8;
+    
+        if(!currentDiagnosisDetails) {
+            showNotification("No diagnosis data to save.", "warning");
+            return;
+        }
+
+        // 3. Diagnosis Result
+        doc.setFont(undefined, 'bold');
+        doc.setFontSize(14);
+        doc.text(`Disease Detected: ${currentDiagnosisDetails.disease_name}`, 20, cursorY); cursorY +=8;
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(12);
+        doc.text(`Confidence Score: ${currentDiagnosisDetails.confidence}`, 20, cursorY); cursorY +=8;
+        doc.text(`Crop Type: ${currentDiagnosisDetails.crop_type}`, 20, cursorY); cursorY +=15;
+
+        // 4. Add Image (If available)
+        if (originalImageBase64) {
+            try {
+                // Add image at x=20, y=65, width=80, height=80
+                doc.addImage(originalImageBase64, 'JPEG', 65, cursorY, 80, 80);
+                cursorY +=90;
+            } catch (e) {
+                console.error("Image add failed", e);
+            }
+        }
+
+        // 5. Treatments (Positioned below image)
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(0, 100, 0);
+        doc.text("Recommended Actions & Treatments:", 20, cursorY); cursorY +=10;
+    
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.setFont(undefined, 'normal');
+
+        const treatments = currentTreatmentSuggestions || ["No specific treatments available."];
+        treatments.forEach((t) => {
+            let text = t;
+            let link = "";
+            if (typeof t === 'object' && t !== null){
+                text = t.text || "";
+                link = t.link || "";
+            }
+            doc.setTextColor(0, 0, 0);
+            doc.text(`• ${text}`, 20, cursorY); cursorY += 7;
+
+            if (link) {
+                doc.setTextColor(0, 0, 255); // Blue
+                doc.setFontSize(10);
+                // jsPDF method to add link
+                doc.text("   [View Product / Buy Now]", 25, cursorY, { url: link });
+                
+                doc.setFontSize(12); // Reset size
+                doc.setTextColor(0, 0, 0); // Reset color
+                cursorY += 7;
+            }
+        });
+
+        // 6. Disclaimer
+        doc.setFontSize(10);
+        doc.setTextColor(150, 150, 150);
+        doc.text("Disclaimer: AI diagnosis is for informational purposes only.", 105, 280, null, null, "center");
+
+        // 7. Save File
+        doc.save(`Offline_Report_${Date.now()}.pdf`);
+        showNotification("Report saved to device!", "success");
+    }
+   
+    // --- 3. SERVER-SIDE DIAGNOSIS LOGIC (UPDATED) ---
+    async function diagnoseServerSide(base64Image) {
+        startLoadingAnimation();
+        statusMessage.textContent = "Analyzing on server...";
+        // Note: skeleton animation in startLoadingAnimation handles the innerHTML
         saveReportBtn.disabled = true;
         printReportBtn.disabled = true;
 
@@ -462,13 +819,7 @@
             const formData = new FormData();
             formData.append('file', dataURLtoBlob(base64Image), 'diagnose_image.png');
 
-            // Log formData contents for debugging
-            console.log("FormData contents:");
-            for (let pair of formData.entries()) {
-                console.log(pair[0]+ ', ' + pair[1]);
-            }
-
-            // Include current filter values for diagnosis
+            // Send slider values so server sees exact same edits
             formData.append('brightness', brightnessSlider.value);
             formData.append('contrast', contrastSlider.value);
             formData.append('saturation', saturationSlider.value);
@@ -476,25 +827,19 @@
             formData.append('blur_reduce', blurReduceSlider.value);
             formData.append('color_balance', colorBalanceSlider.value);
 
-            console.log("Sending POST request to /diagnose...");
             const response = await fetch('/diagnose', {
                 method: 'POST',
                 body: formData
             });
 
-            console.log("Response received from /diagnose.");
             const data = await response.json();
-            console.log("Diagnosis response data:", data);
             stopLoadingAnimation();
 
             if (data.success) {
                 currentDiagnosisDetails = data.diagnosis;
-                currentImageFilename = data.image_filename; // Store filename for report
+                currentImageFilename = data.image_filename;
 
-                // Use the disease_key_for_lookup provided by the backend
                 const diseaseLookupKey = currentDiagnosisDetails.disease_key_for_lookup;
-                console.log("Frontend using diseaseLookupKey:", diseaseLookupKey);
-
                 currentDiseaseInfo = ALL_DISEASE_INFO[diseaseLookupKey] || ALL_DISEASE_INFO['healthy'];
                 currentTreatmentSuggestions = ALL_TREATMENT_SUGGESTIONS[diseaseLookupKey] || ALL_TREATMENT_SUGGESTIONS['healthy'];
 
@@ -504,166 +849,252 @@
                 printReportBtn.disabled = false;
                 showNotification("Diagnosis complete!", "success");
             } else {
-                diagnosisResults.innerHTML = `<p class="text-red-500 font-bold">DIAGNOSIS FAILED</p><p>${data.error}</p>`;
+                // REJECTION CASE (AI Gatekeeper Blocked It)
+                const errorMsg = data.message ? data.message : data.error;
+                const errorTitle = data.message ? "Invalid Image Detected" : "DIAGNOSIS FAILED";
+
+                diagnosisResults.innerHTML = `
+                    <div class="p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 text-red-700 dark:text-red-300">
+                        <p class="font-bold text-lg mb-1">${errorTitle}</p>
+                        <p>${errorMsg}</p>
+                    </div>`;
                 statusMessage.textContent = `Analysis failed: ${data.error}`;
-                showNotification("Diagnosis failed. See results for details.", "error");
-                currentDiagnosisDetails = null;
-                currentImageFilename = null;
+                showNotification(errorMsg, "error");
             }
         } catch (error) {
             console.error("Error during diagnosis fetch:", error);
             stopLoadingAnimation();
-            diagnosisResults.innerHTML = `<p class="text-red-500 font-bold">DIAGNOSIS FAILED</p><p>An unexpected error occurred: ${error.message}</p>`;
+            diagnosisResults.innerHTML = `<p class="text-red-500 font-bold">SERVER ERROR</p><p>Error: ${error.message}</p>`;
             statusMessage.textContent = "An unexpected error occurred.";
-            showNotification("An unexpected error occurred during diagnosis.", "error");
-            currentDiagnosisDetails = null;
-            currentImageFilename = null;
+            showNotification("Error during diagnosis.", "error");
         }
-        console.log("diagnoseImage finished.");
     }
 
     function displayDiagnosisResults(diagnosis, info, treatments) {
+        const diagnosisResults = document.getElementById('diagnosisResults');
+        
+        // 1. Determine Status Icon
+        const isHealthy = diagnosis.disease_name.toLowerCase().includes('healthy');
+        const statusIcon = isHealthy ? '🌿' : '⚠️';
+
+        // 2. GET THE BADGE COLOR (Using your new helper function)
+        const badgeClass = getConfidenceColorClass(diagnosis.confidence);
+
+        // 3. Build the Staggered HTML
         let html = `
-            <h3 class="text-xl font-bold mb-2 text-primary">DIAGNOSIS RESULTS</h3>
-            <p><strong>Crop Type:</strong> ${diagnosis.crop_type}</p>
-            <p><strong>Disease:</strong> ${diagnosis.disease_name} ${diagnosis.disease_name.toLowerCase().includes('healthy') ? '✅' : '⚠️'}</p>
-            <p><strong>Confidence:</strong> <span class="${getConfidenceColorClass(diagnosis.confidence)}">${diagnosis.confidence}</span></p>
-        `;
-        if (diagnosis.note) {
-            html += `<p class="text-yellow-500 italic">${diagnosis.note}</p>`;
-        }
-        html += `<hr class="my-4 border-gray-300 dark:border-gray-600">`;
+            <div class="animate-enter delay-100 mb-6 text-center border-b border-gray-100 dark:border-gray-700 pb-4">
+                <span class="text-4xl mb-2 block transform hover:scale-110 transition-transform duration-300">${statusIcon}</span>
+                <h3 class="text-2xl font-extrabold text-gray-800 dark:text-white tracking-tight leading-tight">
+                    ${diagnosis.disease_name}
+                </h3>
+                
+                <div class="mt-2 inline-flex items-center ${badgeClass}">
+                    Confidence: ${diagnosis.confidence}
+                </div>
+                
+                ${diagnosis.note ? `<p class="text-orange-500 text-xs mt-2 italic animate-pulse">${diagnosis.note}</p>` : ''}
+            </div>
 
-        html += `
-            <h3 class="text-xl font-bold mb-2 text-primary">Disease Information</h3>
-            <p><strong>Description:</strong> ${info.description}</p>
-            <p class="mt-2"><strong>Symptoms:</strong> ${info.symptoms}</p>
-            <hr class="my-4 border-gray-300 dark:border-gray-600">
+            <div class="animate-enter delay-200 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-4 border border-gray-100 dark:border-gray-600 shadow-sm">
+                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Diagnosis Details</h4>
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-gray-600 dark:text-gray-300">Crop Type:</span>
+                    <span class="font-bold text-gray-800 dark:text-white">${diagnosis.crop_type}</span>
+                </div>
+            </div>
+
+            <div class="animate-enter delay-300 mb-6">
+                <h4 class="flex items-center text-lg font-bold text-gray-800 dark:text-white mb-2">
+                    <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    About this Condition
+                </h4>
+                <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border-l-4 border-blue-500 shadow-sm">
+                    <p class="text-sm text-gray-700 dark:text-gray-300 mb-2 leading-relaxed">
+                        <strong>Description:</strong> ${info ? info.description : 'Not available'}
+                    </p>
+                    <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                        <strong>Symptoms:</strong> ${info ? info.symptoms : 'Not available'}
+                    </p>
+                </div>
+            </div>
+
+            <div class="animate-enter delay-400">
+                <h4 class="flex items-center text-lg font-bold text-gray-800 dark:text-white mb-3">
+                    <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    Recommended Action
+                </h4>
+                <ul class="space-y-2">
         `;
 
-        html += `
-            <h3 class="text-xl font-bold mb-2 text-primary">Treatment Suggestions</h3>
-            <ul class="list-disc pl-5">
-        `;
         if (treatments && treatments.length > 0) {
-            treatments.forEach(s => {
-                html += `<li>${s}</li>`;
+            treatments.forEach((t, index) => {
+                let text = t.text || t;
+                let link = t.link || "";
+                let linkHtml = "";
+                if (link) {
+                    linkHtml = ` <a href="${link}" target="_blank" class="ml-2 text-xs bg-green-600 text-white px-2 py-0.5 rounded hover:bg-green-700 no-underline shadow-sm transition-colors">🛒 Buy Now</a>`;
+                }
+                html += `
+                    <li class="flex items-start text-sm text-gray-700 dark:text-gray-300 animate-enter" style="animation-delay: ${0.5 + (index * 0.1)}s">
+                        <span class="mr-2 mt-1 text-green-500 flex-shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </span>
+                        <span>${text}${linkHtml}</span>
+                    </li>`;
             });
         } else {
-            html += `<li>No specific treatment suggestions available for this diagnosis.</li>`;
+            html += `<li class="text-sm text-gray-500 italic">No specific treatment suggestions available.</li>`;
         }
-        html += `</ul>`;
 
+        html += `</ul></div>`;
+
+        // --- NEW: COMMUNITY EXPERT BUTTON ---
+        html += `
+            <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 animate-enter delay-500">
+                <p class="text-xs text-gray-500 mb-2 text-center">Not sure about this result?</p>
+                <button onclick="postToCommunity()" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-md transition-colors flex justify-center items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <span>Ask the Community Experts</span>
+                </button>
+            </div>
+        `;
+
+        // 3. Inject into DOM
         diagnosisResults.innerHTML = html;
+        diagnosisResults.classList.remove('hidden');
+
+        // 4. Trigger Chat Widget Entrance & Auto-Open
+        setTimeout(() => {
+            if(typeof showChatWidget === "function") {
+                showChatWidget();
+                
+                // NEW: Auto-open the chat body so they see the chips immediately
+                const body = document.getElementById('chatBody');
+                const btn = document.getElementById('closeChatBtn');
+                
+                if(body && body.style.display === 'none') {
+                    body.style.display = 'flex';
+                    // Update the arrow icon to point down
+                    btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>';
+                }
+            }
+        }, 1500); // 1.5s delay allows user to glance at the main result first
     }
 
+    // --- HELPER: Get Badge Color based on Score ---
     function getConfidenceColorClass(confidence) {
         const confVal = parseFloat(confidence.replace('%', ''));
-        if (confVal > 75) return 'text-green-500 font-semibold';
-        if (confVal > 50) return 'text-orange-500 font-semibold';
-        return 'text-red-500 font-semibold';
+        
+        // High Confidence (> 75%) -> Green Badge
+        if (confVal > 75) {
+            return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border border-green-200 dark:border-green-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm';
+        }
+        
+        // Medium Confidence (> 50%) -> Yellow/Orange Badge
+        if (confVal > 50) {
+            return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm';
+        }
+        
+        // Low Confidence -> Red Badge
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 border border-red-200 dark:border-red-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm';
     }
 
-    // --- Report Generation ---
+    // --- Report Generation (Updated for Offline Support) ---
     saveReportBtn.addEventListener('click', async () => {
-        if (!currentDiagnosisDetails || !currentImageFilename) {
-            showNotification("No diagnosis data or image to save report.", "warning");
-            return;
-        }
+        if (!currentDiagnosisDetails) return;
+        
+        // CHECK: Are we in Offline Mode?
+        if(fieldModeToggle.checked) {
+            // Use the NEW Client-Side function
+            generateOfflineReport();
+        } else {
+            // Use the EXISTING Server-Side function
+            showNotification("Generating report...", "info");
+            try {
+                const response = await fetch('/generate_report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image_filename: currentImageFilename,
+                        diagnosis_details: currentDiagnosisDetails,
+                        disease_info: currentDiseaseInfo,
+                        treatment_suggestions: currentTreatmentSuggestions
+                    })
+                });
 
-        showNotification("Generating report...", "info");
-        try {
-            const response = await fetch('/generate_report', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    image_filename: currentImageFilename,
-                    diagnosis_details: currentDiagnosisDetails,
-                    disease_info: currentDiseaseInfo,
-                    treatment_suggestions: currentTreatmentSuggestions
-                })
-            });
-
-            if (response.ok) {
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = `diagnosis_report_${new Date().toISOString().slice(0,10)}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                showNotification("Report saved successfully!", "success");
-            } else {
-                const errorData = await response.json();
-                showNotification(`Failed to save report: ${errorData.error}`, "error");
-            }
-        } catch (error) {
-            console.error("Error saving report:", error);
-            showNotification("An error occurred while saving the report.", "error");
-        }
-    });
-
-    printReportBtn.addEventListener('click', async () => {
-        if (!currentDiagnosisDetails || !currentImageFilename) {
-            showNotification("No diagnosis data or image to print report.", "warning");
-            return;
-        }
-
-        showNotification("Generating printable report...", "info");
-        try {
-            const response = await fetch('/generate_report', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    image_filename: currentImageFilename,
-                    diagnosis_details: currentDiagnosisDetails,
-                    disease_info: currentDiseaseInfo,
-                    treatment_suggestions: currentTreatmentSuggestions
-                })
-            });
-
-            if (response.ok) {
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                // Open in a new tab for printing
-                const newWindow = window.open(url, '_blank');
-                if (newWindow) {
-                    newWindow.focus();
-                    showNotification("Report opened for printing. Use your browser's print function.", "info", 5000);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `diagnosis_report_${new Date().toISOString().slice(0,10)}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    showNotification("Report saved successfully!", "success");
                 } else {
-                    showNotification("Pop-up blocked. Please allow pop-ups for this site to view the report.", "warning", 5000);
+                    showNotification("Failed to save report.", "error");
                 }
-            } else {
-                const errorData = await response.json();
-                showNotification(`Failed to generate printable report: ${errorData.error}`, "error");
+            } catch (error) {
+                console.error("Error saving report:", error);
+                showNotification("Error saving report.", "error");
             }
-        } catch (error) {
-            console.error("Error printing report:", error);
-            showNotification("An error occurred while generating the printable report.", "error");
         }
     });
+
+    // --- Print Report (Updated for Offline Support) ---
+    printReportBtn.addEventListener('click', async () => {
+        if (!currentDiagnosisDetails) return;
+        
+        // CHECK: Are we in Offline Mode?
+        if(fieldModeToggle.checked) {
+            // REUSE the new Client-Side function
+            // Note: In offline mode, "Printing" saves the file so you can open & print it manually.
+            generateOfflineReport();
+        } else {
+            // Use the EXISTING Server-Side function (Online Mode)
+            showNotification("Generating printable report...", "info");
+            try {
+                const response = await fetch('/generate_report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image_filename: currentImageFilename,
+                        diagnosis_details: currentDiagnosisDetails,
+                        disease_info: currentDiseaseInfo,
+                        treatment_suggestions: currentTreatmentSuggestions
+                    })
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const newWindow = window.open(url, '_blank');
+                    if (newWindow) {
+                        newWindow.focus();
+                        showNotification("Report opened for printing.", "info");
+                    }
+                } else {
+                    showNotification("Failed to generate printable report.", "error");
+                }
+            } catch (error) {
+                console.error("Error printing report:", error);
+                showNotification("Error printing report.", "error");
+            }
+        }
+    });
+
 
     // --- Zoom and Pan ---
     const zoomLevelSpan = document.getElementById('zoomLevel');
 
     imagePreview.addEventListener('wheel', (e) => {
-        e.preventDefault(); // Prevent page scrolling
+        e.preventDefault();
         if (!originalImageBase64) return;
-
         const scaleAmount = 0.1;
-        if (e.deltaY < 0) {
-            zoomLevel += scaleAmount; // Zoom in
-        } else {
-            zoomLevel -= scaleAmount; // Zoom out
-        }
-        zoomLevel = Math.max(0.1, Math.min(10.0, zoomLevel)); // Clamp zoom level
-
+        zoomLevel += (e.deltaY < 0) ? scaleAmount : -scaleAmount;
+        zoomLevel = Math.max(0.1, Math.min(10.0, zoomLevel));
         updateZoomLabel();
         applyZoomPan();
     });
@@ -674,44 +1105,13 @@
 
     function applyZoomPan() {
         if (!imagePreview.src) return;
-
-        // Get current image position (relative to its container)
         const currentLeft = parseFloat(imagePreview.style.left || '0px');
         const currentTop = parseFloat(imagePreview.style.top || '0px');
-
-        // Calculate new dimensions
-        const naturalWidth = imagePreview.naturalWidth;
-        const naturalHeight = imagePreview.naturalHeight;
-        const scaledWidth = naturalWidth * zoomLevel;
-        const scaledHeight = naturalHeight * zoomLevel;
-
-        // Apply scale
+        
         imagePreview.style.transform = `scale(${zoomLevel})`;
-        imagePreview.style.transformOrigin = '0 0'; // Set origin for consistent scaling
-
-        // Adjust position to keep image centered or within bounds
-        const containerWidth = imagePreviewContainer.clientWidth;
-        const containerHeight = imagePreviewContainer.clientHeight;
-
-        let newLeft = currentLeft;
-        let newTop = currentTop;
-
-        // If image is smaller than container, center it
-        if (scaledWidth <= containerWidth) {
-            newLeft = (containerWidth - scaledWidth) / 2;
-        } else {
-            // Keep current pan, but ensure it doesn't go out of bounds
-            newLeft = Math.max(containerWidth - scaledWidth, Math.min(0, newLeft));
-        }
-
-        if (scaledHeight <= containerHeight) {
-            newTop = (containerHeight - scaledHeight) / 2;
-        } else {
-            newTop = Math.max(containerHeight - scaledHeight, Math.min(0, newTop));
-        }
-
-        imagePreview.style.left = `${newLeft}px`;
-        imagePreview.style.top = `${newTop}px`;
+        imagePreview.style.transformOrigin = '0 0';
+        imagePreview.style.left = `${currentLeft}px`;
+        imagePreview.style.top = `${currentTop}px`;
     }
 
     imagePreview.addEventListener('mousedown', (e) => {
@@ -724,40 +1124,15 @@
 
     imagePreview.addEventListener('mousemove', (e) => {
         if (!isPanning) return;
-        e.preventDefault(); // Prevent selection while dragging
-
+        e.preventDefault();
         const newLeft = e.clientX - panStartX;
         const newTop = e.clientY - panStartY;
-
-        // Clamp panning to image boundaries
-        const naturalWidth = imagePreview.naturalWidth;
-        const naturalHeight = imagePreview.naturalHeight;
-        const scaledWidth = naturalWidth * zoomLevel;
-        const scaledHeight = naturalHeight * zoomLevel;
-
-        const containerWidth = imagePreviewContainer.clientWidth;
-        const containerHeight = imagePreviewContainer.clientHeight;
-
-        const maxLeft = Math.max(0, containerWidth - scaledWidth);
-        const maxTop = Math.max(0, containerHeight - scaledHeight);
-
-        imagePreview.style.left = `${Math.min(0, Math.max(maxLeft, newLeft))}px`;
-        imagePreview.style.top = `${Math.min(0, Math.max(maxTop, newTop))}px`;
+        imagePreview.style.left = `${newLeft}px`;
+        imagePreview.style.top = `${newTop}px`;
     });
 
-    imagePreview.addEventListener('mouseup', () => {
-        isPanning = false;
-        if (!isCropping) {
-            imagePreview.style.cursor = 'grab';
-        }
-    });
-
-    imagePreviewContainer.addEventListener('mouseleave', () => {
-        isPanning = false;
-        if (!isCropping) {
-            imagePreview.style.cursor = 'grab';
-        }
-    });
+    imagePreview.addEventListener('mouseup', () => { isPanning = false; if(!isCropping) imagePreview.style.cursor = 'grab'; });
+    imagePreviewContainer.addEventListener('mouseleave', () => { isPanning = false; if(!isCropping) imagePreview.style.cursor = 'grab'; });
 
     function resetPan() {
         imagePreview.style.left = '0px';
@@ -766,57 +1141,35 @@
 
     // --- Cropping Logic ---
     const cropOverlay = document.getElementById('cropOverlay');
-
     cropImageBtn.addEventListener('click', activateCropMode);
     applyCropBtn.addEventListener('click', applyCrop);
     resetCropBtn.addEventListener('click', resetCropMode);
 
     function activateCropMode() {
-        if (!originalImageBase64) {
-            showNotification("Please upload an image first to crop.", "warning");
-            return;
-        }
+        if (!originalImageBase64) return;
         isCropping = true;
-        statusMessage.textContent = "Draw a rectangle to crop the image.";
         cropImageBtn.classList.add('hidden');
         applyCropBtn.classList.remove('hidden');
         resetCropBtn.classList.remove('hidden');
         imagePreview.style.cursor = 'crosshair';
         cropSelection.classList.remove('hidden');
         cropOverlay.classList.remove('hidden');
-
-        // Bind cropping events
         imagePreviewContainer.addEventListener('mousedown', startCropSelection);
         imagePreviewContainer.addEventListener('mousemove', dragCropSelection);
         imagePreviewContainer.addEventListener('mouseup', endCropSelection);
-
-        showNotification("Crop mode activated. Draw a rectangle.", "info");
     }
 
     function resetCropMode() {
         isCropping = false;
-        cropStartX = null;
-        cropStartY = null;
-        cropEndX = null;
-        cropEndY = null;
-        cropSelection.style.width = '0';
-        cropSelection.style.height = '0';
         cropSelection.classList.add('hidden');
         cropOverlay.classList.add('hidden');
         cropImageBtn.classList.remove('hidden');
         applyCropBtn.classList.add('hidden');
         resetCropBtn.classList.add('hidden');
         imagePreview.style.cursor = 'grab';
-        statusMessage.textContent = "Crop reset. Original image restored.";
-        if (originalImageBase64) {
-            currentImageBase64 = originalImageBase64;
-            displayImage(currentImageBase64);
-        }
-        // Unbind cropping events
         imagePreviewContainer.removeEventListener('mousedown', startCropSelection);
         imagePreviewContainer.removeEventListener('mousemove', dragCropSelection);
         imagePreviewContainer.removeEventListener('mouseup', endCropSelection);
-        showNotification("Crop mode reset.", "info");
     }
 
     function startCropSelection(e) {
@@ -836,130 +1189,106 @@
         const rect = imagePreviewContainer.getBoundingClientRect();
         cropEndX = e.clientX - rect.left;
         cropEndY = e.clientY - rect.top;
-
-        const width = cropEndX - cropStartX;
-        const height = cropEndY - cropStartY;
-
-        cropSelection.style.width = `${Math.abs(width)}px`;
-        cropSelection.style.height = `${Math.abs(height)}px`;
+        cropSelection.style.width = `${Math.abs(cropEndX - cropStartX)}px`;
+        cropSelection.style.height = `${Math.abs(cropEndY - cropStartY)}px`;
         cropSelection.style.left = `${Math.min(cropStartX, cropEndX)}px`;
         cropSelection.style.top = `${Math.min(cropStartY, cropEndY)}px`;
     }
 
-    async function endCropSelection(e) {
+    function endCropSelection(e) {
         if (!isCropping || cropStartX === null) return;
         cropEndX = e.clientX - imagePreviewContainer.getBoundingClientRect().left;
         cropEndY = e.clientY - imagePreviewContainer.getBoundingClientRect().top;
-
-        // Ensure valid crop area
-        const x1 = Math.min(cropStartX, cropEndX);
-        const y1 = Math.min(cropStartY, cropEndY);
-        const x2 = Math.max(cropStartX, cropEndX);
-        const y2 = Math.max(cropStartY, cropEndY);
-
-        if (x2 - x1 < 10 || y2 - y1 < 10) { // Minimum crop size
-            showNotification("Please draw a larger crop area.", "warning");
-            cropSelection.style.width = '0';
-            cropSelection.style.height = '0';
-            return;
-        }
         applyCropBtn.disabled = false;
     }
 
     async function applyCrop() {
-        if (!originalImageBase64 || cropStartX === null) {
-            showNotification("Please draw a crop rectangle first.", "warning");
-            return;
-        }
+        if (!originalImageBase64 || cropStartX === null) return;
 
         const imgElement = imagePreview;
-        const imgRect = imgElement.getBoundingClientRect();
-        const containerRect = imagePreviewContainer.getBoundingClientRect();
-
-        // Calculate crop coordinates relative to the original image's natural size
-        // This is tricky because the displayed image might be scaled and panned.
-        // We need the actual pixel coordinates on the *original* image.
-
-        // Get the current display size of the image within the container
         const displayedWidth = imgElement.clientWidth;
         const displayedHeight = imgElement.clientHeight;
-
-        // Get the actual image's bounding box relative to the container for accurate scaling
+        const naturalWidth = imgElement.naturalWidth;
+        const naturalHeight = imgElement.naturalHeight;
+        
+        const containerRect = imagePreviewContainer.getBoundingClientRect();
+        const imgRect = imgElement.getBoundingClientRect();
         const imgDisplayX = imgRect.left - containerRect.left;
         const imgDisplayY = imgRect.top - containerRect.top;
 
-        // Crop selection coordinates relative to the image itself (not the container)
-        const cropX1RelToImg = Math.min(cropStartX, cropEndX) - imgDisplayX;
-        const cropY1RelToImg = Math.min(cropStartY, cropEndY) - imgDisplayY;
-        const cropX2RelToImg = Math.max(cropStartX, cropEndX) - imgDisplayX;
-        const cropY2RelToImg = Math.max(cropStartY, cropEndY) - imgDisplayY;
+        const cropX1Rel = Math.min(cropStartX, cropEndX) - imgDisplayX;
+        const cropY1Rel = Math.min(cropStartY, cropEndY) - imgDisplayY;
+        const cropX2Rel = Math.max(cropStartX, cropEndX) - imgDisplayX;
+        const cropY2Rel = Math.max(cropStartY, cropEndY) - imgDisplayY;
 
-        // Clamp to image boundaries
-        const finalCropX1 = Math.max(0, cropX1RelToImg);
-        const finalCropY1 = Math.max(0, cropY1RelToImg);
-        const finalCropX2 = Math.min(displayedWidth, cropX2RelToImg);
-        const finalCropY2 = Math.min(displayedHeight, cropY2RelToImg);
-
-        // Calculate scaling factors from displayed image size to original image natural size
-        const naturalWidth = imgElement.naturalWidth;
-        const naturalHeight = imgElement.naturalHeight;
         const scaleX = naturalWidth / displayedWidth;
         const scaleY = naturalHeight / displayedHeight;
 
-        // Convert cropped coordinates back to original image pixel values
-        const x1 = Math.round(finalCropX1 * scaleX);
-        const y1 = Math.round(finalCropY1 * scaleY);
-        const x2 = Math.round(finalCropX2 * scaleX);
-        const y2 = Math.round(finalCropY2 * scaleY);
+        const x1 = Math.max(0, Math.round(cropX1Rel * scaleX));
+        const y1 = Math.max(0, Math.round(cropY1Rel * scaleY));
+        const x2 = Math.min(naturalWidth, Math.round(cropX2Rel * scaleX));
+        const y2 = Math.min(naturalHeight, Math.round(cropY2Rel * scaleY));
 
         if (x2 <= x1 || y2 <= y1) {
-            showNotification("Invalid crop area selected.", "warning");
+            showNotification("Invalid crop area.", "warning");
             return;
         }
 
-        // Create a temporary canvas to draw the cropped image
         const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = naturalWidth;
-        tempCanvas.height = naturalHeight;
+        tempCanvas.width = x2 - x1;
+        tempCanvas.height = y2 - y1;
         const ctx = tempCanvas.getContext('2d');
-
         const img = new Image();
         img.src = originalImageBase64;
+        
         img.onload = async () => {
-            ctx.drawImage(img, 0, 0); // Draw original image onto canvas
-
-            // Get cropped image data from canvas
-            const croppedImageData = ctx.getImageData(x1, y1, x2 - x1, y2 - y1);
-
-            // Create a new canvas for the cropped image
-            const croppedCanvas = document.createElement('canvas');
-            croppedCanvas.width = x2 - x1;
-            croppedCanvas.height = y2 - y1;
-            const croppedCtx = croppedCanvas.getContext('2d');
-            croppedCtx.putImageData(croppedImageData, 0, 0);
-
-            const newCroppedBase64 = croppedCanvas.toDataURL('image/png');
-            originalImageBase64 = newCroppedBase64; // Set the cropped image as the new original
+            ctx.drawImage(img, x1, y1, x2 - x1, y2 - y1, 0, 0, x2 - x1, y2 - y1);
+            const newCroppedBase64 = tempCanvas.toDataURL('image/png');
+            
+            originalImageBase64 = newCroppedBase64;
             currentImageBase64 = newCroppedBase64;
             displayImage(currentImageBase64);
-            resetFiltersUI(); // Reset filters after cropping
-            resetCropMode(); // Hide crop UI elements
-            statusMessage.textContent = "Image cropped. Ready for diagnosis.";
-            showNotification("Image cropped successfully.", "success");
-            await diagnoseImage(currentImageBase64); // Re-diagnose with the new cropped image
+            resetFiltersUI();
+            resetCropMode();
+            statusMessage.textContent = "Image cropped.";
+            
+            await diagnoseImage(currentImageBase64);
         };
     }
 
-    // Initial setup
-    document.addEventListener('DOMContentLoaded', () => {
-        // Attach event listener for image upload after DOM is loaded
-        imageUpload.addEventListener('change', handleImageUpload);
+    // Compare button logic
+    compareOriginalBtn.addEventListener('mousedown', () => {
+        if (originalImageBase64) {
+            savedZoomLevel = zoomLevel;
+            savedPanLeft = parseFloat(imagePreview.style.left || '0');
+            savedPanTop = parseFloat(imagePreview.style.top || '0');
+            imagePreview.src = originalImageBase64;
+            zoomLevel = 1.0;
+            resetPan();
+            updateZoomLabel();
+            applyZoomPan();
+        }
+    });
 
-        // Check if there's a pre-selected image from history (via query param)
+    compareOriginalBtn.addEventListener('mouseup', () => {
+        if (currentImageBase64) {
+            imagePreview.src = currentImageBase64;
+            zoomLevel = savedZoomLevel;
+            imagePreview.style.left = `${savedPanLeft}px`;
+            imagePreview.style.top = `${savedPanTop}px`;
+            updateZoomLabel();
+            applyZoomPan();
+        }
+    });
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', () => {
+        imageUpload.addEventListener('change', handleImageUpload);
+        clearImageBtn.addEventListener('click', clearImage);
+
         const urlParams = new URLSearchParams(window.location.search);
         const imageFilename = urlParams.get('image');
         if (imageFilename) {
-            // Use the UPLOADS_BASE_URL variable
             const imageUrl = `${UPLOADS_BASE_URL}${imageFilename}`;
             fetch(imageUrl)
                 .then(response => response.blob())
@@ -967,39 +1296,543 @@
                     const file = new File([blob], imageFilename, { type: blob.type });
                     handleImageUpload(null, file);
                 })
-                .catch(error => {
-                    console.error("Error fetching image from URL:", error);
-                    showNotification("Failed to load image from history.", "error");
-                });
+                .catch(err => console.error(err));
+        }
+    });
+    // --- DR. CROP CHATBOT LOGIC ---
+
+    function showChatWidget() {
+        const widget = document.getElementById('chatWidget');
+        if (widget) {
+            widget.classList.remove('hidden');
+            // Small delay for animation
+            setTimeout(() => {
+                widget.classList.remove('translate-y-10', 'opacity-0');
+            }, 50);
+        }
+    }
+
+    function toggleChatBody() {
+        const body = document.getElementById('chatBody');
+        const btn = document.getElementById('closeChatBtn');
+    
+        // Toggle display
+        if (body.style.display === 'none') {
+            body.style.display = 'flex';
+            // Change icon to Down Arrow
+            btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>';
+        } else {
+            body.style.display = 'none';
+            // Change icon to Up Arrow (Minimize)
+            btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>';
+        }
+    }
+
+    // --- TTS (Text-to-Speech) Logic ---
+    let synth = window.speechSynthesis;
+    let currentUtterance = null;
+
+    function speakText(elementId) {
+        // 1. Stop any currently playing audio
+        if (synth.speaking) {
+            synth.cancel();
+            // If we clicked the same button, just stop.
+            if (currentUtterance === elementId) {
+                currentUtterance = null;
+                return;
+            }
+        }
+
+        // 2. Get the text
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        
+        // Strip HTML tags for clean reading (remove <b>, <br>, etc.)
+        const textToRead = element.innerText || element.textContent;
+
+        // 3. Create Speech Utterance
+        const utterance = new SpeechSynthesisUtterance(textToRead);
+        
+        // 4. Detect Language & Select Voice
+        // We look at the 'lang' attribute of the HTML tag, or default to English
+        const currentLang = document.documentElement.lang || 'en'; 
+
+        // Map your app's language codes to Browser Speech codes
+        // 'hi' -> 'hi-IN', 'mr' -> 'mr-IN', 'kn' -> 'kn-IN', 'en' -> 'en-US' or 'en-IN'
+        let targetLang = 'en-US';
+        if (currentLang === 'hi') targetLang = 'hi-IN';
+        else if (currentLang === 'mr') targetLang = 'hi-IN'; // Marathi often uses Hindi engine fallback
+        else if (currentLang === 'kn') targetLang = 'kn-IN';
+
+        utterance.lang = targetLang;
+        utterance.rate = 0.9; // Slightly slower is better for farmers
+        utterance.pitch = 1.0;
+
+        // 5. Speak
+        currentUtterance = elementId;
+        synth.speak(utterance);
+        
+        // Optional: Reset when done
+        utterance.onend = function() {
+            currentUtterance = null;
+        };
+    }
+
+    // Helper to send message when a chip is clicked
+    function sendQuickMessage(text) {
+        const input = document.getElementById('chatInput');
+        input.value = text;
+        // Trigger the existing send logic
+        sendMessage();
+    }
+
+    // ✅ NEW: Helper function to safely add messages
+    function addMessageToChat(sender, text) {
+        const messages = document.getElementById('chatMessages');
+        const bubbleDiv = document.createElement('div');
+    
+        if (sender === 'user') {
+            bubbleDiv.className = "flex justify-end mb-4";
+            bubbleDiv.innerHTML = `
+                <div class="bg-green-600 text-white p-3 rounded-tl-lg rounded-bl-lg rounded-br-lg max-w-[85%] shadow-sm text-sm">
+                    ${text}
+                </div>
+            `;
+        } else {
+            // Format Bold text (**text**) to HTML <b>
+            const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+            const msgId = 'msg-' + Date.now();
+            bubbleDiv.className = "flex justify-start mb-4";
+            bubbleDiv.innerHTML = `
+                <div class="flex flex-col max-w-[90%] bg-gray-100 dark:bg-gray-700 rounded-tr-lg rounded-br-lg rounded-bl-lg shadow-sm overflow-hidden">
+                    
+                    <div class="p-3 text-gray-800 dark:text-gray-200 text-sm leading-relaxed">
+                        <span id="${msgId}">${formattedText}</span>
+                    </div>
+                    
+                    <div class="px-3 py-2 bg-gray-200 dark:bg-gray-600/30 border-t border-gray-300 dark:border-gray-600 flex justify-end">
+                        <button onclick="speakText('${msgId}')" class="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors focus:outline-none group">
+                            <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                            <span class="text-xs font-bold uppercase tracking-wide">{{ _('Listen') }}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+    
+        // Insert the new message BEFORE the loading bubble so loading stays at bottom
+        const loadingBubble = document.getElementById('loading-bubble');
+        if (loadingBubble) {
+            messages.insertBefore(bubbleDiv, loadingBubble);
+        } else {
+            messages.appendChild(bubbleDiv);
+        }
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    // --- Speech-to-Text (STT) Logic ---
+    let recognition = null;
+    let isListening = false;
+
+    // Check if browser supports Speech Recognition
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        
+        // Settings
+        recognition.continuous = false; // Stop after one sentence
+        recognition.interimResults = false; // Show only final results
+        
+        // Auto-detect language based on page language
+        const currentLang = document.documentElement.lang || 'en';
+        if (currentLang === 'hi') recognition.lang = 'hi-IN';
+        else if (currentLang === 'mr') recognition.lang = 'mr-IN';
+        else if (currentLang === 'kn') recognition.lang = 'kn-IN';
+        else recognition.lang = 'en-US';
+
+        // Result Handler
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            const inputField = document.getElementById('chatInput');
+            
+            // Set text to input
+            inputField.value = transcript;
+            
+            // Optional: Auto-send if confident? For now, let user review.
+            stopListeningUI();
+
+            setTimeout(() => {
+                sendMessage();
+            }, 200);
+            
+        };
+
+        // Error Handler
+        recognition.onerror = (event) => {
+            if (event.error === 'no-speech') {
+                console.warn("No speech detected. Stopping...");
+                stopListeningUI();
+                // Optional: You could show a gentle toast here like "Didn't hear anything"
+                // But usually, just resetting the button is enough.
+                return; 
+            }
+
+            if (event.error === 'not-allowed') {
+                showNotification("Microphone permission denied.", "error");
+            } else {
+                showNotification("Microphone error: " + event.error, "error");
+            }
+            
+            console.error("Speech recognition error", event.error);
+            stopListeningUI();
+        };
+
+        // End Handler
+        recognition.onend = () => {
+            stopListeningUI();
+        };
+    } else {
+        // Hide Mic button if not supported
+        const micBtn = document.getElementById('micBtn');
+        if(micBtn) micBtn.style.display = 'none';
+        console.log("Web Speech API not supported in this browser.");
+    }
+
+    function toggleSpeechToText() {
+        if (!recognition) {
+            alert("Your browser does not support voice input. Please use Chrome or Edge.");
+            return;
+        }
+
+        if (isListening) {
+            recognition.stop();
+            stopListeningUI();
+        } else {
+            recognition.start();
+            startListeningUI();
+        }
+    }
+
+    function startListeningUI() {
+        isListening = true;
+        const micBtn = document.getElementById('micBtn');
+        const micIcon = document.getElementById('micIcon');
+        
+        // UI Changes for Active State
+        micBtn.classList.add('bg-red-50', 'text-red-600');
+        micBtn.classList.remove('bg-gray-100', 'text-gray-500');
+        
+        // Add Pulse Effect (Manually creating ring if needed, or simple color change)
+        micIcon.classList.add('animate-pulse');
+        
+        // Show "Listening..." placeholder
+        document.getElementById('chatInput').placeholder = "Listening...";
+    }
+
+    function stopListeningUI() {
+        isListening = false;
+        const micBtn = document.getElementById('micBtn');
+        const micIcon = document.getElementById('micIcon');
+        
+        // Revert UI
+        micBtn.classList.remove('bg-red-50', 'text-red-600');
+        micBtn.classList.add('bg-gray-100', 'text-gray-500');
+        micIcon.classList.remove('animate-pulse');
+        
+        // Reset Placeholder
+        document.getElementById('chatInput').placeholder = "{{ _('Type or speak...') }}";
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const messages = document.getElementById('chatMessages');
+        const loadingBubble = document.getElementById('loading-bubble'); 
+        const text = input.value.trim();
+
+        if (!text) return;
+
+        // Disable input while sending
+        input.disabled = true;
+        sendBtn.disabled = true;
+
+        // 1. Add User Message (Use the helper to ensure consistency)
+        addMessageToChat('user', text);
+    
+        input.value = '';
+        messages.scrollTop = messages.scrollHeight;
+
+        // 2. SHOW Loading Bubble
+        if (loadingBubble) {
+            loadingBubble.classList.remove('hidden');
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        try {
+            // 3. Send to Server
+            const diseaseKey = (typeof currentDiagnosisDetails !== 'undefined' && currentDiagnosisDetails) 
+                ? currentDiagnosisDetails.disease_key_for_lookup 
+                : 'healthy';
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: text,
+                    disease_key: diseaseKey
+                })
+            });
+
+            const data = await response.json();
+
+            // 4. HIDE Loading Bubble
+            if (loadingBubble) loadingBubble.classList.add('hidden');
+
+            // 5. Add Bot Message (CRITICAL FIX: Use the helper function!)
+            if (data.error) {
+                addMessageToChat('bot', `⚠️ ${data.error}`);
+            } else {
+                // This call triggers the code that adds the "Listen" button
+                addMessageToChat('bot', data.response);
+            }
+
+        } catch (e) {
+            // Hide loader on error
+            if (loadingBubble) loadingBubble.classList.add('hidden');
+            
+            addMessageToChat('bot', "Connection Error. Please try again.");
+            console.error(e);
+        } finally {
+            input.disabled = false;
+            sendBtn.disabled = false;
+            input.focus();
+            messages.scrollTop = messages.scrollHeight;
+        }
+    }
+    
+    // Bind Enter Key
+    document.addEventListener('DOMContentLoaded', () => {
+        const chatInput = document.getElementById('chatInput');
+        if (chatInput) {
+            chatInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') sendMessage();
+            });
         }
     });
 
-    // Compare Original Button functionality
-    compareOriginalBtn.addEventListener('mousedown', () => {
-        if (originalImageBase64) {
-            // Save current state before switching to original
-            savedZoomLevel = zoomLevel;
-            savedPanLeft = parseFloat(imagePreview.style.left || '0');
-            savedPanTop = parseFloat(imagePreview.style.top || '0');
 
-            imagePreview.src = originalImageBase64;
-            zoomLevel = 1.0; // Reset zoom to 1.0x for original
-            resetPan(); // Reset pan for original
-            updateZoomLabel();
-            applyZoomPan(); // Apply changes
+    async function postToCommunity() {
+        if (!currentDiagnosisDetails || !currentImageFilename) {
+            showNotification("No diagnosis to share!", "warning");
+            return;
         }
-    });
+        
+        if(!confirm("Post this diagnosis to the public community feed for expert review?")) return;
 
-    compareOriginalBtn.addEventListener('mouseup', () => {
-        if (currentImageBase64) {
-            imagePreview.src = currentImageBase64;
-            zoomLevel = savedZoomLevel; // Revert zoom to saved
-            imagePreview.style.left = `${savedPanLeft}px`; // Revert pan to saved
-            imagePreview.style.top = `${savedPanTop}px`;
-            updateZoomLabel();
-            applyZoomPan(); // Apply changes
+        try {
+            const response = await fetch('/ask_expert', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    filename: currentImageFilename,
+                    crop_type: currentDiagnosisDetails.crop_type,
+                    disease_name: currentDiagnosisDetails.disease_name,
+                    confidence: currentDiagnosisDetails.confidence
+                })
+            });
+
+            const data = await response.json();
+            if(data.success) {
+                showNotification("Posted to Community Feed!", "success");
+                // Optional: redirect user to see their post
+                setTimeout(() => window.location.href = "/community", 1000);
+            } else {
+                showNotification("Failed to post: " + data.error, "error");
+            }
+        } catch (e) {
+            console.error(e);
+            showNotification("Network error", "error");
         }
-    });
+    }
 
 </script>
+
+<div id="chatWidget" class="fixed bottom-6 right-6 z-50 hidden flex-col w-80 shadow-2xl rounded-xl overflow-hidden transition-all duration-300 transform translate-y-10 opacity-0 font-sans">
+    <div class="bg-gradient-to-r from-green-600 to-emerald-600 p-4 flex justify-between items-center cursor-pointer hover:opacity-90 transition" onclick="toggleChatBody()">
+        <div class="flex items-center space-x-2">
+            <div class="bg-white p-1 rounded-full shadow-sm">
+                <img src="{{ url_for('static', filename='icons8-chaff-48.png') }}" class="w-6 h-6">
+            </div>
+            <div>
+                <h3 class="text-white font-bold text-sm">Dr. Crop AI</h3>
+                <p class="text-green-100 text-xs">Smart Farming Assistant</p>
+            </div>
+        </div>
+        <button id="closeChatBtn" class="text-white hover:text-gray-200 focus:outline-none">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+    </div>
+
+    <div id="chatBody" class="bg-white dark:bg-gray-800 h-96 flex flex-col border-l border-r border-b border-gray-200 dark:border-gray-700 shadow-xl" style="display: none;">
+        
+        <div id="chatMessages" class="flex-grow p-4 overflow-y-auto space-y-3 text-sm scroll-smooth min-h-0">
+    
+            <div class="flex justify-start mb-4">
+                <div class="flex flex-col max-w-[90%] bg-gray-100 dark:bg-gray-700 rounded-tr-lg rounded-br-lg rounded-bl-lg shadow-sm overflow-hidden animate-enter">
+            
+                    <div class="p-3 text-gray-800 dark:text-gray-200 text-sm leading-relaxed">
+                        <span id="msg-greeting">👋 Dr. Crop here. I've analyzed the image. Tap a button below for instant answers!</span>
+                    </div>
+            
+                    <div class="px-3 py-2 bg-gray-200 dark:bg-gray-600/30 border-t border-gray-300 dark:border-gray-600 flex justify-end">
+                        <button onclick="speakText('msg-greeting')" class="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors focus:outline-none group">
+                            <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                            <span class="text-xs font-bold uppercase tracking-wide">{{ _('Listen') }}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loading-bubble" class="hidden flex items-center p-3 mb-2 bg-gray-100 dark:bg-gray-700 rounded-lg w-fit self-start animate-pulse">
+                <span class="text-xs text-gray-500 dark:text-gray-400 mr-2">{{ _('Dr. Crop is thinking') }}</span>
+                <div class="flex space-x-1">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-bounce"></div>
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="quickChips" class="flex-shrink-0 px-4 py-2 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex gap-2 overflow-x-auto whitespace-nowrap no-scrollbar">
+            <button onclick="sendQuickMessage('What is the best cure and treatment for this?')" class="px-3 py-1 bg-white dark:bg-gray-800 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 text-xs rounded-full hover:bg-green-50 dark:hover:bg-green-900 transition shadow-sm">
+                💊 Cure & Treatment
+            </button>
+            
+            <button onclick="sendQuickMessage('What is the current market price for this crop?')" class="px-3 py-1 bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-400 text-xs rounded-full hover:bg-purple-50 dark:hover:bg-purple-900 transition shadow-sm">
+                💰 Market Price
+            </button>
+            
+            <button onclick="sendQuickMessage('How much yield will I lose because of this?')" class="px-3 py-1 bg-white dark:bg-gray-800 border border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-400 text-xs rounded-full hover:bg-orange-50 dark:hover:bg-orange-900 transition shadow-sm">
+                📉 Yield Impact
+            </button>
+        </div>
+
+        <div class="flex-shrink-0 p-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex items-center space-x-2">
+            
+            <button id="micBtn" onclick="toggleSpeechToText()" class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 transition focus:outline-none" title="Speak to Dr. Crop">
+                <svg id="micIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                
+                <span id="micPulse" class="hidden absolute top-0 right-0 -mr-1 -mt-1 w-3 h-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+            </button>
+
+            <input type="text" id="chatInput" placeholder="{{ _('Type or speak...') }}" class="flex-grow p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition">
+            
+            <button onclick="sendMessage()" id="sendBtn" class="bg-green-600 text-white p-2 rounded-md hover:bg-green-700 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<div class="mt-12 max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600 flex items-center justify-between">
+        <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <span>🌦️</span> {{ _('Environmental Risk Analysis') }}
+        </h3>
+        <span class="text-xs font-medium px-2 py-1 bg-blue-100 text-blue-800 rounded-full">{{ _('Live Data') }}</span>
+    </div>
+
+    <div class="p-6">
+        <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">
+            {{ _("Pathogens spread differently depending on the weather. Check your farm's current risk status.") }}
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-3">
+            <input type="text" id="cityInputDiag" placeholder="{{ _('Enter Farm Location (e.g. Pune)') }}" 
+                   class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-900 dark:text-white outline-none transition-all">
+            <button onclick="checkWeatherDiag()" 
+                    class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-md transition-colors">
+                {{ _('Analyze Risk') }}
+            </button>
+        </div>
+
+        <div id="weatherResultDiag" class="hidden mt-6 p-4 rounded-lg bg-gray-50 dark:bg-gray-900 border-l-4 transition-all duration-300 border-gray-300">
+            <div class="grid grid-cols-2 gap-6 mb-4">
+                <div class="text-center p-3 bg-white dark:bg-gray-800 rounded shadow-sm">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide">Temperature</p>
+                    <p class="text-xl font-bold text-gray-800 dark:text-white"><span id="dispTempDiag">--</span>°C</p>
+                </div>
+                <div class="text-center p-3 bg-white dark:bg-gray-800 rounded shadow-sm">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide">Humidity</p>
+                    <p class="text-xl font-bold text-gray-800 dark:text-white"><span id="dispHumidDiag">--</span>%</p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+                <div class="mt-1">
+                    <p class="font-bold text-gray-700 dark:text-gray-200">Risk Level: <span id="dispRiskDiag">--</span></p>
+                    <p id="dispAdviceDiag" class="text-sm mt-1 text-gray-600 dark:text-gray-400 leading-relaxed"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function checkWeatherDiag() {
+        const city = document.getElementById('cityInputDiag').value;
+        const resultDiv = document.getElementById('weatherResultDiag');
+        
+        if(!city) { alert("Please enter a city!"); return; }
+
+        try {
+            const response = await fetch('/check_weather_risk', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ city: city })
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                alert(data.error);
+            } else {
+                resultDiv.classList.remove('hidden');
+                
+                document.getElementById('dispTempDiag').innerText = data.temp;
+                document.getElementById('dispHumidDiag').innerText = data.humidity;
+                
+                const riskLabel = document.getElementById('dispRiskDiag');
+                riskLabel.innerText = data.risk_level;
+                document.getElementById('dispAdviceDiag').innerText = data.alert_message;
+
+                // --- COLOR LOGIC ---
+                // We change the LEFT BORDER color based on risk
+                resultDiv.className = "hidden mt-6 p-4 rounded-lg bg-gray-50 dark:bg-gray-900 border-l-4 transition-all duration-300"; // Reset
+                resultDiv.classList.remove('hidden');
+
+                if(data.risk_level.includes("HIGH")) {
+                    resultDiv.classList.add("border-red-500", "bg-red-50", "dark:bg-red-900/20");
+                    riskLabel.className = "text-red-600 dark:text-red-400 font-bold";
+                } else if(data.risk_level.includes("Medium")) {
+                    resultDiv.classList.add("border-orange-500", "bg-orange-50", "dark:bg-orange-900/20");
+                    riskLabel.className = "text-orange-600 dark:text-orange-400 font-bold";
+                } else {
+                    resultDiv.classList.add("border-green-500", "bg-green-50", "dark:bg-green-900/20");
+                    riskLabel.className = "text-green-600 dark:text-green-400 font-bold";
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Failed to connect to weather service.");
+        }
+    }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 {% endblock %}

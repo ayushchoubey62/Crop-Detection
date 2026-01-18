@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8 min-h-screen">
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-8 transition-colors duration-300 border border-gray-100 dark:border-gray-700">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">{{ _('Terms of Service') }}</h1>
+        <p class="text-gray-600 dark:text-gray-400 mb-4">{{ _('Last Updated:') }} {{ now.strftime('%B %d, %Y') }}</p>
+
+        <div class="space-y-6 text-gray-800 dark:text-gray-300">
+            <h2 class="text-xl font-bold text-green-600 dark:text-green-400">1. {{ _('Acceptance of Terms') }}</h2>
+            <p>{{ _('By accessing and using Crop Doctor AI, you accept and agree to be bound by the terms and provision of this agreement.') }}</p>
+
+            <h2 class="text-xl font-bold text-green-600 dark:text-green-400">2. {{ _('Educational Use Only (Disclaimer)') }}</h2>
+            <div class="bg-red-50 dark:bg-red-900/30 p-4 rounded-md border-l-4 border-red-500 text-gray-700 dark:text-gray-300">
+                <p class="font-bold text-red-800 dark:text-red-200">{{ _('This is an AI-assisted diagnostic tool.') }}</p>
+                <p>{{ _('The results provided by Crop Doctor AI are for informational purposes only. While we strive for accuracy, this tool should not replace professional agricultural advice or lab testing. We are not liable for any crop loss or financial damage resulting from reliance on this tool.') }}</p>
+            </div>
+
+            <h2 class="text-xl font-bold text-green-600 dark:text-green-400">3. {{ _('User Conduct') }}</h2>
+            <p>{{ _('You agree not to upload malicious code, illegal content, or images that do not belong to you.') }}</p>
+
+            <h2 class="text-xl font-bold text-green-600 dark:text-green-400">4. {{ _('Changes to Terms') }}</h2>
+            <p>{{ _('We reserve the right to modify these terms at any time. Continued use of the service constitutes acceptance of new terms.') }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

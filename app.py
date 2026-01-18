@@ -2,44 +2,313 @@ import os
 import io
 import json
 import logging
+import requests 
+import sqlite3
 import numpy as np
 import cv2
 from datetime import datetime
 from PIL import Image, ImageEnhance, ImageFilter, ImageOps
-from flask import Flask, render_template, request, jsonify, send_file, url_for, make_response
+from flask import Flask, render_template, request, jsonify, send_file, url_for, make_response, after_this_request, redirect
 from werkzeug.utils import secure_filename
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
-from fpdf import FPDF # For PDF generation
-import tempfile # Import tempfile for creating temporary files
+from fpdf import FPDF
+import tempfile
+from groq import Groq
+from dotenv import load_dotenv
+from flask import after_this_request
+import secrets
+import smtplib 
+from email.mime.text import MIMEText 
+from email.mime.multipart import MIMEMultipart
+from flask_babel import Babel, _, gettext
+from flask import session
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
 
+app.secret_key = os.getenv('SECRET_KEY', 'dev_fallback_key')
+
+# --- BABEL CONFIGURATION ---
+app.config['BABEL_DEFAULT_LOCALE'] = 'en'
+app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'hi', 'mr', 'kn'] # English, Hindi, Marathi & kannada 
+
+babel = Babel(app)
+
+def get_locale():
+    # Check if user has a preference in session
+    if 'language' in session:
+        return session['language']
+    # Otherwise try to match best language from browser request
+    return request.accept_languages.best_match(app.config['BABEL_SUPPORTED_LOCALES'])
+
+babel.init_app(app, locale_selector=get_locale)
+
+# --- GROQ CONFIGURATION ---
+load_dotenv()
+groq_api_key = os.getenv("GROQ_API_KEY")
+
+# 3. Check if the key exists (Safety Check)
+if not groq_api_key:
+    # This error will stop the app if you forgot the .env file
+    raise ValueError("No API Key found! Make sure you created the .env file with GOOGLE_API_KEY inside.")
+
+# 4. Configure GROQ
+client = Groq(api_key=groq_api_key)
+
+weather_api_key = os.getenv("WEATHER_API_KEY")
+
+# 👇 SECURE CONFIGURATION 👇
+SENDER_EMAIL = os.getenv("MAIL_USER")
+SENDER_PASSWORD = os.getenv("MAIL_PASS")
+
+# (If these are None, print a warning)
+if not SENDER_EMAIL or not SENDER_PASSWORD:
+    print("⚠️ WARNING: Email credentials not found in .env file!")
+
 # --- Configuration ---
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = os.path.join('static', 'uploads')
 STATIC_FOLDER = 'static'
 MODELS_FOLDER = 'models'
-FEEDBACK_FOLDER = 'feedback'
-HISTORY_FILE = 'app_data.json' # Using a single JSON for history and settings
+FEEDBACK_FOLDER = 'feedback' # Kept for screenshots
+DB_NAME = 'crop_doctor.db'
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(MODELS_FOLDER, exist_ok=True)
 os.makedirs(FEEDBACK_FOLDER, exist_ok=True)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16 MB limit for uploads
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16 MB limit
 
-# --- Global Variables for Models and Data (Loaded once on app startup) ---
+# --- Global Variables ---
 disease_model = None
-crop_classifier = None # Placeholder for a potential crop classifier model
-class_labels = None
-app_data = { # Initialize with default values
-    'dark_mode': False,
-    'diagnosis_history': [],
-    'recent_images': []
+gatekeeper_model = None
+
+class_labels = {
+    'Apple_Apple_scab': 0, 'Apple_Black_rot': 1, 'Apple_Cedar_apple_rust': 2,
+    'Apple_healthy': 3, 'Blueberry_healthy': 4, 'Cherry_Powdery_mildew': 5,
+    'Cherry_healthy': 6, 'Corn_Cercospora_leaf_spot_Gray_leaf_spot': 7,
+    'Corn_Common_rust': 8, 'Corn_Northern_Leaf_Blight': 9, 'Corn_healthy': 10,
+    'Grape_Black_rot': 11, 'Grape_Esca_Black_Measles': 12, 'Grape_Leaf_blight': 13,
+    'Grape_healthy': 14, 'Orange_Haunglongbing_Citrus_greening': 15,
+    'Peach_Bacterial_spot': 16, 'Peach_healthy': 17, 'Pepper_bell_Bacterial_spot': 18,
+    'Pepper_bell_healthy': 19, 'Potato_Early_blight': 20, 'Potato_Late_blight': 21,
+    'Potato_healthy': 22, 'Raspberry_healthy': 23, 'Soybean_healthy': 24,
+    'Squash_Powdery_mildew': 25, 'Strawberry_Leaf_scorch': 26, 'Strawberry_healthy': 27,
+    'Tomato_Bacterial_spot': 28, 'Tomato_Early_blight': 29, 'Tomato_Late_blight': 30,
+    'Tomato_Leaf_Mold': 31, 'Tomato_Septoria_leaf_spot': 32,
+    'Tomato_Spider_mites_Two_spotted_spider_mite': 33, 'Tomato_Target_Spot': 34,
+    'Tomato_Tomato_Yellow_Leaf_Curl_Virus': 35, 'Tomato_Tomato_mosaic_virus': 36,
+    'Tomato_healthy': 37
 }
+
+# --- Database Helper Functions ---
+def get_db_connection():
+    """Creates a connection to the SQLite database."""
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row # Access columns by name (row['id'])
+    return conn
+
+def init_db():
+    """Initializes the database tables."""
+    with get_db_connection() as conn:
+        # History Table
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                image_filename TEXT NOT NULL,
+                crop_type TEXT,
+                disease_name TEXT,
+                confidence REAL,
+                timestamp TEXT,
+                full_details TEXT, -- Stores full JSON diagnosis
+                disease_key_for_lookup TEXT
+            )
+        ''')
+        # Feedback Table
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS feedback (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                type TEXT,
+                text TEXT,
+                email TEXT,
+                rating INTEGER,
+                screenshot_filename TEXT,
+                timestamp TEXT
+            )
+        ''')
+        # Settings Table (for Dark Mode)
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS settings (
+                key TEXT PRIMARY KEY,
+                value TEXT
+            )
+        ''')
+        # --- NEW: Community/Expert Feed Table ---
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS community_posts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                image_filename TEXT NOT NULL,
+                crop_type TEXT,
+                predicted_disease TEXT,
+                confidence TEXT,
+                user_question TEXT,
+                expert_reply TEXT,
+                reply_author TEXT,
+                timestamp TEXT
+            )
+        ''')
+        
+        # 5. NEW: Expert Access Tokens Table (For Professional Keys)
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS expert_tokens (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                token TEXT UNIQUE NOT NULL,
+                assigned_to_name TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS verification_requests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                email TEXT NOT NULL,
+                qualification TEXT NOT NULL,
+                role TEXT DEFAULT 'Expert',
+                status TEXT DEFAULT 'pending',
+                timestamp TEXT
+            )
+        ''')
+        
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS government_schemes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                ministry TEXT,
+                description TEXT,
+                eligible_state TEXT DEFAULT 'All',
+                eligible_crop TEXT DEFAULT 'All',
+                benefit TEXT,
+                link TEXT,
+                deadline DATE
+            )
+        ''')
+        
+        
+        # ✅ NEW ROBUST DATA (Verified HTTPS Links)
+        schemes_data = [
+            # --- ALL INDIA SCHEMES (Visible to everyone) ---
+            ('Mission for Integrated Development of Horticulture (MIDH)', 'Ministry of Agriculture', 
+            'Subsidy for planting material, greenhouses, and cold storage for fruit crops.', 
+            'All', 'Apple, Grape, Cherry, Peach, Strawberry', '40-50% Subsidy on Infrastructure', 'https://midh.gov.in/', '2026-03-31'),
+        
+            ('Operation Greens (TOP Scheme)', 'Ministry of Food Processing', 
+            'Price stabilization scheme specifically for Tomato, Onion, and Potato farmers.', 
+            'All', 'Tomato, Potato', '50% Subsidy on Transport & Storage', 'https://www.mofpi.gov.in/', '2026-12-31'),
+        
+            ('Pradhan Mantri Fasal Bima Yojana (PMFBY)', 'Ministry of Agriculture', 
+            'Insurance against crop loss due to pests (like Late Blight) or weather.', 
+            'All', 'All', 'Insurance Claim Settlement', 'https://pmfby.gov.in/', '2026-07-31'),
+
+            ('NFSM - Coarse Cereals (Maize)', 'Ministry of Agriculture', 
+            'Support for improved seeds and technology demonstrations for Maize (Corn).', 
+            'All', 'Corn', 'Free Hybrid Seeds & Field Demos', 'https://nfsm.gov.in/', '2026-06-30'),
+
+            # --- NORTH INDIA SPECIFIC ---
+            ('High Density Apple Plantation Scheme', 'Dept of Horticulture', 
+            'Special subsidy for high-density apple orchards to boost production.', 
+            'Jammu and Kashmir, Himachal Pradesh, Uttarakhand', 'Apple', '50% Subsidy on Plant Material', 'https://dirhortijmu.nic.in/', '2026-10-15'),
+
+            ('Citrus Development Programme', 'National Horticulture Board', 
+             'Rejuvenation of old orchards and new plantation support for Citrus fruits.', 
+            'Punjab, Haryana, Rajasthan', 'Orange', 'Credit linked subsidy up to 40%', 'https://nhb.gov.in/', '2026-09-15'),
+
+            # --- SOUTH INDIA SPECIFIC ---
+            ('Drip Irrigation Subsidy (PMKSY)', 'Ministry of Jal Shakti', 
+            'Massive subsidy for installing drip irrigation systems in water-scarce regions.', 
+            'Tamil Nadu, Karnataka, Andhra Pradesh, Telangana', 'All', '75-100% Subsidy for Small Farmers', 'https://pmksy.gov.in/', '2026-05-20'),
+
+            ('Coconut Development Board Scheme', 'Ministry of Agriculture', 
+            'Assistance for expansion of area under coconut and replanting.', 
+            'Kerala, Tamil Nadu, Karnataka, Goa', 'Coconut', '₹17,500 per hectare', 'https://www.coconutboard.gov.in/', '2026-08-10'),
+
+            # --- CENTRAL & WEST INDIA ---
+            ('NFSM - Oilseeds & Soybean', 'Ministry of Agriculture', 
+            'Incentives for increasing oilseed production including Soybean.', 
+            'Madhya Pradesh, Maharashtra, Gujarat', 'Soybean', '₹4000/quintal subsidy on seeds', 'https://nfsm.gov.in/', '2026-05-20'),
+
+            ('Onion Storage Structure Scheme', 'Maharashtra Dept of Agriculture', 
+            'Subsidy for constructing "Kanda Chawl" (Onion Storage) to prevent rotting.', 
+            'Maharashtra, Gujarat', 'Onion', '₹87,500 per unit subsidy', 'https://krishi.maharashtra.gov.in/', '2026-04-01'),
+
+            # --- EAST & NORTH-EAST INDIA ---
+            ('BGREI - Rice & Veg Program', 'Ministry of Agriculture', 
+            'Bringing Green Revolution to Eastern India - Tech support for rice and vegetables.', 
+            'West Bengal, Bihar, Odisha, Assam', 'Rice, Tomato, Potato', 'Free Seeds & Tech Support', 'https://rkvy.nic.in/', '2026-06-15'),
+
+            ('Organic Farming Mission (MOVCDNER)', 'Ministry of Agriculture', 
+            'Promoting organic farming certification and value chains.', 
+            'Sikkim, Assam, Arunachal Pradesh, Nagaland, Manipur, Mizoram, Tripura, Meghalaya', 'All', '₹50,000 per hectare for 3 years', 'https://pgsindia-ncof.gov.in/', '2026-11-30')
+        ]
+        
+        conn.execute("DELETE FROM government_schemes")
+        
+        conn.executemany('''
+            INSERT INTO government_schemes (name, ministry, description, eligible_state, eligible_crop, benefit, link, deadline)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', schemes_data)
+        
+        # Initialize dark mode if not set
+        conn.execute('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)', ('dark_mode', 'false'))
+        conn.commit()
+    logging.info("Database initialized successfully.")
+
+def send_token_email(recipient_email, recipient_name, token, role):
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = SENDER_EMAIL
+        msg['To'] = recipient_email
+        msg['Subject'] = "✅ Your Expert Verification Approved!"
+
+        body = f"""
+        <html>
+          <body>
+            <h2 style="color:green;">Congratulations, {recipient_name}!</h2>
+            <p>Your application to join as a <b>{role}</b> has been approved.</p>
+            <p>Here is your unique Expert Token. Please keep it safe.</p>
+            
+            <div style="background:#f3f4f6; padding:15px; border-radius:10px; border-left: 5px solid green; margin: 20px 0;">
+                <h3 style="margin:0; font-family:monospace; font-size:24px;">{token}</h3>
+            </div>
+
+            <p><b>How to use it:</b></p>
+            <ol>
+                <li>Go to the Community Page.</li>
+                <li>Click "Reply" on a post.</li>
+                <li>Paste this token in the Expert Token box.</li>
+            </ol>
+            <p>Thank you for helping our farmers! 🚜</p>
+          </body>
+        </html>
+        """
+        
+        msg.attach(MIMEText(body, 'html'))
+
+        # Connect to Gmail Server
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+        server.send_message(msg)
+        server.quit()
+        
+        print(f"📧 Email sent successfully to {recipient_email}")
+        return True
+    except Exception as e:
+        print(f"❌ Failed to send email: {e}")
+        return False
 
 # --- Standardized Disease Information Dictionary ---
 # Keys here MUST exactly match the 'predicted_label' from the model output,
@@ -173,7 +442,7 @@ disease_info = {
         "description": "Septoria leaf spot is a common fungal disease of tomatoes. It causes numerous small, circular spots on older leaves, often with dark borders and tiny black dots in the center.",
         "symptoms": "Numerous small, circular spots (1/8 to 1/4 inch) on older leaves. Spots have dark brown borders and tan to gray centers, often with tiny black specks (pycnidia) in the middle. Severe infections lead to defoliation."
     },
-    "Tomato_Spider_mites _Two_spotted_spider_mite": { # This key is correct as is, matching the class_labels
+    "Tomato_Spider_mites_Two_spotted_spider_mite": { # This key is correct as is, matching the class_labels
         "description": "Spider mites are tiny pests that feed on plant cells, causing stippling and yellowing of leaves. Heavy infestations can lead to webbing and severe plant damage.",
         "symptoms": "Tiny yellow or white stippling (pinprick dots) on leaves. Yellowing, bronzing, or drying of leaves. Fine webbing on the undersides of leaves or between stems. Mites are barely visible to the naked eye."
     },
@@ -200,828 +469,1180 @@ disease_info = {
 # except for 'healthy' which is a generic key.
 treatment_suggestions_data = {
     "Apple_Apple_scab": [
-        "Apply fungicides containing myclobutanil or sulfur",
-        "Remove and destroy infected leaves and fruit",
-        "Improve air circulation through pruning"
+        {"text": "Apply fungicides containing myclobutanil or sulfur", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Remove and destroy infected leaves and fruit", "link": ""},
+        {"text": "Improve air circulation through pruning", "link": ""}
     ],
     "Apple_Black_rot": [
-        "Prune out infected plant parts (canes, fruit)",
-        "Apply fungicides like captan or mancozeb during susceptible stages",
-        "Ensure good air circulation and sunlight exposure"
+        {"text": "Prune out infected plant parts (canes, fruit)", "link": ""},
+        {"text": "Apply fungicides like captan or mancozeb", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Ensure good air circulation and sunlight exposure", "link": ""}
     ],
     "Apple_Cedar_apple_rust": [
-        "Remove nearby cedar trees (alternate host)",
-        "Apply fungicides such as myclobutanil",
-        "Plant resistant apple varieties"
+        {"text": "Remove nearby cedar trees (alternate host)", "link": ""},
+        {"text": "Apply fungicides such as myclobutanil", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Plant resistant apple varieties", "link": ""}
     ],
     "Blueberry_healthy": [
-        "Continue regular monitoring",
-        "Maintain good cultural practices (proper watering, fertilization, pruning)",
-        "Ensure good air circulation and balanced nutrition"
+        {"text": "Continue regular monitoring", "link": ""},
+        {"text": "Maintain good cultural practices", "link": "https://www.bighaat.com/collections/growth-promoters"},
+        {"text": "Ensure good air circulation", "link": ""}
     ],
     "Cherry_Powdery_mildew": [
-        "Apply sulfur or potassium bicarbonate",
-        "Reduce humidity around plants",
-        "Use resistant varieties when available",
-        "Prune affected areas to improve air circulation"
+        {"text": "Apply sulfur or potassium bicarbonate", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Reduce humidity around plants", "link": ""},
+        {"text": "Use resistant varieties when available", "link": ""},
+        {"text": "Prune affected areas", "link": ""}
     ],
     "Cherry_healthy": [
-        "Continue regular monitoring",
-        "Maintain good cultural practices (proper watering, fertilization, pruning)",
-        "Ensure good air circulation and balanced nutrition"
+        {"text": "Continue regular monitoring", "link": ""},
+        {"text": "Maintain good cultural practices", "link": "https://www.bighaat.com/collections/growth-promoters"},
+        {"text": "Ensure good air circulation", "link": ""}
     ],
     "Corn_Cercospora_leaf_spot_Gray_leaf_spot": [
-        "Apply fungicides containing chlorothalonil or copper",
-        "Rotate crops to non-host plants",
-        "Remove and destroy infected plant debris"
+        {"text": "Apply fungicides containing chlorothalonil or copper", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Rotate crops to non-host plants", "link": ""},
+        {"text": "Remove and destroy infected plant debris", "link": ""}
     ],
     "Corn_Common_rust": [
-        "Use resistant varieties",
-        "Apply fungicides if severe, such as those with propiconazole or azoxystrobin",
-        "Practice good sanitation to remove rust spores"
+        {"text": "Use resistant varieties", "link": ""},
+        {"text": "Apply fungicides if severe", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Practice good sanitation", "link": ""}
     ],
     "Corn_Northern_Leaf_Blight": [
-        "Use resistant varieties",
-        "Apply fungicides if severe, typically those containing strobilurins or triazoles",
-        "Practice crop rotation and residue management"
+        {"text": "Use resistant varieties", "link": ""},
+        {"text": "Apply fungicides (Strobilurins or Triazoles)", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Practice crop rotation", "link": ""}
     ],
     "Corn_healthy": [
-        "Continue regular monitoring",
-        "Maintain good cultural practices (proper watering, fertilization, pruning)",
-        "Ensure good air circulation and balanced nutrition"
+        {"text": "Continue regular monitoring", "link": ""},
+        {"text": "Maintain good cultural practices", "link": "https://www.bighaat.com/collections/growth-promoters"},
+        {"text": "Ensure good air circulation", "link": ""}
     ],
     "Grape_Black_rot": [
-        "Apply fungicides containing mancozeb, myclobutanil, or captan",
-        "Sanitation: Remove and destroy all mummified berries and infected plant parts",
-        "Pruning: Prune to improve air circulation and canopy drying"
+        {"text": "Apply fungicides (Mancozeb, Myclobutanil, Captan)", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Sanitation: Remove and destroy all mummified berries", "link": ""},
+        {"text": "Pruning: Prune to improve air circulation", "link": ""}
     ],
     "Grape_Esca_Black_Measles": [
-        "Prune out diseased wood during dry periods",
-        "Apply protective fungicidal paints to pruning wounds",
-        "Improve vineyard hygiene to reduce inoculum"
+        {"text": "Prune out diseased wood during dry periods", "link": ""},
+        {"text": "Apply protective fungicidal paints to wounds", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Improve vineyard hygiene", "link": ""}
     ],
     "Grape_Leaf_blight": [
-        "Apply fungicides (e.g., copper-based or mancozeb)",
-        "Improve air circulation around plants by proper spacing and pruning",
-        "Remove and dispose of infected leaves"
+        {"text": "Apply fungicides (Copper-based or Mancozeb)", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Improve air circulation around plants", "link": ""},
+        {"text": "Remove and dispose of infected leaves", "link": ""}
     ],
     "Grape_healthy": [
-        "Continue regular monitoring",
-        "Maintain good cultural practices (proper watering, fertilization, pruning)",
-        "Ensure good air circulation and balanced nutrition"
+        {"text": "Continue regular monitoring", "link": ""},
+        {"text": "Maintain good cultural practices", "link": "https://www.bighaat.com/collections/growth-promoters"},
+        {"text": "Ensure good air circulation", "link": ""}
     ],
     "Orange_Haunglongbing_Citrus_greening": [
-        "No known cure; remove infected trees to prevent spread",
-        "Control citrus psyllid vectors with insecticides",
-        "Plant certified disease-free nursery stock"
+        {"text": "No known cure; remove infected trees", "link": ""},
+        {"text": "Control citrus psyllid vectors with Insecticides", "link": "https://www.bighaat.com/collections/insecticides"},
+        {"text": "Plant certified disease-free nursery stock", "link": ""}
     ],
     "Peach_Bacterial_spot": [
-        "Apply copper-based bactericides",
-        "Use disease-free seeds and transplants",
-        "Avoid overhead watering and splashing soil onto plants",
-        "Practice crop rotation"
+        {"text": "Apply Copper-based bactericides", "link": "https://www.bighaat.com/collections/bactericides"},
+        {"text": "Use disease-free seeds and transplants", "link": ""},
+        {"text": "Avoid overhead watering", "link": ""},
+        {"text": "Practice crop rotation", "link": ""}
     ],
     "Peach_healthy": [
-        "Continue regular monitoring",
-        "Maintain good cultural practices (proper watering, fertilization, pruning)",
-        "Ensure good air circulation and balanced nutrition"
+        {"text": "Continue regular monitoring", "link": ""},
+        {"text": "Maintain good cultural practices", "link": "https://www.bighaat.com/collections/growth-promoters"},
+        {"text": "Ensure good air circulation", "link": ""}
     ],
     "Pepper_bell_Bacterial_spot": [
-        "Apply copper-based bactericides",
-        "Use disease-free seeds and transplants",
-        "Avoid overhead watering and splashing soil onto plants",
-        "Practice crop rotation"
+        {"text": "Apply Copper-based bactericides", "link": "https://www.bighaat.com/collections/bactericides"},
+        {"text": "Use disease-free seeds and transplants", "link": ""},
+        {"text": "Avoid overhead watering", "link": ""},
+        {"text": "Practice crop rotation", "link": ""}
     ],
     "Pepper_bell_healthy": [
-        "Continue regular monitoring",
-        "Maintain good cultural practices (proper watering, fertilization, pruning)",
-        "Ensure good air circulation and balanced nutrition"
+        {"text": "Continue regular monitoring", "link": ""},
+        {"text": "Maintain good cultural practices", "link": "https://www.bighaat.com/collections/growth-promoters"},
+        {"text": "Ensure good air circulation", "link": ""}
     ],
     "Potato_Early_blight": [
-        "Apply copper-based fungicides",
-        "Practice crop rotation",
-        "Remove and destroy infected plant material"
+        {"text": "Apply Copper-based fungicides", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Practice crop rotation", "link": ""},
+        {"text": "Remove and destroy infected plant material", "link": ""}
     ],
     "Potato_Late_blight": [
-        "Apply fungicides containing chlorothalonil or copper",
-        "Destroy infected plants immediately",
-        "Avoid overhead watering"
+        {"text": "Apply fungicides containing Chlorothalonil or Copper", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Destroy infected plants immediately", "link": ""},
+        {"text": "Avoid overhead watering", "link": ""}
     ],
     "Potato_healthy": [
-        "Continue regular monitoring",
-        "Maintain good cultural practices (proper watering, fertilization, pruning)",
-        "Ensure good air circulation and balanced nutrition"
+        {"text": "Continue regular monitoring", "link": ""},
+        {"text": "Maintain good cultural practices", "link": "https://www.bighaat.com/collections/growth-promoters"},
+        {"text": "Ensure good air circulation", "link": ""}
     ],
     "Raspberry_healthy": [
-        "Continue regular monitoring",
-        "Maintain good cultural practices (proper watering, fertilization, pruning)",
-        "Ensure good air circulation and balanced nutrition"
+        {"text": "Continue regular monitoring", "link": ""},
+        {"text": "Maintain good cultural practices", "link": "https://www.bighaat.com/collections/growth-promoters"},
+        {"text": "Ensure good air circulation", "link": ""}
     ],
     "Soybean_healthy": [
-        "Continue regular monitoring",
-        "Maintain good cultural practices (proper watering, fertilization, pruning)",
-        "Ensure good air circulation and balanced nutrition"
+        {"text": "Continue regular monitoring", "link": ""},
+        {"text": "Maintain good cultural practices", "link": "https://www.bighaat.com/collections/growth-promoters"},
+        {"text": "Ensure good air circulation", "link": ""}
     ],
     "Squash_Powdery_mildew": [
-        "Apply sulfur or potassium bicarbonate",
-        "Reduce humidity around plants",
-        "Use resistant varieties when available",
-        "Prune affected areas to improve air circulation"
+        {"text": "Apply Sulfur or Potassium Bicarbonate", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Reduce humidity around plants", "link": ""},
+        {"text": "Use resistant varieties when available", "link": ""},
+        {"text": "Prune affected areas", "link": ""}
     ],
     "Strawberry_Leaf_scorch": [
-        "Apply fungicides with captan or myclobutanil",
-        "Sanitation: Remove and destroy infected leaves",
-        "Mulching: Use mulch to prevent splashing spores"
+        {"text": "Apply fungicides with Captan or Myclobutanil", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Sanitation: Remove and destroy infected leaves", "link": ""},
+        {"text": "Mulching: Use mulch to prevent splashing spores", "link": ""}
     ],
     "Strawberry_healthy": [
-        "Continue regular monitoring",
-        "Maintain good cultural practices (proper watering, fertilization, pruning)",
-        "Ensure good air circulation and balanced nutrition"
+        {"text": "Continue regular monitoring", "link": ""},
+        {"text": "Maintain good cultural practices", "link": "https://www.bighaat.com/collections/growth-promoters"},
+        {"text": "Ensure good air circulation", "link": ""}
     ],
     "Tomato_Bacterial_spot": [
-        "Apply copper-based bactericides",
-        "Use disease-free seeds and transplants",
-        "Avoid overhead watering and splashing soil onto plants",
-        "Practice crop rotation"
+        {"text": "Apply Copper-based bactericides", "link": "https://www.bighaat.com/collections/bactericides"},
+        {"text": "Use disease-free seeds and transplants", "link": ""},
+        {"text": "Avoid overhead watering", "link": ""},
+        {"text": "Practice crop rotation", "link": ""}
     ],
     "Tomato_Early_blight": [
-        "Apply copper-based fungicides",
-        "Practice crop rotation",
-        "Remove and destroy infected plant material"
+        {"text": "Apply Copper-based fungicides", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Practice crop rotation", "link": ""},
+        {"text": "Remove and destroy infected plant material", "link": ""}
     ],
     "Tomato_Late_blight": [
-        "Apply fungicides containing chlorothalonil or copper",
-        "Destroy infected plants immediately",
-        "Avoid overhead watering"
+        {"text": "Apply fungicides containing Chlorothalonil or Copper", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Destroy infected plants immediately", "link": ""},
+        {"text": "Avoid overhead watering", "link": ""}
     ],
     "Tomato_Leaf_Mold": [
-        "Improve air circulation by pruning and spacing plants",
-        "Reduce humidity in greenhouses",
-        "Apply fungicides if necessary, suchg as chlorothalonil or mancozeb"
+        {"text": "Improve air circulation", "link": ""},
+        {"text": "Reduce humidity in greenhouses", "link": ""},
+        {"text": "Apply fungicides (Chlorothalonil or Mancozeb)", "link": "https://www.bighaat.com/collections/fungicides"}
     ],
     "Tomato_Septoria_leaf_spot": [
-        "Apply fungicides with chlorothalonil or mancozeb",
-        "Remove infected leaves and plant debris",
-        "Avoid overhead watering to minimize leaf wetness"
+        {"text": "Apply fungicides with Chlorothalonil or Mancozeb", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Remove infected leaves and plant debris", "link": ""},
+        {"text": "Avoid overhead watering", "link": ""}
     ],
-    "Tomato_Spider_mites _Two_spotted_spider_mite": [ # This key is correct as is
-        "Apply insecticidal soaps or horticultural oils",
-        "Increase humidity around plants (mist foliage)",
-        "Introduce predatory mites"
+    "Tomato_Spider_mites_Two_spotted_spider_mite": [
+        {"text": "Apply Insecticidal Soaps or Neem Oil", "link": "https://www.bighaat.com/collections/insecticides"},
+        {"text": "Increase humidity around plants (mist foliage)", "link": ""},
+        {"text": "Introduce predatory mites", "link": ""}
     ],
     "Tomato_Target_Spot": [
-        "Apply fungicides containing chlorothalonil or mancozeb",
-        "Practice crop rotation and sanitation",
-        "Ensure good air circulation"
+        {"text": "Apply fungicides containing Chlorothalonil or Mancozeb", "link": "https://www.bighaat.com/collections/fungicides"},
+        {"text": "Practice crop rotation and sanitation", "link": ""},
+        {"text": "Ensure good air circulation", "link": ""}
     ],
-    "Tomato_Tomato_Yellow_Leaf_Curl_Virus": [ # Key now matches full predicted_label
-        "No direct chemical cure for the virus; manage whitefly vectors with insecticides",
-        "Use resistant varieties if available",
-        "Remove infected plants immediately"
+    "Tomato_Tomato_Yellow_Leaf_Curl_Virus": [
+        {"text": "No cure; manage Whitefly vectors with Insecticides", "link": "https://www.bighaat.com/collections/insecticides"},
+        {"text": "Use resistant varieties if available", "link": ""},
+        {"text": "Remove infected plants immediately", "link": ""}
     ],
-    "Tomato_Tomato_mosaic_virus": [ # Key now matches full predicted_label
-        "No chemical cure; remove and destroy infected plants",
-        "Disinfect tools and hands after handling infected plants",
-        "Use resistant varieties or certified disease-free seeds"
+    "Tomato_Tomato_mosaic_virus": [
+        {"text": "No chemical cure; remove infected plants", "link": ""},
+        {"text": "Disinfect tools and hands", "link": ""},
+        {"text": "Use resistant varieties", "link": ""}
     ],
-    "healthy": [ # Single generic healthy entry for all healthy crops
-        "Continue regular monitoring",
-        "Maintain good cultural practices (proper watering, fertilization, pruning)",
-        "Preventative measures like ensuring good air circulation and balanced nutrition"
+    "healthy": [
+        {"text": "Continue regular monitoring", "link": ""},
+        {"text": "Maintain good cultural practices", "link": "https://www.bighaat.com/collections/growth-promoters"},
+        {"text": "Preventative measures", "link": ""}
     ]
 }
 
-
-# --- Helper Functions ---
-def load_app_data():
-    global app_data
-    default_app_data = {
-        'dark_mode': False,
-        'diagnosis_history': [],
-        'recent_images': []
-    }
-    try:
-        if os.path.exists(HISTORY_FILE):
-            with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
-                loaded_data = json.load(f)
-                # Ensure loaded_data is a dictionary
-                if isinstance(loaded_data, dict):
-                    app_data = loaded_data
-                    # Ensure dark_mode key exists and is boolean
-                    if 'dark_mode' not in app_data or not isinstance(app_data['dark_mode'], bool):
-                        app_data['dark_mode'] = False
-
-                    # Filter out non-existent image paths from history to avoid errors
-                    app_data['diagnosis_history'] = [
-                        item for item in app_data.get('diagnosis_history', [])
-                        if 'image_path' not in item or (item['image_path'] and os.path.exists(item['image_path']))
-                    ]
-                    # Filter recent images, ensuring paths exist
-                    app_data['recent_images'] = [
-                        path for path in app_data.get('recent_images', [])
-                        if os.path.exists(path)
-                    ]
-                    logging.info("Application data loaded successfully.")
-                else:
-                    logging.warning(f"Loaded data from {HISTORY_FILE} is not a dictionary. Starting with default settings.")
-                    app_data = default_app_data
-        else:
-            app_data = default_app_data # Initialize if file doesn't exist
-    except (json.JSONDecodeError, Exception) as e:
-        logging.error(f"Error loading application data from {HISTORY_FILE}: {e}. Starting with default settings.", exc_info=True)
-        app_data = default_app_data
-
-def save_app_data():
-    try:
-        with open(HISTORY_FILE, 'w', encoding='utf-8') as f:
-            json.dump(app_data, f, indent=4)
-        logging.info(f"Application data saved successfully to {HISTORY_FILE}.")
-    except Exception as e:
-        logging.error(f"Error saving application data to {HISTORY_FILE}: {e}", exc_info=True)
-
+# Populate generic fallback for all specific healthy keys if missing
+if "healthy" in treatment_suggestions_data:
+    for key in disease_info:
+        if "healthy" in key.lower() and key not in treatment_suggestions_data:
+            # Use .copy() so they are independent lists
+            treatment_suggestions_data[key] = treatment_suggestions_data["healthy"].copy()
+            
+# --- ML Functions ---
+# [Replace the existing def load_models() function with this]
 def load_models():
-    global disease_model, class_labels
-    model_path = os.path.join(MODELS_FOLDER, "my_model.keras")
+    global disease_model, gatekeeper_model
+    
+    # 1. Load Main Disease Model
+    disease_model_path = os.path.join(MODELS_FOLDER, "my_model.keras")
     try:
-        if not os.path.exists(model_path):
-            logging.error(f"Model file not found at: {model_path}. Please ensure 'my_model.keras' is in the '{MODELS_FOLDER}' directory.")
+        if os.path.exists(disease_model_path):
+            disease_model = load_model(disease_model_path)
+            # Warmup
+            disease_model.predict(np.zeros((1, 150, 150, 3)), verbose=0)
+            logging.info("✅ Disease Model Loaded.")
+        else:
+            logging.error(f"❌ Disease Model missing at {disease_model_path}")
             return False
 
-        disease_model = load_model(model_path)
-        # Warm-up prediction
-        dummy_input = np.zeros((1, 150, 150, 3), dtype=np.float32)
-        _ = disease_model.predict(dummy_input, verbose=0)
-        logging.info("Disease detection model loaded and warmed up successfully.")
-
-        # Define class labels - make sure these match your model's output
-        class_labels = {
-            'Apple_Apple_scab': 0, 'Apple_Black_rot': 1, 'Apple_Cedar_apple_rust': 2,
-            'Apple_healthy': 3, 'Blueberry_healthy': 4, 'Cherry_Powdery_mildew': 5,
-            'Cherry_healthy': 6, 'Corn_Cercospora_leaf_spot_Gray_leaf_spot': 7,
-            'Corn_Common_rust': 8, 'Corn_Northern_Leaf_Blight': 9, 'Corn_healthy': 10,
-            'Grape_Black_rot': 11, 'Grape_Esca_Black_Measles': 12, 'Grape_Leaf_blight': 13,
-            'Grape_healthy': 14, 'Orange_Haunglongbing_Citrus_greening': 15,
-            'Peach_Bacterial_spot': 16, 'Peach_healthy': 17, 'Pepper_bell_Bacterial_spot': 18,
-            'Pepper_bell_healthy': 19, 'Potato_Early_blight': 20, 'Potato_Late_blight': 21,
-            'Potato_healthy': 22, 'Raspberry_healthy': 23, 'Soybean_healthy': 24,
-            'Squash_Powdery_mildew': 25, 'Strawberry_Leaf_scorch': 26, 'Strawberry_healthy': 27,
-            'Tomato_Bacterial_spot': 28, 'Tomato_Early_blight': 29, 'Tomato_Late_blight': 30,
-            'Tomato_Leaf_Mold': 31, 'Tomato_Septoria_leaf_spot': 32,
-            'Tomato_Spider_mites _Two_spotted_spider_mite': 33, 'Tomato_Target_Spot': 34,
-            'Tomato_Tomato_Yellow_Leaf_Curl_Virus': 35, 'Tomato_Tomato_mosaic_virus': 36,
-            'Tomato_healthy': 37
-        }
-        logging.info("Class labels defined.")
+        # 2. Load Gatekeeper Model (NEW)
+        gatekeeper_path = os.path.join(MODELS_FOLDER, "gatekeeper_model.keras")
+        if os.path.exists(gatekeeper_path):
+            gatekeeper_model = load_model(gatekeeper_path)
+            # Warmup (MobileNetV2 uses 224x224 input)
+            gatekeeper_model.predict(np.zeros((1, 224, 224, 3)), verbose=0)
+            logging.info("✅ Gatekeeper AI Loaded.")
+        else:
+            logging.warning("⚠️ Gatekeeper AI missing. Validation will be disabled.")
+            
         return True
     except Exception as e:
-        logging.critical(f"Failed to load machine learning model: {e}", exc_info=True)
+        logging.critical(f"Failed to load models: {e}")
         return False
-
-def is_non_crop_image_heuristic(img_bytes):
-    """
-    Enhanced heuristic approach for non-crop detection based on image properties.
-    This is a fallback if no ML crop classifier is available.
-    """
-    try:
-        img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
-        img_array = np.array(img)
-
-        if img.size[0] < 100 or img.size[1] < 100:
-            logging.info(f"Heuristic non-crop detection: True (Reason: Image too small - {img.size[0]}x{img.size[1]})")
-            return True
-
-        hsv = cv2.cvtColor(img_array, cv2.COLOR_RGB2HSV)
-        green_pixels_mask = (hsv[:,:,0] > 30) & (hsv[:,:,0] < 90) & (hsv[:,:,1] > 40)
-        green_ratio = np.sum(green_pixels_mask) / (img.size[0] * img.size[1])
-
-        gray = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
-        laplacian_var = cv2.Laplacian(gray, cv2.CV_64F).var()
-
-        avg_brightness = np.mean(gray)
-        contrast = gray.std()
-
-        # Relaxed thresholds for heuristic detection
-        if (green_ratio < 0.05 or # Lowered from 0.10
-            laplacian_var < 5 or  # Lowered from 10
-            avg_brightness < 10 or
-            avg_brightness > 245 or
-            contrast < 10):       # Lowered from 15
-            logging.info(f"Heuristic non-crop detection: True (Green Ratio: {green_ratio:.2f}, Laplacian Var: {laplacian_var:.2f}, Brightness: {avg_brightness:.2f}, Contrast: {contrast:.2f})")
-            return True
-
-        logging.info(f"Heuristic non-crop detection: False (Green Ratio: {green_ratio:.2f}, Laplacian Var: {laplacian_var:.2f}, Brightness: {avg_brightness:.2f}, Contrast: {contrast:.2f})")
-        return False
-
-    except Exception as e:
-        logging.error(f"Heuristic non-crop detection failed: {e}", exc_info=True)
-        return False # Default to assuming it's a crop if heuristic detection fails.
 
 def diagnose_disease(img_bytes):
-    if disease_model is None or class_labels is None:
-        logging.error("diagnose_disease: Disease detection model or class labels not loaded.")
-        return {"error": "Disease detection model not loaded."}
-
-    # Perform non-crop detection first
-    if is_non_crop_image_heuristic(img_bytes):
-        logging.info("diagnose_disease: Heuristic detected non-crop image.")
-        return {"error": "Uploaded image doesn't appear to be a crop leaf image. Please upload a clearer image of a single crop leaf."}
-
+    if not disease_model: return {"error": "Model not loaded."}
+    
     try:
         img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
-        img = img.resize((150, 150), Image.Resampling.LANCZOS) # Resize for model input
+        img = img.resize((150, 150), Image.Resampling.LANCZOS)
         img_array = image.img_to_array(img) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
 
         predictions = disease_model.predict(img_array, verbose=0)
-
-        predicted_class_idx = np.argmax(predictions, axis=1)[0]
+        idx = np.argmax(predictions, axis=1)[0]
         confidence = np.max(predictions) * 100
+        predicted_label = list(class_labels.keys())[idx]
 
-        predicted_label = list(class_labels.keys())[predicted_class_idx]
-        logging.info(f"diagnose_disease: Predicted label from model: '{predicted_label}'")
-        
-        # Determine the key for dictionary lookup and human-readable display name
-        if 'healthy' in predicted_label.lower():
-            disease_key_for_lookup = "healthy"
-            display_disease_name = "Healthy"
-        else:
-            disease_key_for_lookup = predicted_label # Use the full predicted label as the key
-            display_disease_name = predicted_label.replace('_', ' ').strip() # Convert to human-readable
+        disease_key = "healthy" if "healthy" in predicted_label.lower() else predicted_label
+        display_name = "Healthy" if "healthy" in predicted_label.lower() else predicted_label.replace('_', ' ')
 
-        # Extract crop_type from the predicted_label for display
-        crop_type = predicted_label.split('_')[0]
-
-
-        result = {
-            "crop_type": crop_type,
-            "disease_name": display_disease_name, # This is the human-readable name for UI
-            "disease_key_for_lookup": disease_key_for_lookup, # This is the key for dictionary lookups
+        return {
+            "crop_type": predicted_label.split('_')[0],
+            "disease_name": display_name,
+            "disease_key_for_lookup": predicted_label, # Use full label for precise lookup
             "confidence": f"{confidence:.1f}%",
-            "full_label": predicted_label # Keep original full label for reference
+            "note": "Low confidence." if confidence < 50 else ""
         }
-        logging.info(f"diagnose_disease: Diagnosis Result: {result}")
-
-        if confidence < 50:
-            result["note"] = "Low confidence prediction. Please upload a clearer image for better results."
-
-        return result
-
     except Exception as e:
-        logging.error(f"Error during diagnosis: {e}", exc_info=True)
-        return {"error": f"An error occurred during diagnosis: {str(e)}"}
+        logging.error(f"Diagnosis error: {e}")
+        return {"error": str(e)}
 
 def apply_image_filters(img_bytes, filters):
     try:
         img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
-
-        if 'brightness' in filters:
-            enhancer = ImageEnhance.Brightness(img)
-            img = enhancer.enhance(float(filters['brightness']))
-        if 'contrast' in filters:
-            enhancer = ImageEnhance.Contrast(img)
-            img = enhancer.enhance(float(filters['contrast']))
-        if 'saturation' in filters:
-            enhancer = ImageEnhance.Color(img)
-            img = enhancer.enhance(float(filters['saturation']))
-        if 'edge_enhance' in filters and float(filters['edge_enhance']) > 0:
-            img = img.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
-            enhancer = ImageEnhance.Sharpness(img)
-            img = enhancer.enhance(1.0 + float(filters['edge_enhance']))
-        if 'blur_reduce' in filters and float(filters['blur_reduce']) > 0:
-            img = img.filter(ImageFilter.MedianFilter(size=3))
-            enhancer = ImageEnhance.Sharpness(img)
-            img = enhancer.enhance(1.0 + float(filters['blur_reduce']))
-        if 'color_balance' in filters:
-            factor = float(filters['color_balance'])
-            img_array = np.array(img)
-            if factor > 0: # More red/yellow
-                img_array[:,:,0] = np.clip(img_array[:,:,0] * (1 + factor), 0, 255) # Red
-                img_array[:,:,1] = np.clip(img_array[:,:,1] * (1 + factor/2), 0, 255) # Green (less than red)
-            else: # More blue
-                img_array[:,:,2] = np.clip(img_array[:,:,2] * (1 - factor), 0, 255) # Blue
-            img = Image.fromarray(img_array)
-        if 'auto_contrast' in filters and filters['auto_contrast'] == 'true':
-            img = ImageOps.autocontrast(img)
-        if 'sharpen' in filters and filters['sharpen'] == 'true':
-            img = img.filter(ImageFilter.SHARPEN)
-        if 'grayscale' in filters and filters['grayscale'] == 'true':
-            img = img.convert("L").convert("RGB")
-
-        img_byte_arr = io.BytesIO()
-        img.save(img_byte_arr, format='PNG')
-        img_byte_arr.seek(0)
-        return img_byte_arr.getvalue()
+        if 'brightness' in filters: img = ImageEnhance.Brightness(img).enhance(float(filters['brightness']))
+        if 'contrast' in filters: img = ImageEnhance.Contrast(img).enhance(float(filters['contrast']))
+        if 'saturation' in filters: img = ImageEnhance.Color(img).enhance(float(filters['saturation']))
+        if 'auto_contrast' in filters: img = ImageOps.autocontrast(img)
+        if 'grayscale' in filters: img = img.convert("L").convert("RGB")
+        
+        output = io.BytesIO()
+        img.save(output, format='PNG')
+        return output.getvalue()
     except Exception as e:
-        logging.error(f"Error applying image filters: {e}", exc_info=True)
+        logging.error(f"Filter error: {e}")
         return None
+    
 
-# --- Application Initialization (Moved from @app.before_first_request) ---
-# These functions will run once when the Flask application starts.
-load_app_data()
-if not load_models():
-    logging.critical("Application failed to load ML models. Some features may not work.")
+# [Paste this where the old is_plant_image function was]
+def verify_plant_ai(img_bytes):
+    """
+    Returns True if AI is >90% sure it's a plant.
+    """
+    if not gatekeeper_model:
+        return True # Fallback: if model missing, allow everything
+        
+    try:
+        # 1. Preprocess for MobileNetV2 (224x224)
+        img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+        img = img.resize((224, 224), Image.Resampling.LANCZOS)
+        img_array = image.img_to_array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
+
+        # 2. Predict
+        prediction = gatekeeper_model.predict(img_array, verbose=0)[0][0]
+        
+        # 3. STRICT Threshold Logic (0.90 = 90%)
+        # If prediction > 0.90, it is a Plant (1).
+        is_plant = prediction > 0.90
+        
+        status = "✅ ACCEPTED" if is_plant else "❌ REJECTED"
+        confidence = prediction * 100
+        logging.info(f"Gatekeeper Check: {confidence:.2f}% ({status})")
+        
+        return is_plant
+        
+    except Exception as e:
+        logging.error(f"Gatekeeper Check Failed: {e}")
+        return True # Fail open to avoid blocking users on error
+
+# --- Init ---
+init_db()
+if not load_models(): logging.warning("Model load failed.")
+
+def get_dark_mode():
+    with get_db_connection() as conn:
+        row = conn.execute("SELECT value FROM settings WHERE key='dark_mode'").fetchone()
+        return row['value'] == 'true' if row else False
 
 # --- Routes ---
 @app.route('/')
 def home():
-    # Pass the current datetime object to the template
-    return render_template('index.html', dark_mode=bool(app_data.get('dark_mode', False)), now=datetime.now())
+    return render_template('index.html', dark_mode=get_dark_mode(), now=datetime.now())
 
 @app.route('/toggle_theme', methods=['POST'])
 def toggle_theme():
-    app_data['dark_mode'] = not app_data.get('dark_mode', False) # Safely toggle
-    save_app_data()
-    return jsonify(success=True, dark_mode=app_data['dark_mode'])
+    current = get_dark_mode()
+    new_val = 'false' if current else 'true'
+    with get_db_connection() as conn:
+        conn.execute("UPDATE settings SET value = ? WHERE key = 'dark_mode'", (new_val,))
+        conn.commit()
+    return jsonify(success=True, dark_mode=(new_val == 'true'))
 
 @app.route('/diagnose', methods=['GET', 'POST'])
 def diagnose_page():
     if request.method == 'POST':
-        if 'file' not in request.files:
-            return jsonify({"error": "No file part"}), 400
+        if 'file' not in request.files: return jsonify({"error": "No file"}), 400
         file = request.files['file']
-        if file.filename == '':
-            return jsonify({"error": "No selected file"}), 400
-        if file:
-            try:
-                # Read image data
-                img_bytes = file.read()
+        if not file.filename: return jsonify({"error": "No filename"}), 400
 
-                # Apply filters if provided
-                filters = request.form.to_dict()
-                if filters:
-                    filtered_img_bytes = apply_image_filters(img_bytes, filters)
-                    if filtered_img_bytes is None:
-                        return jsonify({"error": "Failed to apply image filters."}), 500
-                    img_bytes = filtered_img_bytes
+        try:
+            img_bytes = file.read()
+            filters = request.form.to_dict()
+            if filters:
+                processed = apply_image_filters(img_bytes, filters)
+                if processed: img_bytes = processed
 
-                # Save the image temporarily for diagnosis and history (if it's a new upload)
-                # Or, if it's a re-diagnosis, use the existing path
-                original_filename = secure_filename(file.filename)
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-                unique_filename = f"{timestamp}_{original_filename}"
-                save_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
-
-                # Ensure the directory exists
-                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
-                with open(save_path, 'wb') as f:
-                    f.write(img_bytes)
-
-                diagnosis_result = diagnose_disease(img_bytes)
-
-                if "error" in diagnosis_result:
-                    logging.error(f"diagnose_page: Diagnosis returned an error: {diagnosis_result['error']}")
-                    return jsonify(diagnosis_result), 500
-
-                # Add to history
-                history_entry = {
-                    "image_path": save_path,
-                    "diagnosis": diagnosis_result,
-                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                }
-                app_data['diagnosis_history'].insert(0, history_entry)
-                if len(app_data['diagnosis_history']) > 50: # Limit history size
-                    app_data['diagnosis_history'].pop()
-                save_app_data()
-
-                # Return the diagnosis result and the URL to the saved image
-                image_url = url_for('uploaded_file', filename=unique_filename)
+            filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{secure_filename(file.filename)}"
+            save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            with open(save_path, 'wb') as f: f.write(img_bytes)
+            
+            # --- NEW AI CHECK ---
+            if not verify_plant_ai(img_bytes):
+                os.remove(save_path) # Delete the junk file
                 return jsonify({
-                    "success": True,
-                    "diagnosis": diagnosis_result,
-                    "image_url": image_url,
-                    "image_filename": unique_filename # Send filename for report generation
-                })
-            except Exception as e:
-                logging.error(f"Error during diagnose POST: {e}", exc_info=True)
-                return jsonify({"error": f"Server error during diagnosis: {str(e)}"}), 500
+                    'error': 'Invalid Image Detected',
+                    'message': 'Our AI Analysis indicates this is likely NOT a crop leaf. Please upload a clear photo of a plant.'
+                }), 400
 
-    # GET request for diagnosis page
-    return render_template(
-        'diagnose.html',
-        dark_mode=bool(app_data.get('dark_mode', False)),
-        disease_info=disease_info, # Pass disease_info
-        treatment_suggestions_data=treatment_suggestions_data, # Pass treatment_suggestions_data
-        now=datetime.now(), # Pass the current datetime object to the template
-        uploads_base_url=url_for('uploaded_file', filename='') # Pass the base URL for uploads
-    )
+            result = diagnose_disease(img_bytes)
+            if "error" in result: return jsonify(result), 500
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    """Serve uploaded files from the UPLOAD_FOLDER."""
-    try:
-        return send_file(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    except FileNotFoundError:
-        logging.error(f"File not found: {filename} in {app.config['UPLOAD_FOLDER']}")
-        return jsonify({"error": "File not found"}), 404
-    except Exception as e:
-        logging.error(f"Error serving uploaded file {filename}: {e}")
-        return jsonify({"error": "Error serving file"}), 500
-
-
-@app.route('/history')
-def history_page():
-    # Sort history by most recent by default
-    sorted_history = sorted(app_data['diagnosis_history'], key=lambda x: x['timestamp'], reverse=True)
-    # Pass the current datetime object to the template
-    return render_template('history.html', history=sorted_history, dark_mode=bool(app_data.get('dark_mode', False)), class_labels=class_labels, now=datetime.now())
-
-@app.route('/get_history_details/<path:filename>') # Changed to <path:filename>
-def get_history_details(filename):
-    # Ensure we are always working with just the basename
-    # This handles cases where the client might send "uploads/filename.png" or just "filename.png"
-    actual_filename = os.path.basename(filename)
-    logging.info(f"get_history_details: Request for filename: {filename}, processed as: {actual_filename}")
-
-    for item in app_data['diagnosis_history']:
-        # Compare with the basename of the stored image_path
-        stored_filename = os.path.basename(item.get('image_path', ''))
-        if stored_filename == actual_filename:
-            # Prepare data for display
-            details = item['diagnosis']
-            logging.info(f"get_history_details: Found history item. Details: {details}")
-            
-            # Use the 'disease_key_for_lookup' provided by the backend
-            disease_lookup_key = details.get('disease_key_for_lookup')
-            logging.info(f"get_history_details: Using disease_lookup_key: '{disease_lookup_key}'")
-            
-            # Attempt to get info using disease_lookup_key first
-            info = disease_info.get(disease_lookup_key)
-            
-            # Final fallback to generic healthy info if still not found
-            if info is None:
-                logging.warning(f"get_history_details: Info still not found for '{disease_lookup_key}'. Falling back to generic healthy info.")
-                info = disease_info.get("healthy")
-
-            treatment_suggestions = treatment_suggestions_data.get(disease_lookup_key, treatment_suggestions_data.get("healthy"))
-            
-            logging.info(f"get_history_details: Fetched info: {info}")
-            logging.info(f"get_history_details: Fetched treatment_suggestions: {treatment_suggestions}")
+            # Save to SQLite
+            with get_db_connection() as conn:
+                conn.execute('''
+                    INSERT INTO history (image_filename, crop_type, disease_name, confidence, timestamp, full_details, disease_key_for_lookup)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    filename,
+                    result['crop_type'],
+                    result['disease_name'],
+                    float(result['confidence'].strip('%')),
+                    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    json.dumps(result),
+                    result['disease_key_for_lookup']
+                ))
+                conn.commit()
 
             return jsonify({
                 "success": True,
-                "details": details, # This still contains the human-readable 'disease_name'
-                "info": info,
-                "treatment_suggestions": treatment_suggestions,
-                "image_url": url_for('uploaded_file', filename=actual_filename), # Use actual_filename here
-                "timestamp": item['timestamp'] # Include timestamp for display
+                "diagnosis": result,
+                "image_url": url_for('uploaded_file', filename=filename),
+                "image_filename": filename
             })
-    logging.warning(f"get_history_details: History item not found for filename: {filename}")
-    return jsonify({"error": "History item not found"}), 404
+        except Exception as e:
+            logging.error(f"Diagnose error: {e}")
+            return jsonify({"error": str(e)}), 500
 
-@app.route('/delete_history_item/<path:filename>', methods=['POST']) # Changed to <path:filename>
+    return render_template('diagnose.html', 
+                           dark_mode=get_dark_mode(), 
+                           disease_info=disease_info, 
+                           treatment_suggestions_data=treatment_suggestions_data,
+                           now=datetime.now(),
+                           uploads_base_url=url_for('uploaded_file', filename=''))
+
+
+@app.route('/static/uploads/<filename>')
+def uploaded_file(filename):
+    # 1. Construct the full path
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    
+    # 2. Check if the file actually exists
+    if os.path.exists(file_path):
+        return send_file(file_path)
+    else:
+        # 3. If missing, return a 404 error instead of crashing the server
+        return "Image not found", 404
+
+# Add this route to serve the service worker from the ROOT
+@app.route('/service-worker.js')
+def service_worker():
+    return send_file(os.path.join(app.static_folder, 'service-worker.js'), mimetype='application/javascript')
+
+@app.route('/history')
+def history_page():
+    sort_by = request.args.get('sort_by', 'recent')
+    filter_crop = request.args.get('filter_crop', 'all')
+
+    query = "SELECT * FROM history"
+    params = []
+    
+    if filter_crop != 'all':
+        query += " WHERE lower(crop_type) = ?"
+        params.append(filter_crop.lower())
+
+    if sort_by == 'oldest': query += " ORDER BY timestamp ASC"
+    elif sort_by == 'highest_confidence': query += " ORDER BY confidence DESC"
+    elif sort_by == 'lowest_confidence': query += " ORDER BY confidence ASC"
+    else: query += " ORDER BY timestamp DESC"
+
+    with get_db_connection() as conn:
+        rows = conn.execute(query, params).fetchall()
+
+    history_data = []
+    for row in rows:
+        diag_details = json.loads(row['full_details'])
+        lookup_key = diag_details.get('disease_key_for_lookup', 'healthy')
+        info = disease_info.get(lookup_key, disease_info['healthy'])
+        treatments = treatment_suggestions_data.get(lookup_key, treatment_suggestions_data['healthy'])
+        
+        # 4. Bundle everything together
+        history_data.append({
+            "image_path": row['image_filename'], # Just the filename
+            "diagnosis": diag_details,
+            "timestamp": row['timestamp'],
+            "info": info,                   # <--- ADDED THIS
+            "treatment_suggestions": treatments # <--- ADDED THIS
+        })
+
+    return render_template('history.html', 
+                           history=history_data, 
+                           dark_mode=get_dark_mode(), 
+                           class_labels=class_labels, 
+                           now=datetime.now())
+
+@app.route('/get_history_details/<path:filename>')
+def get_history_details(filename):
+    actual_filename = os.path.basename(filename)
+    with get_db_connection() as conn:
+        row = conn.execute("SELECT * FROM history WHERE image_filename = ?", (actual_filename,)).fetchone()
+    
+    if row:
+        details = json.loads(row['full_details'])
+        key = row['disease_key_for_lookup']
+        info = disease_info.get(key) or disease_info.get('healthy')
+        treatments = treatment_suggestions_data.get(key) or treatment_suggestions_data.get('healthy') or []
+        
+        return jsonify({
+            "success": True, 
+            "details": details, 
+            "info": info, 
+            "treatment_suggestions": treatments,
+            "image_url": url_for('uploaded_file', filename=actual_filename),
+            "timestamp": row['timestamp']
+        })
+    return jsonify({"error": "Not found"}), 404
+
+@app.route('/delete_history_item/<path:filename>', methods=['POST'])
 def delete_history_item(filename):
-    actual_filename = os.path.basename(filename) # Ensure we're working with basename
-    initial_len = len(app_data['diagnosis_history'])
-    app_data['diagnosis_history'] = [
-        item for item in app_data['diagnosis_history']
-        if not (item.get('image_path') and os.path.basename(item['image_path']) == actual_filename)
-    ]
-    if len(app_data['diagnosis_history']) < initial_len:
-        # Also delete the associated image file
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], actual_filename) # Use actual_filename here
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            logging.info(f"Deleted image file: {file_path}")
-        save_app_data()
-        return jsonify(success=True)
-    return jsonify(success=False, message="Item not found"), 404
+    actual_filename = os.path.basename(filename)
+    
+    with get_db_connection() as conn:
+        conn.execute("DELETE FROM history WHERE image_filename = ?", (actual_filename,))
+        conn.commit()
+    
+    # --- COMMENTED OUT: Stop deleting the file so Community posts stay safe ---
+    # path = os.path.join(app.config['UPLOAD_FOLDER'], actual_filename)
+    # if os.path.exists(path): os.remove(path)
+    # ------------------------------------------------------------------------
+
+    return jsonify(success=True)
 
 @app.route('/clear_all_history', methods=['POST'])
 def clear_all_history():
-    # Delete all uploaded images first
-    for item in app_data['diagnosis_history']:
-        if item.get('image_path') and os.path.exists(item['image_path']):
-            try:
-                os.remove(item['image_path'])
-            except Exception as e:
-                logging.error(f"Error deleting history image file {item['image_path']}: {e}")
-    app_data['diagnosis_history'] = []
-    save_app_data()
+    with get_db_connection() as conn:
+        # We don't need to fetch rows anymore since we aren't deleting files
+        # rows = conn.execute("SELECT image_filename FROM history").fetchall()
+        
+        # Only delete the data from the database
+        conn.execute("DELETE FROM history")
+        conn.commit()
+    
+    # --- COMMENTED OUT TO SAVE IMAGES FOR BACKUP/RESTORE ---
+    # for row in rows:
+    #     path = os.path.join(app.config['UPLOAD_FOLDER'], row['image_filename'])
+    #     if os.path.exists(path): os.remove(path)
+    # -------------------------------------------------------
+
     return jsonify(success=True)
-
-@app.route('/export_all_history', methods=['GET'])
-def export_all_history():
-    if not app_data['diagnosis_history']:
-        return jsonify({"error": "No history to export"}), 404
-
-    export_data = []
-    for item in app_data['diagnosis_history']:
-        # Convert image_path to a URL for export if needed, or just keep path
-        # For simplicity, let's keep the path as it is for local export
-        export_data.append({
-            "image_path": item.get("image_path"),
-            "diagnosis": item.get("diagnosis"),
-            "timestamp": item.get("timestamp")
-        })
-
-    temp_file_path = os.path.join(UPLOAD_FOLDER, f"crop_diagnosis_history_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
-    with open(temp_file_path, 'w', encoding='utf-8') as f:
-            json.dump(export_data, f, indent=4)
-
-    return send_file(temp_file_path, as_attachment=True, download_name=os.path.basename(temp_file_path))
-
-@app.route('/import_history', methods=['POST'])
-def import_history():
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
-    if file:
-        try:
-            imported_data = json.load(file)
-            if not isinstance(imported_data, list):
-                raise ValueError("Imported file does not contain a list of history records.")
-
-            overwrite = request.form.get('overwrite') == 'true'
-            if overwrite:
-                app_data['diagnosis_history'].clear()
-
-            for item in imported_data:
-                if all(key in item for key in ["diagnosis", "timestamp"]):
-                    # Validate image_path if it exists, and make it relative if needed
-                    if 'image_path' in item and item['image_path']:
-                        # For simplicity, we'll assume imported image paths are relative to UPLOAD_FOLDER
-                        # or that the user will manually place them. If the path is absolute and doesn't exist,
-                        # we'll nullify it.
-                        if not os.path.exists(item['image_path']):
-                            item['image_path'] = None # Mark as missing
-                            logging.warning(f"Imported history item references missing image: {item.get('image_path', 'N/A')}")
-                    app_data['diagnosis_history'].append(item)
-                else:
-                    logging.warning(f"Skipping invalid history item during import: {item}")
-
-            save_app_data()
-            return jsonify(success=True, message="History imported successfully.")
-
-        except json.JSONDecodeError as e:
-            return jsonify({"error": f"Invalid JSON file format: {e}"}), 400
-        except ValueError as e:
-            return jsonify({"error": str(e)}), 400
-        except Exception as e:
-            logging.error(f"Error importing history: {e}", exc_info=True)
-            return jsonify({"error": f"Failed to import history: {str(e)}"}), 500
-
 
 @app.route('/feedback', methods=['GET', 'POST'])
 def feedback_page():
     if request.method == 'POST':
         try:
-            feedback_data = {
-                "type": request.form.get("feedback_type"),
-                "text": request.form.get("feedback_text"),
-                "email": request.form.get("email"),
-                "rating": request.form.get("rating"),
-                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "version": "1.0",
-                "platform": "Web (Flask)"
-            }
+            screenshot_filename = None
+            if 'screenshot' in request.files:
+                f = request.files['screenshot']
+                if f.filename:
+                    screenshot_filename = secure_filename(f.filename)
+                    f.save(os.path.join(FEEDBACK_FOLDER, screenshot_filename))
 
-            if 'screenshot' in request.files and request.files['screenshot'].filename != '':
-                screenshot_file = request.files['screenshot']
-                filename = secure_filename(screenshot_file.filename)
-                screenshots_dir = os.path.join(FEEDBACK_FOLDER, "screenshots")
-                os.makedirs(screenshots_dir, exist_ok=True)
-                screenshot_path = os.path.join(screenshots_dir, filename)
-                screenshot_file.save(screenshot_path)
-                feedback_data["screenshot"] = filename
-
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-            file_path = os.path.join(FEEDBACK_FOLDER, f"feedback_{timestamp}.json")
-            with open(file_path, "w", encoding='utf-8') as f:
-                json.dump(feedback_data, f, indent=2)
-
-            return jsonify(success=True, message="Feedback submitted successfully!")
+            with get_db_connection() as conn:
+                conn.execute('''
+                    INSERT INTO feedback (type, text, email, rating, screenshot_filename, timestamp)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                ''', (
+                    request.form.get("feedback_type"),
+                    request.form.get("feedback_text"),
+                    request.form.get("email"),
+                    request.form.get("rating"),
+                    screenshot_filename,
+                    datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                ))
+                conn.commit()
+            return jsonify(success=True)
         except Exception as e:
-            logging.error(f"Error submitting feedback: {e}", exc_info=True)
-            return jsonify({"error": f"Failed to submit feedback: {str(e)}"}), 500
-    # Pass the current datetime object to the template
-    return render_template('feedback.html', dark_mode=bool(app_data.get('dark_mode', False)), now=datetime.now())
+            return jsonify({"error": str(e)}), 500
+            
+    return render_template('feedback.html', dark_mode=get_dark_mode(), now=datetime.now())
 
+@app.route('/export_all_history', methods=['GET'])
+def export_all_history():
+    with get_db_connection() as conn:
+        rows = conn.execute("SELECT * FROM history").fetchall()
+    
+    data = []
+    for row in rows:
+        data.append({
+            "diagnosis": json.loads(row['full_details']),
+            "timestamp": row['timestamp'],
+            # IMPROVEMENT 1: Use 'image_filename' to match your DB and Frontend
+            "image_filename": row['image_filename'] 
+        })
+    
+    # Create the file
+    filename = f"export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    
+    with open(path, 'w') as f:
+        json.dump(data, f, indent=2)
+
+    # IMPROVEMENT 2: Delete the file from the server after sending it
+    @after_this_request
+    def remove_file(response):
+        try:
+            os.remove(path)
+        except Exception as e:
+            logging.error(f"Error removing export file: {e}")
+        return response
+
+    return send_file(path, as_attachment=True, download_name=filename, mimetype='application/json')
+
+@app.route('/import_history', methods=['POST'])
+def import_history():
+    if 'file' not in request.files: return jsonify({"error": "No file"}), 400
+    file = request.files['file']
+    overwrite = request.form.get('overwrite') == 'true'
+    
+    try:
+        data = json.load(file)
+        with get_db_connection() as conn:
+            if overwrite: conn.execute("DELETE FROM history")
+            for item in data:
+                diag = item['diagnosis']
+                
+                # IMPROVED LOGIC: Try 'image_filename' first (new standard), 
+                # then fallback to 'image_path' (old exports), 
+                # finally fallback to 'unknown.png'.
+                img_name = item.get('image_filename', item.get('image_path', 'unknown.png'))
+
+                conn.execute('''
+                    INSERT INTO history (image_filename, crop_type, disease_name, confidence, timestamp, full_details, disease_key_for_lookup)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    img_name,
+                    diag['crop_type'],
+                    diag['disease_name'],
+                    float(str(diag['confidence']).strip('%')), # Added str() safety just in case
+                    item['timestamp'],
+                    json.dumps(diag),
+                    diag.get('disease_key_for_lookup', diag['disease_name'])
+                ))
+            conn.commit()
+        return jsonify(success=True)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 @app.route('/help')
 def help_page():
-    # Pass the current datetime object to the template
-    return render_template('help.html', dark_mode=bool(app_data.get('dark_mode', False)), now=datetime.now())
+    return render_template('help.html', dark_mode=get_dark_mode(), now=datetime.now())
 
 @app.route('/about')
 def about_page():
-    # Pass the current datetime object to the template
+    return render_template('about.html', dark_mode=get_dark_mode(), now=datetime.now())
 
-    return render_template('about.html', dark_mode=bool(app_data.get('dark_mode', False)), now=datetime.now())
+# --- DISEASE LIBRARY ROUTE ---
+@app.route('/library')
+def library_page():
+    # We pass the 'disease_info' dictionary to the template
+    return render_template('library.html', diseases=disease_info, now=datetime.now())
+
+# --- LEGAL ROUTES ---
+@app.route('/privacy')
+def privacy_page():
+    return render_template('privacy.html', now=datetime.now())
+
+@app.route('/terms')
+def terms_page():
+    return render_template('terms.html', now=datetime.now())
 
 @app.route('/generate_report', methods=['POST'])
 def generate_report():
     data = request.json
-    image_filename = data.get('image_filename')
-    diagnosis_details = data.get('diagnosis_details')
-    disease_info_data = data.get('disease_info')
-    treatment_suggestions = data.get('treatment_suggestions')
+    filename = data.get('image_filename')
+    details = data.get('diagnosis_details')
+    info = data.get('disease_info')
+    treatments = data.get('treatment_suggestions')
 
-    if not image_filename or not diagnosis_details:
-        return jsonify({"error": "Missing data for report generation"}), 400
-
-    image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
-    if not os.path.exists(image_path):
-        return jsonify({"error": "Image file not found for report"}), 404
-
-    temp_image_file_path = None # Initialize to None for finally block
-    try:
-        pdf = FPDF()
-        pdf.set_font("Helvetica", "B", 16)
-        pdf.add_page()
-
-        pdf.cell(0, 10, "Crop Disease Diagnosis Report", ln=True, align="C")
-        pdf.ln(10)
-
-        pdf.set_font("Helvetica", size=12)
-        pdf.cell(0, 10, f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True)
-        pdf.cell(0, 10, f"Image: {image_filename}", ln=True)
-        pdf.ln(5)
-
-        pdf.set_font("Helvetica", "B", 14)
-        pdf.cell(0, 10, "Diagnosis Results:", ln=True)
-        pdf.set_font("Helvetica", size=12)
-
-        pdf.cell(0, 7, f"Crop Type: {diagnosis_details.get('crop_type', 'N/A')}", ln=True)
-        pdf.cell(0, 7, f"Disease: {diagnosis_details.get('disease_name', 'N/A')}", ln=True)
-        pdf.cell(0, 7, f"Confidence: {diagnosis_details.get('confidence', 'N/A')}", ln=True)
-        pdf.ln(5)
-
-        pdf.set_font("Helvetica", "B", 14)
-        pdf.cell(0, 10, "Disease Information:", ln=True)
-        pdf.set_font("Helvetica", size=12)
-        if disease_info_data:
-            pdf.multi_cell(0, 7, f"Description: {disease_info_data.get('description', 'N/A')}")
-            pdf.ln(2)
-            pdf.multi_cell(0, 7, f"Symptoms: {disease_info_data.get('symptoms', 'N/A')}")
-        else:
-            pdf.multi_cell(0, 7, "No detailed information available for this disease.")
-        pdf.ln(10)
-
-        pdf.set_font("Helvetica", "B", 14)
-        pdf.cell(0, 10, "Treatment Suggestions:", ln=True)
-        pdf.set_font("Helvetica", size=12)
-
-        if treatment_suggestions:
-            for suggestion in treatment_suggestions:
-                pdf.multi_cell(0, 7, f"- {suggestion}")
-        else:
-            pdf.multi_cell(0, 7, "No specific treatment suggestions available for this diagnosis.")
-        pdf.ln(10)
-
-        # Embed image from the original file path
+    if not filename or not details: return jsonify({"error": "Missing data"}), 400
+    
+    image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Helvetica", "B", 22)
+    pdf.set_text_color(0, 100, 0)
+    pdf.cell(0, 15, "Crop Disease Report", ln=True, align="C")
+    pdf.ln(5)
+    
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font("Helvetica", size=12)
+    pdf.ln(10)
+    pdf.cell(0, 7, f"Date: {datetime.now().strftime('%Y-%m-%d')}", ln=True)
+    pdf.set_font("Helvetica", "B", 14)
+    pdf.cell(0, 8, f"Disease Detected: {details['disease_name']}", ln=True)
+    pdf.set_font("Helvetica", size=12)
+    pdf.cell(0, 8, f"Confidence: {details['confidence']}", ln=True)
+    pdf.cell(0,8, f"Crop Type: {details['crop_type']}", ln=True)
+    pdf.ln(5)
+    
+    if os.path.exists(image_path):
         try:
-            # Open the image using PIL
-            img_to_embed = Image.open(image_path).convert("RGB")
-            img_width, img_height = img_to_embed.size
-            max_pdf_width = 150
-            max_pdf_height = 150
-
-            if img_width > max_pdf_width or img_height > max_pdf_height:
-                img_to_embed.thumbnail((max_pdf_width, max_pdf_height), Image.Resampling.LANCZOS)
-
-            # Save the resized image to a temporary file for FPDF
-            # PyFPDF 1.7.2 seems to prefer a file path over BytesIO for image embedding.
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as t_file:
-                temp_image_file_path = t_file.name # Store path for finally block
-                img_to_embed.save(temp_image_file_path, format="JPEG")
+            tmp_filename = None
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
+                tmp_filename = tmp.name
+                Image.open(image_path).convert('RGB').save(tmp, format='JPEG')
             
-            logging.info(f"Attempting to embed image from temporary file: {temp_image_file_path}")
+            if tmp_filename:
+                # Calculate center position: (A4 width 210mm - Image width 80mm) / 2 = 65
+                pdf.image(tmp_filename, x=65, y=None, w=80) 
+                pdf.ln(5) # Add space after image
+                try: os.unlink(tmp_filename)
+                except Exception: pass
+        except Exception as e:
+            logging.error(f"PDF Image error: {e}")
+    
+    if info:
+        pdf.ln(5)
+        pdf.set_font("Helvetica", "B", 12)
+        pdf.set_fill_color(240, 240, 240) # Light Gray Background
+        pdf.cell(0, 8, "Symptoms & Description:", ln=True, fill=True)
+        pdf.set_font("Helvetica", size=12)
+        pdf.multi_cell(0, 6, info.get('symptoms', 'N/A'))
+        
+    pdf.ln(5)
+    
+    if treatments:
+        pdf.set_font("Helvetica", "B", 12)
+        pdf.set_text_color(0, 100, 0) # Green Header
+        pdf.cell(0, 10, "Recommended Actions & Treatments:", ln=True)
+        pdf.set_text_color(0, 0, 0) # Reset Black
+        pdf.set_font("Helvetica", size=12)
+        for t in treatments:
+            if isinstance(t, dict):
+                text_content = t.get('text', '')
+                link_content = t.get('link', '')
+                
+                # Print the main text
+                pdf.cell(0, 7, f"- {text_content}", ln=True)
+                
+                # If there is a link, add a blue clickable line below it
+                if link_content:
+                    pdf.set_text_color(0, 0, 255) # Blue
+                    pdf.set_font("Helvetica", "I", 10) # Italic Small
+                    pdf.cell(0, 5, "   [Click to View Product / Buy Now]", ln=True, link=link_content)
+                    pdf.set_text_color(0, 0, 0) # Reset Black
+                    pdf.set_font("Helvetica", size=12) # Reset Normal
+            else:
+                # Fallback for old simple string data
+                pdf.cell(0, 7, f"- {t}", ln=True)       
+                
+    pdf_out = pdf.output(dest='S').encode('latin-1')
+    return send_file(io.BytesIO(pdf_out), download_name="report.pdf", as_attachment=True, mimetype='application/pdf')
 
-            pdf.ln(5)
-            pdf.cell(0, 10, "Image Preview:", ln=True)
-            x_pos = (pdf.w - img_to_embed.width) / 2
-            # Pass the path of the temporary file to pdf.image
-            pdf.image(temp_image_file_path, x=x_pos, w=img_to_embed.width, type="JPEG")
-        except Exception as img_embed_e:
-            logging.error(f"Failed to embed image in PDF: {img_embed_e}", exc_info=True)
-            pdf.set_font("Helvetica", "I", 10)
-            pdf.cell(0, 10, "Error: Could not embed image in report.", ln=True, align="C")
+@app.route('/chat', methods=['POST'])
+def chat_with_dr_crop():
+    data = request.json
+    user_message = data.get('message')
+    disease_key = data.get('disease_key')
+    
+    lang_code = session.get('language', 'en')
+    
+    # Map code to the full English name for the prompt
+    lang_map = {
+        'en': 'English',
+        'hi': 'Hindi',
+        'mr': 'Marathi',
+        'kn': 'Kannada'
+    }
+    # e.g., "Hindi", "Marathi", or "English"
+    target_language = lang_map.get(lang_code, 'English')
+    
+    
+    # --- 1. PREPARE CONTEXT (Same Logic as before) ---
+    
+    # Extract Crop Name (e.g., "Potato" from "Potato_Early_blight")
+    # If disease_key is None/Empty, default to "this crop"
+    crop_name = disease_key.split('_')[0] if disease_key and '_' in disease_key else "this crop"
 
-        # Get PDF content as bytes
-        pdf_content_bytes = pdf.output(dest='S') # Explicitly get as string
-        # Ensure it's bytes for BytesIO, as fpdf.output() might return str in some environments
-        pdf_output = io.BytesIO(pdf_content_bytes.encode('latin-1'))
-        pdf_output.seek(0)
+    # RAG: Retrieve context from your existing dictionaries
+    # We use .get() to avoid crashing if the key is missing
+    context_info = disease_info.get(disease_key, {}) if disease_key else disease_info.get('healthy', {})
+    treatment_info = treatment_suggestions_data.get(disease_key, [])
+    
+    # ✅ FIX: Handle both strings and dictionaries (objects with links)
+    if treatment_info:
+        treatment_list = []
+        for t in treatment_info:
+            if isinstance(t, dict):
+                # If it's a dictionary, extract the 'text' field
+                treatment_list.append(t.get('text', ''))
+            else:
+                # If it's already a string, just add it
+                treatment_list.append(str(t))
+        treatment_str = ", ".join(treatment_list)
+    else:
+        treatment_str = "No specific treatments found."
+    
+    # --- 2. BUILD THE SYSTEM PROMPT (The "Brain") ---
+    # This string defines the 3 personalities (Pathologist, Economist, Agronomist)
+    system_prompt = f"""
+    You are 'Dr. Crop', an expert AI consultant for Agriculture. You have Three distinct roles:
+    
+    ROLE 1: PLANT PATHOLOGIST (Disease Doctor)
+    - The user has a {crop_name} plant.
+    - Diagnosis: {disease_key.replace('_', ' ') if disease_key else 'Unknown'}
+    - Description: {context_info.get('description', 'N/A')}
+    - Symptoms: {context_info.get('symptoms', 'N/A')}
+    - Recommended Treatments: {treatment_str}
+    
+    ROLE 2: AGRICULTURAL ECONOMIST (Market Analyst)
+    - You are an expert on {crop_name} market trends, pricing strategies, and supply chains.
+    - You know about the global and local (Indian) demand for {crop_name}.
+    
+    ROLE 3: AGRONOMIST (Yield Estimator)
+    - You can estimate the potential yield for {crop_name}.
+    - **CRITICAL:** If the user asks for a yield prediction but hasn't given their Farm Size (acres/hectares) or Region, YOU MUST ASK THEM FOR IT first.
+    - Once you have the details, provide a realistic estimate range (e.g., "For 1 acre of {crop_name} in this region, average yield is X tons").
+    
+    *** CRITICAL LANGUAGE INSTRUCTION ***
+    The user has selected their language as: {target_language}.
+    You MUST provide your entire answer STRICTLY in {target_language}.
+    - Do not mix languages (e.g., do not write Hindi in English script).
+    - If the user asks in English but their selected language is {target_language}, TRANSLATE your thought process and reply ONLY in {target_language}.
+    - Use the native script for the language (Devanagari for Hindi/Marathi, Kannada script for Kannada).
+    
+    INSTRUCTIONS:
+    1. If the user asks about the **disease** (symptoms, cure, prevention), answer as the **Doctor** using the specific context above.
+    2. If the user asks about **profit, market prices, selling, or business**, answer as the **Economist**.
+       - Suggest the best time of year to sell {crop_name}.
+       - Suggest value-added products.
+    3. If the user asks about **yield, harvest, or production**, answer as the **Agronomist**.
+       - **Rule:** If Farm Size or Region is missing, ask for it.
+       - Important: Since the plant is diagnosed with {disease_key.replace('_', ' ') if disease_key else 'Unknown'}, mention that yield might be reduced by 10-20% if left untreated.
+    4. Keep answers concise, helpful, and professional.
+    """
+    # --- 3. CALL GROQ API ---
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_prompt
+                },
+                {
+                    "role": "user",
+                    "content": user_message
+                }
+            ],
+            # Use the "Instant" model for max speed
+            model="llama-3.1-8b-instant",
+            
+            # Optional parameters to control creativity vs precision
+            temperature=0.6,
+            max_tokens=500,
+        )
+        
+        # Extract the answer
+        bot_reply = chat_completion.choices[0].message.content
+        return jsonify({"response": bot_reply})
+        
+    except Exception as e:
+        print(f"⚠️ Groq API Error: {e}")
+        return jsonify({"error": "Dr. Crop is currently unavailable. Please try again later."}), 500
+    
+@app.route('/check_weather_risk', methods=['POST'])
+def check_weather_risk():
+    city = request.json.get('city')
+    
+    if not city:
+        return jsonify({'error': "Please enter a city name."})
 
-        filename = f"diagnosis_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
-        return send_file(pdf_output, as_attachment=True, download_name=filename, mimetype='application/pdf')
+    # 1. Call OpenWeatherMap API
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={weather_api_key}&units=metric"
+    
+    try:
+        response = requests.get(url)
+        data = response.json()
+        
+        if response.status_code != 200:
+            return jsonify({'error': "City not found!"})
+
+        # 2. Extract Data
+        temp = data['main']['temp']       # Temperature in Celsius
+        humidity = data['main']['humidity'] # Humidity %
+        condition = data['weather'][0]['description'] # e.g., "light rain"
+
+        # 3. Analyze Disease Risk (Mapped to ALL 38 Classes)
+        risk_level = "Low"
+        alert_message = "Weather appears favorable for crop growth. Continue regular monitoring."
+        
+        # --- LOGIC 1: HIGH MOISTURE (Fungal & Bacterial Risks) ---
+        # Triggers: High Humidity (>70%) OR Rain/Drizzle/Mist
+        # Mapped Classes:
+        # - Apple: Scab, Black Rot, Cedar Rust
+        # - Cherry/Squash: Powdery Mildew
+        # - Corn: Cercospora, Common Rust, Northern Blight
+        # - Grape: Black Rot, Esca, Leaf Blight
+        # - Peach/Pepper/Tomato: Bacterial Spots
+        # - Potato/Tomato: Early & Late Blights, Leaf Mold, Septoria, Target Spot
+        # - Strawberry: Leaf Scorch
+        if humidity > 70 or any(x in condition.lower() for x in ['rain', 'drizzle', 'mist', 'thunderstorm']):
+            risk_level = "HIGH (Fungal & Bacterial Risk)"
+            alert_message = (
+                f"⚠️ High Moisture ({humidity}% Humidity / {condition}) detected! "
+                "This favors **Blights** (Potato/Tomato/Corn), **Rots** (Apple/Grape), "
+                "**Rusts** (Corn/Apple), and **Bacterial Spots** (Pepper/Peach/Tomato). "
+                "Action: Improve drainage and apply preventative fungicides if necessary."
+            )
+        
+        # --- LOGIC 2: HOT & DRY (Pest Risks) ---
+        # Triggers: High Temp (>30°C) AND Low Humidity (<50%)
+        # Mapped Classes:
+        # - Tomato: Spider Mites (Two-spotted spider mite) - They hate rain but love dry heat!
+        elif temp > 30 and humidity < 50:
+            risk_level = "Medium (Pest Risk)"
+            alert_message = (
+                f"⚠️ Hot & Dry conditions ({temp}°C, {humidity}% Humidity). "
+                "This favors rapid reproduction of **Spider Mites** (especially on Tomatoes). "
+                "Action: Check under leaves for webbing and mist foliage to increase humidity."
+            )
+
+        # --- LOGIC 3: WARM WEATHER (Viral Vector Risks) ---
+        # Triggers: Warm Temps (>25°C) which make insects active
+        # Mapped Classes:
+        # - Orange: Huanglongbing (Spread by Psyllids)
+        # - Tomato: Yellow Leaf Curl Virus, Mosaic Virus (Spread by Whiteflies/Aphids)
+        elif temp > 25:
+            risk_level = "Medium (Viral Vector Activity)"
+            alert_message = (
+                f"⚠️ Warm temperatures ({temp}°C) increase insect activity. "
+                "Be noticeable of vectors spreading viruses like **Citrus Greening** (Orange) "
+                "and **Yellow Leaf Curl** (Tomato). "
+                "Action: Monitor for whiteflies and aphids."
+            )
+
+        # --- LOGIC 4: COLD STRESS ---
+        # Triggers: Temp < 10°C
+        # Mapped Classes: General health of warm crops (Tomato, Pepper, Corn, Squash)
+        elif temp < 10:
+             risk_level = "Medium (Cold Stress)"
+             alert_message = "Temperatures are low. Frost damage is possible for sensitive crops like Tomato, Pepper, Corn, and Squash."
+
+        return jsonify({
+            'city': city,
+            'temp': temp,
+            'humidity': humidity,
+            'condition': condition,
+            'risk_level': risk_level,
+            'alert_message': alert_message
+        })
 
     except Exception as e:
-        logging.error(f"Error generating PDF report: {e}", exc_info=True)
-        return jsonify({"error": f"Failed to generate report: {str(e)}"}), 500
-    finally:
-        # Clean up the temporary image file if it was created
-        if temp_image_file_path and os.path.exists(temp_image_file_path):
-            try:
-                os.remove(temp_image_file_path)
-                logging.info(f"Cleaned up temporary image file: {temp_image_file_path}")
-            except Exception as e:
-                logging.error(f"Error cleaning up temporary image file {temp_image_file_path}: {e}")
+        print(f"Weather API Error: {e}")
+        return jsonify({'error': "Could not fetch weather data."})
+    
+# --- COMMUNITY & EXPERT ROUTES ---
 
-# --- Add this block to run the Flask app ---
+@app.route('/community')
+def community_page():
+    with get_db_connection() as conn:
+        posts = conn.execute("SELECT * FROM community_posts ORDER BY timestamp DESC").fetchall()
+    return render_template('community.html', posts=posts, dark_mode=get_dark_mode())
+
+@app.route('/ask_expert', methods=['POST'])
+def ask_expert():
+    data = request.json
+    # We copy the existing image file to a safe 'community' reference
+    # In this simple version, we reuse the same filename from uploads
+    try:
+        with get_db_connection() as conn:
+            conn.execute('''
+                INSERT INTO community_posts (image_filename, crop_type, predicted_disease, confidence, user_question, timestamp)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (
+                data['filename'],
+                data['crop_type'],
+                data['disease_name'],
+                data['confidence'],
+                data.get('question', 'Is this diagnosis correct?'),
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            ))
+            conn.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/expert_reply', methods=['POST'])
+def expert_reply():
+    post_id = request.form.get('post_id')
+    reply_text = request.form.get('reply_text')
+    reply_author = request.form.get('reply_author') or "Community Member"
+    expert_code = request.form.get('expert_code')
+
+    if expert_code and expert_code.strip():
+        with get_db_connection() as conn:
+            token_row = conn.execute("SELECT * FROM expert_tokens WHERE token = ?", (expert_code.strip(),)).fetchone()
+        
+        if token_row:
+            # ✅ VALID TOKEN FOUND! 
+            # Force the name to match the Verified Expert Name (e.g., "Dr. Ayush")
+            reply_author = token_row['assigned_to_name']
+        else:
+            # ❌ INVALID TOKEN: Strip any fake titles user tried to add
+            reply_author = reply_author.replace("Dr.", "").replace("Expert", "").strip()
+    
+    # 2. If NO token is provided, but they tried to use a title -> Block it
+    elif "Dr." in reply_author or "Expert" in reply_author:
+        reply_author = reply_author.replace("Dr.", "").replace("Expert", "").strip()
+
+    # Final cleanup if name becomes empty
+    if not reply_author: reply_author = "Community Member"
+    
+    # 3. Save the reply
+    with get_db_connection() as conn:
+        conn.execute("UPDATE community_posts SET expert_reply = ?, reply_author = ? WHERE id = ?", 
+                     (reply_text, reply_author, post_id))
+        conn.commit()
+    
+    return redirect(url_for('community_page'))
+
+@app.route('/apply_for_expert', methods=['POST'])
+def apply_for_expert():
+    name = request.form.get('name')
+    email = request.form.get('email')
+    qualification = request.form.get('qualification')
+    role = request.form.get('role') # Get the selected role
+    
+    with get_db_connection() as conn:
+        conn.execute("INSERT INTO verification_requests (name, email, qualification, role, timestamp) VALUES (?, ?, ?, ?, ?)",
+                     (name, email, qualification, role, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+    
+    return redirect(url_for('community_page'))
+
+# --- UPDATED ADMIN DASHBOARD ---
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    with get_db_connection() as conn:
+        requests = conn.execute("SELECT * FROM verification_requests WHERE status='pending'").fetchall()
+        experts = conn.execute("SELECT * FROM expert_tokens").fetchall()
+        
+    html = """
+    <html><body style='font-family:sans-serif; padding:40px; background:#f0f9ff;'>
+        <h1>🛡️ Admin Verification Panel</h1>
+        
+        <h2>📝 Pending Applications</h2>
+        <table border='1' cellspacing='0' cellpadding='10' style='background:white; width:100%; text-align:left;'>
+            <tr style='background:#ddd;'><th>Name</th><th>Role</th><th>Email</th><th>ID/License</th><th>Action</th></tr>
+            {rows}
+        </table>
+        
+        <h2>✅ Active Experts</h2>
+        <ul>{expert_list}</ul>
+    </body></html>
+    """
+    
+    rows_html = ""
+    for r in requests:
+        rows_html += f"""
+        <tr>
+            <td>{r['name']}</td>
+            <td><b>{r['role']}</b></td> <td>{r['email']}</td>
+            <td>{r['qualification']}</td>
+            <td>
+                <a href='/approve_expert/{r['id']}' style='background:green; color:white; padding:5px 10px; text-decoration:none; border-radius:5px;'>Approve</a>
+            </td>
+        </tr>
+        """
+        
+    expert_list_html = "".join([f"<li><b>{e['assigned_to_name']}</b> - Token: <code>{e['token']}</code></li>" for e in experts])
+    
+    return html.format(rows=rows_html, expert_list=expert_list_html)
+
+# --- UPDATED APPROVAL LOGIC ---
+@app.route('/approve_expert/<int:req_id>')
+def approve_expert(req_id):
+    with get_db_connection() as conn:
+        req = conn.execute("SELECT * FROM verification_requests WHERE id = ?", (req_id,)).fetchone()
+        
+        if req:
+            # 1. SMART NAME GENERATION
+            # If Doctor -> "Dr. Name"
+            # If Shop Owner -> "Expert Name"
+            if req['role'] == 'Doctor':
+                final_name = "Dr. " + req['name']
+            else:
+                final_name = "Expert " + req['name'] + " (" + req['role'] + ")"
+
+            # 2. Generate Token
+            new_token = "EXP-" + secrets.token_hex(3).upper()
+            
+            # 3. Save to Database
+            conn.execute("INSERT INTO expert_tokens (token, assigned_to_name) VALUES (?, ?)", (new_token, final_name))
+            conn.execute("UPDATE verification_requests SET status='approved' WHERE id = ?", (req_id,))
+            conn.commit()
+
+            # 4. 👇 NEW: SEND EMAIL AUTOMATICALLY 👇
+            # This calls the helper function we created earlier
+            email_status = send_token_email(req['email'], final_name, new_token, req['role'])
+            
+            # Check if email worked or failed
+            if email_status:
+                status_msg = "✅ Email Sent Successfully!"
+                status_color = "green"
+            else:
+                status_msg = "⚠️ Database updated, but Email failed (Check console logs)."
+                status_color = "orange"
+
+            # 5. Show Success Page
+            return f"""
+            <div style='text-align:center; margin-top:50px; font-family:sans-serif;'>
+                <h1 style='color:green;'>✅ Verified Successfully!</h1>
+                <p>Role: <b>{req['role']}</b></p>
+                <p>Display Name: <b>{final_name}</b></p>
+                <hr style='width:300px;'>
+                <h3 style='color:{status_color};'>{status_msg}</h3>
+                <p>Sent to: <b>{req['email']}</b></p>
+                <br>
+                <div style="background:#f3f4f6; padding:10px; display:inline-block; border-radius:10px;">
+                    Token: <b>{new_token}</b>
+                </div>
+                <br><br>
+                <a href='/admin_dashboard'>Return to Dashboard</a>
+            </div>
+            """
+            
+    return "Error: Request not found"
+
+@app.route('/generate_expert_key/<name>')
+def generate_expert_key(name):
+    # This generates a random secure key like "EXP-a1b2c3d4"
+    new_token = "EXP-" + secrets.token_hex(4)
+    
+    try:
+        with get_db_connection() as conn:
+            conn.execute("INSERT INTO expert_tokens (token, assigned_to_name) VALUES (?, ?)", (new_token, name))
+            conn.commit()
+        return f"✅ Key Generated for {name}: <b>{new_token}</b><br>Give this key to the doctor."
+    except Exception as e:
+        return f"Error: {e}"
+
+@app.route('/delete_community_post/<int:post_id>', methods=['POST'])
+def delete_community_post(post_id):
+    try:
+        with get_db_connection() as conn:
+            # We ONLY delete the database record. 
+            # We do NOT delete the image file, as it might be used in History.
+            conn.execute("DELETE FROM community_posts WHERE id = ?", (post_id,))
+            conn.commit()
+        return jsonify(success=True)
+    except Exception as e:
+        return jsonify(success=False, error=str(e))
+
+@app.route('/schemes', methods=['GET', 'POST'])
+def schemes_page():
+    # Default filters
+    selected_state = 'All'
+    selected_crop = 'All'
+    
+    # If user filters via Form
+    if request.method == 'POST':
+        selected_state = request.form.get('state', 'All')
+        selected_crop = request.form.get('crop', 'All')
+
+    query = "SELECT * FROM government_schemes WHERE 1=1"
+    params = []
+
+    # Logic: If specific state chosen, show Global ('All') + That State
+    # Logic: If specific state chosen, show Global ('All') + partial matches
+    if selected_state != 'All':
+        # CHANGED '=' TO 'LIKE' AND ADDED WILDCARDS (%)
+        query += " AND (eligible_state = 'All' OR eligible_state LIKE ?)"
+        params.append(f'%{selected_state}%')
+        
+    # Logic: Filter by crop
+    if selected_crop != 'All':
+        # CHANGED '=' TO 'LIKE' AND ADDED WILDCARDS (%)
+        query += " AND (eligible_crop = 'All' OR eligible_crop LIKE ?)"
+        params.append(f'%{selected_crop}%')
+        
+    with get_db_connection() as conn:
+        schemes = conn.execute(query, params).fetchall()
+
+    # Calculate days left for alerts
+    today = datetime.now().date()
+    final_schemes = []
+    for s in schemes:
+        scheme = dict(s)
+        try:
+            # Calculate days until deadline
+            deadline_date = datetime.strptime(scheme['deadline'], '%Y-%m-%d').date()
+            days_left = (deadline_date - today).days
+        
+            scheme['days_left'] = days_left
+            scheme['is_urgent'] = 0 <= days_left <= 30
+            scheme['is_expired'] = days_left < 0
+        except ValueError:
+            scheme['days_left'] = 0
+            scheme['is_urgent'] = False
+            scheme['is_expired'] = False
+        
+        
+        
+        final_schemes.append(scheme)
+
+    return render_template('schemes.html', 
+                           schemes=final_schemes, 
+                           dark_mode=get_dark_mode(),
+                           selected_state=selected_state,
+                           selected_crop=selected_crop)
+
+
+@app.route('/set_language/<language>')
+def set_language(language):
+    if language in app.config['BABEL_SUPPORTED_LOCALES']:
+        session['language'] = language
+    return redirect(request.referrer or '/')
+
 if __name__ == '__main__':
-    # You can specify host='0.0.0.0' to make it accessible from other devices on your network
-    # and port=5000 (or any other port)
     app.run(debug=True, host='0.0.0.0', port=5000)

@@ -1,0 +1,1578 @@
+# Kannada translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-12 20:42+0530\n"
+"PO-Revision-Date: 2026-01-12 21:00+0530\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: kn\n"
+"Language-Team: kn <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: templates/base.html:169
+msgid "Diagnose"
+msgstr "ರೋಗನಿರ್ಣಯ"
+
+#: templates/base.html:174
+msgid "History"
+msgstr "ಇತಿಹಾಸ"
+
+#: templates/base.html:179 templates/base.html:261 templates/help.html:96
+#: templates/index.html:54
+msgid "Feedback"
+msgstr "ಪ್ರತಿಕ್ರಿಯೆ"
+
+#: templates/base.html:184
+msgid "Help"
+msgstr "ಸಹಾಯ"
+
+#: templates/base.html:189
+msgid "Community"
+msgstr "ಸಮುದಾಯ"
+
+#: templates/base.html:194 templates/index.html:59
+msgid "About"
+msgstr "ನಮ್ಮ ಬಗ್ಗೆ"
+
+#: templates/base.html:199
+msgid "Library"
+msgstr "ಗ್ರಂಥಾಲಯ"
+
+#: templates/base.html:204
+msgid "Schemes"
+msgstr "ಯೋಜನೆಗಳು"
+
+#: templates/base.html:236 templates/base.html:297
+msgid "Crop Doctor AI"
+msgstr "ಕ್ರಾಪ್ ಡಾಕ್ಟರ್ ಎಐ"
+
+#: templates/base.html:239
+msgid ""
+"Empowering farmers with advanced AI to detect crop diseases early, "
+"estimate yields, and protect harvests."
+msgstr "ಬೆಳೆ ರೋಗಗಳನ್ನು ಮೊದಲೇ ಪತ್ತೆಹಚ್ಚಲು, ಇಳುವರಿಯನ್ನು ಅಂದಾಜು ಮಾಡಲು ಮತ್ತು ಬೆಳೆಗಳನ್ನು ರಕ್ಷಿಸಲು ಸುಧಾರಿತ AI ನೊಂದಿಗೆ ರೈತರನ್ನು ಸಬಲೀಕರಣಗೊಳಿಸುವುದು."
+
+#: templates/base.html:256
+msgid "Product"
+msgstr "ಉತ್ಪನ್ನ"
+
+#: templates/base.html:258
+msgid "Smart Diagnosis"
+msgstr "ಸ್ಮಾರ್ಟ್ ರೋಗನಿರ್ಣಯ"
+
+#: templates/base.html:259
+msgid "History Log"
+msgstr "ಇತಿಹಾಸ ಲಾಗ್"
+
+#: templates/base.html:260
+msgid "Community Forum"
+msgstr "ಸಮುದಾಯ ವೇದಿಕೆ"
+
+#: templates/base.html:266
+msgid "Resources"
+msgstr "ಸಂಪನ್ಮೂಲಗಳು"
+
+#: templates/base.html:268
+msgid "Help Center"
+msgstr "ಸಹಾಯ ಕೇಂದ್ರ"
+
+#: templates/base.html:269
+msgid "Government Schemes"
+msgstr "ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು"
+
+#: templates/base.html:270 templates/index.html:37
+msgid "Disease Library"
+msgstr "ರೋಗ ಗ್ರಂಥಾಲಯ"
+
+#: templates/base.html:271
+msgid "About Us"
+msgstr "ನಮ್ಮ ಬಗ್ಗೆ"
+
+#: templates/base.html:276
+msgid "Support"
+msgstr "ಬೆಂಬಲ"
+
+#: templates/base.html:297
+msgid "All rights reserved."
+msgstr "ಎಲ್ಲಾ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ."
+
+#: templates/base.html:300
+msgid "Privacy Policy"
+msgstr "ಗೌಪ್ಯತಾ ನೀತಿ"
+
+#: templates/base.html:301 templates/terms.html:5
+msgid "Terms of Service"
+msgstr "ಸೇವಾ ನಿಯಮಗಳು"
+
+#: templates/community.html:18
+msgid "Community & Expert Hub"
+msgstr "ಸಮುದಾಯ ಮತ್ತು ತಜ್ಞರ ಹಬ್"
+
+#: templates/community.html:20
+msgid "Connect with experts and other farmers to solve crop issues."
+msgstr "ಬೆಳೆ ಸಮಸ್ಯೆಗಳನ್ನು ಬಗೆಹರಿಸಲು ತಜ್ಞರು ಮತ್ತು ಇತರ ರೈತರೊಂದಿಗೆ ಸಂಪರ್ಕ ಸಾಧಿಸಿ."
+
+#: templates/community.html:26
+msgid "Are you a Doctor? Join as Expert"
+msgstr "ನೀವು ವೈದ್ಯರೇ? ತಜ್ಞರಾಗಿ ಸೇರಿಕೊಳ್ಳಿ"
+
+#: templates/community.html:35
+msgid "Total Issues"
+msgstr "ಒಟ್ಟು ಸಮಸ್ಯೆಗಳು"
+
+#: templates/community.html:45
+msgid "Expert Verified"
+msgstr "ತಜ್ಞರಿಂದ ಪರಿಶೀಲಿಸಲಾಗಿದೆ"
+
+#: templates/community.html:55
+msgid "Pending Review"
+msgstr "ಪರಿಶೀಲನೆ ಬಾಕಿ ಇದೆ"
+
+#: templates/community.html:63
+msgid "Search crops, diseases, or questions..."
+msgstr "ಬೆಳೆಗಳು, ರೋಗಗಳು ಅಥವಾ ಪ್ರಶ್ನೆಗಳನ್ನು ಹುಡುಕಿ..."
+
+#: templates/community.html:70
+msgid "All Posts"
+msgstr "ಎಲ್ಲಾ ಪೋಸ್ಟ್‌ಗಳು"
+
+#: templates/community.html:71
+msgid "Verified"
+msgstr "ಪರಿಶೀಲಿಸಲಾಗಿದೆ"
+
+#: templates/community.html:72
+msgid "Pending"
+msgstr "ಬಾಕಿ ಉಳಿದಿದೆ"
+
+#: templates/community.html:200
+msgid "No posts found"
+msgstr "ಯಾವುದೇ ಪೋಸ್ಟ್‌ಗಳು ಕಂಡುಬಂದಿಲ್ಲ"
+
+#: templates/community.html:201
+msgid "Try adjusting your search filters."
+msgstr "ನಿಮ್ಮ ಹುಡುಕಾಟ ಫಿಲ್ಟರ್‌ಗಳನ್ನು ಸರಿಹೊಂದಿಸಲು ಪ್ರಯತ್ನಿಸಿ."
+
+#: templates/community.html:212
+msgid "Join as an Expert"
+msgstr "ತಜ್ಞರಾಗಿ ಸೇರಿಕೊಳ್ಳಿ"
+
+#: templates/community.html:214
+msgid "Verify your identity to get the"
+msgstr "ಪಡೆಯಲು ನಿಮ್ಮ ಗುರುತನ್ನು ಪರಿಶೀಲಿಸಿ"
+
+#: templates/community.html:214
+msgid "Green Badge"
+msgstr "ಹಸಿರು ಬ್ಯಾಡ್ಜ್"
+
+#: templates/community.html:214
+msgid "and help farmers."
+msgstr "ಮತ್ತು ರೈತರಿಗೆ ಸಹಾಯ ಮಾಡಿ."
+
+#: templates/community.html:219
+msgid "Full Name"
+msgstr "ಪೂರ್ಣ ಹೆಸರು"
+
+#: templates/community.html:224
+msgid "I am a..."
+msgstr "ನಾನು ಒಬ್ಬ..."
+
+#: templates/community.html:226
+msgid "Doctor / Pathologist (Dr.)"
+msgstr "ವೈದ್ಯರು / ರೋಗಶಾಸ್ತ್ರಜ್ಞರು (ಡಾ.)"
+
+#: templates/community.html:227
+msgid "Medical/Agri Shop Owner"
+msgstr "ವೈದ್ಯಕೀಯ/ಕೃಷಿ ಅಂಗಡಿ ಮಾಲೀಕರು"
+
+#: templates/community.html:228
+msgid "Agronomist / Scientist"
+msgstr "ಕೃಷಿ ವಿಜ್ಞಾನಿ / ವಿಜ್ಞಾನಿ"
+
+#: templates/community.html:233
+msgid "Email Address"
+msgstr "ಇಮೇಲ್ ವಿಳಾಸ"
+
+#: templates/community.html:238
+msgid "Verification Details"
+msgstr "ಪರಿಶೀಲನೆ ವಿವರಗಳು"
+
+#: templates/community.html:243
+msgid "Submit Application"
+msgstr "ಅರ್ಜಿ ಸಲ್ಲಿಸಿ"
+
+#: templates/diagnose.html:32 templates/index.html:14
+msgid "Crop Disease Diagnosis"
+msgstr "ಬೆಳೆ ರೋಗ ಪತ್ತೆ"
+
+#: templates/diagnose.html:35
+msgid "Image Tools"
+msgstr "ಚಿತ್ರ ಪರಿಕರಗಳು"
+
+#: templates/diagnose.html:38
+msgid "Upload Image"
+msgstr "ಚಿತ್ರವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ"
+
+#: templates/diagnose.html:39
+msgid "Clear Image"
+msgstr "ಚಿತ್ರವನ್ನು ತೆರವುಗೊಳಿಸಿ"
+
+#: templates/diagnose.html:43
+msgid "Live Preview"
+msgstr "ಲೈವ್ ಮುನ್ನೋಟ"
+
+#: templates/diagnose.html:49
+msgid "Field Mode (Offline)"
+msgstr "ಫೀಲ್ಡ್ ಮೋಡ್ (ಆಫ್‌ಲೈನ್)"
+
+#: templates/diagnose.html:54
+msgid "Crop Image"
+msgstr "ಚಿತ್ರವನ್ನು ಕ್ರಾಪ್ ಮಾಡಿ"
+
+#: templates/diagnose.html:55
+msgid "Apply Crop"
+msgstr "ಕ್ರಾಪ್ ಅನ್ವಯಿಸಿ"
+
+#: templates/diagnose.html:56
+msgid "Reset Crop"
+msgstr "ಕ್ರಾಪ್ ಮರುಹೊಂದಿಸಿ"
+
+#: templates/diagnose.html:58
+msgid "Ready to upload image"
+msgstr "ಚಿತ್ರ ಅಪ್‌ಲೋಡ್ ಮಾಡಲು ಸಿದ್ಧವಾಗಿದೆ"
+
+#: templates/diagnose.html:65
+msgid "Image Preview"
+msgstr "ಚಿತ್ರ ಮುನ್ನೋಟ"
+
+#: templates/diagnose.html:68
+msgid "No image uploaded"
+msgstr "ಯಾವುದೇ ಚಿತ್ರ ಅಪ್‌ಲೋಡ್ ಆಗಿಲ್ಲ"
+
+#: templates/diagnose.html:73
+msgid "Compare Original"
+msgstr "ಮೂಲದೊಂದಿಗೆ ಹೋಲಿಸಿ"
+
+#: templates/diagnose.html:79
+msgid "Diagnosis Results"
+msgstr "ರೋಗನಿರ್ಣಯ ಫಲಿತಾಂಶಗಳು"
+
+#: templates/diagnose.html:81
+msgid "No diagnosis available. Upload an image to start."
+msgstr "ಯಾವುದೇ ರೋಗನಿರ್ಣಯ ಲಭ್ಯವಿಲ್ಲ. ಪ್ರಾರಂಭಿಸಲು ಚಿತ್ರವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ."
+
+#: templates/diagnose.html:87 templates/help.html:76
+msgid "Image Enhancement Tools"
+msgstr "ಚಿತ್ರ ವರ್ಧನೆ ಪರಿಕರಗಳು"
+
+#: templates/diagnose.html:90
+msgid "Basic Adjustments"
+msgstr "ಮೂಲ ಹೊಂದಾಣಿಕೆಗಳು"
+
+#: templates/diagnose.html:92
+msgid "Brightness"
+msgstr "ಪ್ರಕಾಶಮಾನ (Brightness)"
+
+#: templates/diagnose.html:97
+msgid "Contrast"
+msgstr "ವ್ಯತ್ಯಾಸ (Contrast)"
+
+#: templates/diagnose.html:102
+msgid "Saturation"
+msgstr "ಸ್ಯಾಚುರೇಶನ್"
+
+#: templates/diagnose.html:109
+msgid "Advanced Adjustments"
+msgstr "ಸುಧಾರಿತ ಹೊಂದಾಣಿಕೆಗಳು"
+
+#: templates/diagnose.html:111
+msgid "Edge Enhance"
+msgstr "ಅಂಚು ಹೆಚ್ಚಳ"
+
+#: templates/diagnose.html:116
+msgid "Blur Reduce"
+msgstr "ಮಸುಕು ಕಡಿಮೆ ಮಾಡಿ"
+
+#: templates/diagnose.html:121
+msgid "Color Balance"
+msgstr "ಬಣ್ಣ ಸಮತೋಲನ"
+
+#: templates/diagnose.html:128
+msgid "Presets"
+msgstr "ಪೂರ್ವನಿಗದಿಗಳು (Presets)"
+
+#: templates/diagnose.html:130
+msgid "Auto Contrast"
+msgstr "ಸ್ವಯಂ ಕಾಂಟ್ರಾಸ್ಟ್"
+
+#: templates/diagnose.html:131
+msgid "Sharpen"
+msgstr "ತೀಕ್ಷ್ಣಗೊಳಿಸಿ (Sharpen)"
+
+#: templates/diagnose.html:132
+msgid "Grayscale"
+msgstr "ಗ್ರೇಸ್ಕೇಲ್"
+
+#: templates/diagnose.html:133
+msgid "Reset Filters"
+msgstr "ಫಿಲ್ಟರ್‌ಗಳನ್ನು ಮರುಹೊಂದಿಸಿ"
+
+#: templates/diagnose.html:140
+msgid "Save Report"
+msgstr "ವರದಿ ಉಳಿಸಿ"
+
+#: templates/diagnose.html:141
+msgid "Print Report"
+msgstr "ವರದಿ ಮುದ್ರಿಸಿ"
+
+#: templates/diagnose.html:142 templates/feedback.html:74
+#: templates/help.html:33 templates/history.html:72
+msgid "Back to Home"
+msgstr "ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ"
+
+#: templates/diagnose.html:375
+msgid "Image uploaded. Analyzing..."
+msgstr "ಚಿತ್ರ ಅಪ್‌ಲೋಡ್ ಆಗಿದೆ. ವಿಶ್ಲೇಷಿಸಲಾಗುತ್ತಿದೆ..."
+
+#: templates/diagnose.html:596
+msgid "Analyzing on device (Offline)..."
+msgstr "ಸಾಧನದಲ್ಲಿ ವಿಶ್ಲೇಷಿಸಲಾಗುತ್ತಿದೆ (ಆಫ್‌ಲೈನ್)..."
+
+#: templates/diagnose.html:714
+msgid "Offline Analysis Complete"
+msgstr "ಆಫ್‌ಲೈನ್ ವಿಶ್ಲೇಷಣೆ ಪೂರ್ಣಗೊಂಡಿದೆ"
+
+#: templates/diagnose.html:1521
+msgid "Environmental Risk Analysis"
+msgstr "ಪರಿಸರ ಅಪಾಯದ ವಿಶ್ಲೇಷಣೆ"
+
+#: templates/diagnose.html:1523
+msgid "Live Data"
+msgstr "ಲೈವ್ ಡೇಟಾ"
+
+#: templates/diagnose.html:1528
+msgid ""
+"Pathogens spread differently depending on the weather. Check your farm's "
+"current risk status."
+msgstr "ಹವಾಮಾನವನ್ನು ಅವಲಂಬಿಸಿ ರೋಗಕಾರಕಗಳು ವಿಭಿನ್ನವಾಗಿ ಹರಡುತ್ತವೆ. ನಿಮ್ಮ ಜಮೀನಿನ ಪ್ರಸ್ತುತ ಅಪಾಯದ ಸ್ಥಿತಿಯನ್ನು ಪರಿಶೀಲಿಸಿ."
+
+#: templates/diagnose.html:1532
+msgid "Enter Farm Location (e.g. Pune)"
+msgstr "ಜಮೀನಿನ ಸ್ಥಳವನ್ನು ನಮೂದಿಸಿ (ಉದಾ. ಪುಣೆ)"
+
+#: templates/diagnose.html:1536
+msgid "Analyze Risk"
+msgstr "ಅಪಾಯವನ್ನು ವಿಶ್ಲೇಷಿಸಿ"
+
+#: templates/feedback.html:4
+msgid "User Feedback & Support"
+msgstr "ಬಳಕೆದಾರರ ಪ್ರತಿಕ್ರಿಯೆ ಮತ್ತು ಬೆಂಬಲ"
+
+#: templates/feedback.html:9
+msgid "Feedback Type"
+msgstr "ಪ್ರತಿಕ್ರಿಯೆಯ ಪ್ರಕಾರ"
+
+#: templates/feedback.html:13
+msgid "Suggestion"
+msgstr "ಸಲಹೆ"
+
+#: templates/feedback.html:17
+msgid "Bug Report"
+msgstr "ದೋಷ ವರದಿ"
+
+#: templates/feedback.html:21
+msgid "Feature Request"
+msgstr "ವೈಶಿಷ್ಟ್ಯದ ವಿನಂತಿ"
+
+#: templates/feedback.html:25
+msgid "General Feedback"
+msgstr "ಸಾಮಾನ್ಯ ಪ್ರತಿಕ್ರಿಯೆ"
+
+#: templates/feedback.html:32
+msgid "Contact Email (optional):"
+msgstr "ಸಂಪರ್ಕ ಇಮೇಲ್ (ಐಚ್ಛಿಕ):"
+
+#: templates/feedback.html:38
+msgid "Rating"
+msgstr "ರೇಟಿಂಗ್"
+
+#: templates/feedback.html:41
+msgid "Poor"
+msgstr "ಕಳಪೆ"
+
+#: templates/feedback.html:41
+msgid "Fair"
+msgstr "ಪರವಾಗಿಲ್ಲ"
+
+#: templates/feedback.html:41
+msgid "Good"
+msgstr "ಉತ್ತಮ"
+
+#: templates/feedback.html:41
+msgid "Very Good"
+msgstr "ತುಂಬಾ ಚೆನ್ನಾಗಿದೆ"
+
+#: templates/feedback.html:41
+msgid "Excellent"
+msgstr "ಅತ್ಯುತ್ತಮ"
+
+#: templates/feedback.html:55
+msgid "Your Feedback:"
+msgstr "ನಿಮ್ಮ ಪ್ರತಿಕ್ರಿಯೆ:"
+
+#: templates/feedback.html:56
+msgid "Please describe your feedback in detail..."
+msgstr "ದಯವಿಟ್ಟು ನಿಮ್ಮ ಪ್ರತಿಕ್ರಿಯೆಯನ್ನು ವಿವರವಾಗಿ ವಿವರಿಸಿ..."
+
+#: templates/feedback.html:63
+msgid "Attach screenshot (if applicable)"
+msgstr "ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಲಗತ್ತಿಸಿ (ಅನ್ವಯಿಸಿದರೆ)"
+
+#: templates/feedback.html:66
+msgid "Select Screenshot"
+msgstr "ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಆಯ್ಕೆಮಾಡಿ"
+
+#: templates/feedback.html:72
+msgid "Submit Feedback"
+msgstr "ಪ್ರತಿಕ್ರಿಯೆ ಸಲ್ಲಿಸಿ"
+
+#: templates/feedback.html:73
+msgid "Reset Form"
+msgstr "ಫಾರ್ಮ್ ಮರುಹೊಂದಿಸಿ"
+
+#: templates/help.html:7
+msgid "Crop Disease Diagnosis Guide"
+msgstr "ಬೆಳೆ ರೋಗ ನಿರ್ಣಯ ಮಾರ್ಗದರ್ಶಿ"
+
+#: templates/help.html:8
+msgid "Comprehensive user manual and troubleshooting guide"
+msgstr "ಸಮಗ್ರ ಬಳಕೆದಾರ ಕೈಪಿಡಿ ಮತ್ತು ದೋಷನಿವಾರಣೆ ಮಾರ್ಗದರ್ಶಿ"
+
+#: templates/help.html:14
+msgid "Search the guide..."
+msgstr "ಮಾರ್ಗದರ್ಶಿಯನ್ನು ಹುಡುಕಿ..."
+
+#: templates/help.html:15
+msgid "Search"
+msgstr "ಹುಡುಕಿ"
+
+#: templates/help.html:20
+msgid "Table of Contents"
+msgstr "ಪರಿವಿಡಿ"
+
+#: templates/help.html:34
+msgid "Print This Guide"
+msgstr "ಈ ಮಾರ್ಗದರ್ಶಿಯನ್ನು ಮುದ್ರಿಸಿ"
+
+#: templates/help.html:47
+msgid "Getting Started"
+msgstr "ಪ್ರಾರಂಭಿಸಲಾಗುತ್ತಿದೆ"
+
+#: templates/help.html:49
+msgid "Welcome to Crop Disease Diagnosis"
+msgstr "ಬೆಳೆ ರೋಗ ನಿರ್ಣಯಕ್ಕೆ ಸುಸ್ವಾಗತ"
+
+#: templates/help.html:49
+msgid ""
+"This AI-powered application helps farmers and agricultural professionals "
+"identify diseases in crop leaves through image analysis."
+msgstr "ಈ AI-ಚಾಲಿತ ಅಪ್ಲಿಕೇಶನ್ ರೈತರು ಮತ್ತು ಕೃಷಿ ವೃತ್ತಿಪರರಿಗೆ ಚಿತ್ರ ವಿಶ್ಲೇಷಣೆಯ ಮೂಲಕ ಬೆಳೆ ಎಲೆಗಳಲ್ಲಿನ ರೋಗಗಳನ್ನು ಗುರುತಿಸಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ."
+
+#: templates/help.html:50
+msgid "System Requirements"
+msgstr "ಸಿಸ್ಟಂ ಅವಶ್ಯಕತೆಗಳು"
+
+#: templates/help.html:50
+msgid ""
+"• Modern web browser\\n• Internet connection\\n• Sufficient device "
+"storage for image uploads\\n• Webcam or camera for live capture (browser "
+"support dependent)"
+msgstr "• ಆಧುನಿಕ ವೆಬ್ ಬ್ರೌಸರ್\\n• ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ\\n• ಇಮೇಜ್ ಅಪ್‌ಲೋಡ್‌ಗಳಿಗಾಗಿ ಸಾಕಷ್ಟು ಸಾಧನ ಸಂಗ್ರಹಣೆ\\n• ಲೈವ್ ಕ್ಯಾಪ್ಚರ್‌ಗಾಗಿ ವೆಬ್‌ಕ್ಯಾಮ್ ಅಥವಾ ಕ್ಯಾಮೆರಾ (ಬ್ರೌಸರ್ ಬೆಂಬಲವನ್ನು ಅವಲಂಬಿಸಿದೆ)"
+
+#: templates/help.html:51
+msgid "First Time Setup"
+msgstr "ಮೊದಲ ಬಾರಿಯ ಸೆಟಪ್"
+
+#: templates/help.html:51
+msgid ""
+"1. Ensure your browser is up-to-date.\\n2. No specific software "
+"installation is required for the web app.\\n3. Make sure you have a "
+"stable internet connection."
+msgstr "1. ನಿಮ್ಮ ಬ್ರೌಸರ್ ನವೀಕೃತವಾಗಿದೆ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ.\\n2. ವೆಬ್ ಅಪ್ಲಿಕೇಶನ್‌ಗೆ ಯಾವುದೇ ನಿರ್ದಿಷ್ಟ ಸಾಫ್ಟ್‌ವೇರ್ ಸ್ಥಾಪನೆಯ ಅಗತ್ಯವಿಲ್ಲ.\\n3. ನೀವು ಸ್ಥಿರವಾದ ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕವನ್ನು ಹೊಂದಿರುವಿರಾ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ."
+
+#: templates/help.html:56
+msgid "Image Capture Guidelines"
+msgstr "ಚಿತ್ರ ಸೆರೆಹಿಡಿಯುವ ಮಾರ್ಗಸೂಚಿಗಳು"
+
+#: templates/help.html:58
+msgid "Optimal Image Quality"
+msgstr "ಸೂಕ್ತವಾದ ಚಿತ್ರ ಗುಣಮಟ್ಟ"
+
+#: templates/help.html:58
+msgid ""
+"• Capture in well-lit conditions\\n• Focus on the leaf surface\\n• "
+"Include both healthy and affected areas\\n• Avoid shadows and glare"
+msgstr "• ಚೆನ್ನಾಗಿ ಬೆಳಗಿದ ಪರಿಸ್ಥಿತಿಗಳಲ್ಲಿ ಸೆರೆಹಿಡಿಯಿರಿ\\n• ಎಲೆಯ ಮೇಲ್ಮೈಯಲ್ಲಿ ಗಮನಹರಿಸಿ\\n• ಆರೋಗ್ಯಕರ ಮತ್ತು ಪೀಡಿತ ಪ್ರದೇಶಗಳನ್ನು ಸೇರಿಸಿ\\n• ನೆರಳುಗಳು ಮತ್ತು ಪ್ರಜ್ವಲಿಸುವಿಕೆಯನ್ನು ತಪ್ಪಿಸಿ"
+
+#: templates/help.html:59
+msgid "Recommended Practices"
+msgstr "ಶಿಫಾರಸು ಮಾಡಲಾದ ಅಭ್ಯಾಸಗಳು"
+
+#: templates/help.html:59
+msgid ""
+"- Place leaf on neutral background\\n- Include scale reference if "
+"possible\\n- Capture multiple angles for severe cases"
+msgstr "- ಎಲೆಯನ್ನು ತಟಸ್ಥ ಹಿನ್ನೆಲೆಯಲ್ಲಿ ಇರಿಸಿ\\n- ಸಾಧ್ಯವಾದರೆ ಸ್ಕೇಲ್ ಉಲ್ಲೇಖವನ್ನು ಸೇರಿಸಿ\\n- ತೀವ್ರತರವಾದ ಪ್ರಕರಣಗಳಿಗೆ ಅನೇಕ ಕೋನಗಳನ್ನು ಸೆರೆಹಿಡಿಯಿರಿ"
+
+#: templates/help.html:60
+msgid "Common Mistakes"
+msgstr "ಸಾಮಾನ್ಯ ತಪ್ಪುಗಳು"
+
+#: templates/help.html:60
+msgid ""
+"× Blurry or out-of-focus images\\n× Images with multiple leaves\\n× "
+"Extreme close-ups without context\\n× Poor lighting conditions"
+msgstr "× ಮಸುಕಾದ ಅಥವಾ ಗಮನಹರಿಸದ ಚಿತ್ರಗಳು\\n× ಅನೇಕ ಎಲೆಗಳನ್ನು ಹೊಂದಿರುವ ಚಿತ್ರಗಳು\\n× ಸಂದರ್ಭವಿಲ್ಲದೆ ವಿಪರೀತ ಕ್ಲೋಸ್-ಅಪ್‌ಗಳು\\n× ಕಳಪೆ ಬೆಳಕಿನ ಪರಿಸ್ಥಿತಿಗಳು"
+
+#: templates/help.html:65
+msgid "Diagnosis Process"
+msgstr "ರೋಗನಿರ್ಣಯ ಪ್ರಕ್ರಿಯೆ"
+
+#: templates/help.html:67
+msgid "Step-by-Step Guide"
+msgstr "ಹಂತ-ಹಂತದ ಮಾರ್ಗದರ್ಶಿ"
+
+#: templates/help.html:67
+msgid ""
+"1. Navigate to Diagnosis page.\\n2. Upload an image or use your device "
+"camera.\\n3. Adjust image using enhancement tools if needed.\\n4. View "
+"the diagnosis results, including confidence score and details.\\n5. Save "
+"or print the comprehensive report."
+msgstr "1. ರೋಗನಿರ್ಣಯ ಪುಟಕ್ಕೆ ನ್ಯಾವಿಗೇಟ್ ಮಾಡಿ.\\n2. ಚಿತ್ರವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ ಅಥವಾ ನಿಮ್ಮ ಸಾಧನದ ಕ್ಯಾಮೆರಾವನ್ನು ಬಳಸಿ.\\n3. ಅಗತ್ಯವಿದ್ದರೆ ವರ್ಧನೆ ಪರಿಕರಗಳನ್ನು ಬಳಸಿಕೊಂಡು ಚಿತ್ರವನ್ನು ಹೊಂದಿಸಿ.\\n4. ವಿಶ್ವಾಸಾರ್ಹ ಸ್ಕೋರ್ ಮತ್ತು ವಿವರಗಳನ್ನು ಒಳಗೊಂಡಂತೆ ರೋಗನಿರ್ಣಯದ ಫಲಿತಾಂಶಗಳನ್ನು ವೀಕ್ಷಿಸಿ.\\n5. ಸಮಗ್ರ ವರದಿಯನ್ನು ಉಳಿಸಿ ಅಥವಾ ಮುದ್ರಿಸಿ."
+
+#: templates/help.html:68
+msgid "Understanding Results"
+msgstr "ಫಲಿತಾಂಶಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು"
+
+#: templates/help.html:68
+msgid ""
+"• Confidence scores indicate prediction reliability.\\n• Multiple results"
+" may appear for similar diseases.\\n• Low confidence suggests retaking "
+"the image with better quality."
+msgstr "• ವಿಶ್ವಾಸಾರ್ಹ ಅಂಕಗಳು ಭವಿಷ್ಯವಾಣಿಯ ವಿಶ್ವಾಸಾರ್ಹತೆಯನ್ನು ಸೂಚಿಸುತ್ತವೆ.\\n• ಇದೇ ರೀತಿಯ ಕಾಯಿಲೆಗಳಿಗೆ ಬಹು ಫಲಿತಾಂಶಗಳು ಕಾಣಿಸಿಕೊಳ್ಳಬಹುದು.\\n• ಕಡಿಮೆ ವಿಶ್ವಾಸವು ಉತ್ತಮ ಗುಣಮಟ್ಟದೊಂದಿಗೆ ಚಿತ್ರವನ್ನು ಹಿಂಪಡೆಯಲು ಸೂಚಿಸುತ್ತದೆ."
+
+#: templates/help.html:69
+msgid "Troubleshooting Diagnosis"
+msgstr "ರೋಗನಿರ್ಣಯ ದೋಷನಿವಾರಣೆ"
+
+#: templates/help.html:69
+msgid ""
+"If you get poor results:\\n- Try different image adjustments.\\n- Capture"
+" a clearer image.\\n- Ensure the image is of a single crop leaf."
+msgstr "ನೀವು ಕಳಪೆ ಫಲಿತಾಂಶಗಳನ್ನು ಪಡೆದರೆ:\\n- ವಿಭಿನ್ನ ಚಿತ್ರ ಹೊಂದಾಣಿಕೆಗಳನ್ನು ಪ್ರಯತ್ನಿಸಿ.\\n- ಸ್ಪಷ್ಟವಾದ ಚಿತ್ರವನ್ನು ಸೆರೆಹಿಡಿಯಿರಿ.\\n- ಚಿತ್ರವು ಒಂದೇ ಬೆಳೆ ಎಲೆಯದ್ದಾಗಿದೆ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ."
+
+#: templates/help.html:74
+msgid "Advanced Features"
+msgstr "ಸುಧಾರಿತ ವೈಶಿಷ್ಟ್ಯಗಳು"
+
+#: templates/help.html:76
+msgid ""
+"• Brightness/Contrast adjustment\\n• Color saturation controls\\n• "
+"Sharpening filters\\n• Cropping functionality\\n• Auto-contrast and "
+"grayscale presets"
+msgstr "• ಬ್ರೈಟ್‌ನೆಸ್/ಕಾಂಟ್ರಾಸ್ಟ್ ಹೊಂದಾಣಿಕೆ\\n• ಬಣ್ಣ ಸ್ಯಾಚುರೇಶನ್ ನಿಯಂತ್ರಣಗಳು\\n• ಶಾರ್ಪನಿಂಗ್ ಫಿಲ್ಟರ್‌ಗಳು\\n• ಕ್ರಾಪಿಂಗ್ ಕಾರ್ಯಕ್ಷಮತೆ\\n• ಆಟೋ-ಕಾಂಟ್ರಾಸ್ಟ್ ಮತ್ತು ಗ್ರೇಸ್ಕೇಲ್ ಪೂರ್ವನಿಗದಿಗಳು"
+
+#: templates/help.html:77
+msgid "History Management"
+msgstr "ಇತಿಹಾಸ ನಿರ್ವಹಣೆ"
+
+#: templates/help.html:77
+msgid ""
+"• View past diagnoses.\\n• Filter by date/crop type.\\n• Export complete "
+"history to JSON.\\n• Import history from JSON.\\n• Re-diagnose or view "
+"image from history."
+msgstr "• ಹಿಂದಿನ ರೋಗನಿರ್ಣಯಗಳನ್ನು ವೀಕ್ಷಿಸಿ.\\n• ದಿನಾಂಕ/ಬೆಳೆ ಪ್ರಕಾರದ ಮೂಲಕ ಫಿಲ್ಟರ್ ಮಾಡಿ.\\n• ಸಂಪೂರ್ಣ ಇತಿಹಾಸವನ್ನು JSON ಗೆ ರಫ್ತು ಮಾಡಿ.\\n• JSON ನಿಂದ ಇತಿಹಾಸವನ್ನು ಆಮದು ಮಾಡಿಕೊಳ್ಳಿ.\\n• ಮರು-ರೋಗನಿರ್ಣಯ ಮಾಡಿ ಅಥವಾ ಇತಿಹಾಸದಿಂದ ಚಿತ್ರವನ್ನು ವೀಕ್ಷಿಸಿ."
+
+#: templates/help.html:78
+msgid "Feedback System"
+msgstr "ಪ್ರತಿಕ್ರಿಯೆ ವ್ಯವಸ್ಥೆ"
+
+#: templates/help.html:78
+msgid ""
+"• Submit suggestions, bug reports, or feature requests.\\n• Optionally "
+"attach screenshots.\\n• Rate your overall experience."
+msgstr "• ಸಲಹೆಗಳು, ದೋಷ ವರದಿಗಳು ಅಥವಾ ವೈಶಿಷ್ಟ್ಯದ ವಿನಂತಿಗಳನ್ನು ಸಲ್ಲಿಸಿ.\\n• ಐಚ್ಛಿಕವಾಗಿ ಸ್ಕ್ರೀನ್‌ಶಾಟ್‌ಗಳನ್ನು ಲಗತ್ತಿಸಿ.\\n• ನಿಮ್ಮ ಒಟ್ಟಾರೆ ಅನುಭವವನ್ನು ರೇಟ್ ಮಾಡಿ."
+
+#: templates/help.html:83
+msgid "Troubleshooting"
+msgstr "ದೋಷನಿವಾರಣೆ"
+
+#: templates/help.html:85
+msgid "Common Issues"
+msgstr "ಸಾಮಾನ್ಯ ಸಮಸ್ಯೆಗಳು"
+
+#: templates/help.html:85
+msgid ""
+"• Image upload failed: Check file size and format.\\n• Slow performance: "
+"Ensure a stable internet connection; large images take longer.\\n• "
+"Incorrect results: Verify image quality and ensure it is a single crop "
+"leaf."
+msgstr "• ಚಿತ್ರ ಅಪ್‌ಲೋಡ್ ವಿಫಲವಾಗಿದೆ: ಫೈಲ್ ಗಾತ್ರ ಮತ್ತು ಸ್ವರೂಪವನ್ನು ಪರಿಶೀಲಿಸಿ.\\n• ನಿಧಾನ ಕಾರ್ಯಕ್ಷಮತೆ: ಸ್ಥಿರವಾದ ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕವನ್ನು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ; ದೊಡ್ಡ ಚಿತ್ರಗಳು ಹೆಚ್ಚು ಸಮಯ ತೆಗೆದುಕೊಳ್ಳುತ್ತವೆ.\\n• ತಪ್ಪಾದ ಫಲಿತಾಂಶಗಳು: ಚಿತ್ರದ ಗುಣಮಟ್ಟವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಅದು ಒಂದೇ ಬೆಳೆ ಎಲೆ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ."
+
+#: templates/help.html:86
+msgid "Error Messages"
+msgstr "ದೋಷ ಸಂದೇಶಗಳು"
+
+#: templates/help.html:86
+msgid ""
+"- Invalid image: Try a different format (JPG, PNG, BMP).\\n- Low "
+"confidence: Retake image with better lighting/focus.\\n- Server error: "
+"Contact support or try again later."
+msgstr "- ಅಮಾನ್ಯ ಚಿತ್ರ: ಬೇರೆ ಸ್ವರೂಪವನ್ನು ಪ್ರಯತ್ನಿಸಿ (JPG, PNG, BMP).\\n- ಕಡಿಮೆ ವಿಶ್ವಾಸ: ಉತ್ತಮ ಬೆಳಕು/ಫೋಕಸ್‌ನೊಂದಿಗೆ ಚಿತ್ರವನ್ನು ಮರುಪಡೆಯಿರಿ.\\n- ಸರ್ವರ್ ದೋಷ: ಬೆಂಬಲವನ್ನು ಸಂಪರ್ಕಿಸಿ ಅಥವಾ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
+
+#: templates/help.html:87
+msgid "FAQ"
+msgstr "ಪದೇ ಪದೇ ಕೇಳಲಾಗುವ ಪ್ರಶ್ನೆಗಳು (FAQ)"
+
+#: templates/help.html:87
+msgid ""
+"Q: Can I use this for any crop?\\nA: Currently supports 15 major crops "
+"(see full list in About page).\\n\\nQ: How accurate are the results?\\nA:"
+" Accuracy depends on image quality and model training data. Average "
+"accuracy is high in controlled conditions."
+msgstr "ಪ್ರ: ನಾನು ಇದನ್ನು ಯಾವುದೇ ಬೆಳೆಗೆ ಬಳಸಬಹುದೇ?\\nಉ: ಪ್ರಸ್ತುತ 15 ಪ್ರಮುಖ ಬೆಳೆಗಳನ್ನು ಬೆಂಬಲಿಸುತ್ತದೆ (ನಮ್ಮ ಬಗ್ಗೆ ಪುಟದಲ್ಲಿ ಸಂಪೂರ್ಣ ಪಟ್ಟಿಯನ್ನು ನೋಡಿ).\\n\\nಪ್ರ: ಫಲಿತಾಂಶಗಳು ಎಷ್ಟು ನಿಖರವಾಗಿವೆ?\\nಉ: ನಿಖರತೆಯು ಚಿತ್ರದ ಗುಣಮಟ್ಟ ಮತ್ತು ಮಾದರಿ ತರಬೇತಿ ಡೇಟಾವನ್ನು ಅವಲಂಬಿಸಿರುತ್ತದೆ. ನಿಯಂತ್ರಿತ ಪರಿಸ್ಥಿತಿಗಳಲ್ಲಿ ಸರಾಸರಿ ನಿಖರತೆ ಹೆಚ್ಚು."
+
+#: templates/help.html:92
+msgid "Support & Resources"
+msgstr "ಬೆಂಬಲ ಮತ್ತು ಸಂಪನ್ಮೂಲಗಳು"
+
+#: templates/help.html:94
+msgid "Contact Information"
+msgstr "ಸಂಪರ್ಕ ಮಾಹಿತಿ"
+
+#: templates/help.html:94
+msgid ""
+"• Email: support@cropdiagnosis.com (placeholder)\\n• For real support, "
+"use the Feedback page or check our official website (if available)."
+msgstr "• ಇಮೇಲ್: support@cropdiagnosis.com (ಪ್ಲೇಸ್‌ಹೋಲ್ಡರ್)\\n• ನಿಜವಾದ ಬೆಂಬಲಕ್ಕಾಗಿ, ಪ್ರತಿಕ್ರಿಯೆ ಪುಟವನ್ನು ಬಳಸಿ ಅಥವಾ ನಮ್ಮ ಅಧಿಕೃತ ವೆಬ್‌ಸೈಟ್ ಪರಿಶೀಲಿಸಿ (ಲಭ್ಯವಿದ್ದರೆ)."
+
+#: templates/help.html:95
+msgid "Additional Resources"
+msgstr "ಹೆಚ್ಚುವರಿ ಸಂಪನ್ಮೂಲಗಳು"
+
+#: templates/help.html:95
+msgid ""
+"- Video tutorials (if available)\\n- Community forums (if available)\\n- "
+"External agricultural resources."
+msgstr "- ವೀಡಿಯೊ ಟ್ಯುಟೋರಿಯಲ್‌ಗಳು (ಲಭ್ಯವಿದ್ದರೆ)\\n- ಸಮುದಾಯ ವೇದಿಕೆಗಳು (ಲಭ್ಯವಿದ್ದರೆ)\\n- ಬಾಹ್ಯ ಕೃಷಿ ಸಂಪನ್ಮೂಲಗಳು."
+
+#: templates/help.html:96
+msgid ""
+"We value your input! Please report any issues or suggestions through the "
+"dedicated Feedback page in the navigation menu."
+msgstr "ನಿಮ್ಮ ಪ್ರತಿಕ್ರಿಯೆಯನ್ನು ನಾವು ಗೌರವಿಸುತ್ತೇವೆ! ನ್ಯಾವಿಗೇಷನ್ ಮೆನುವಿನಲ್ಲಿರುವ ಮೀಸಲಾದ ಪ್ರತಿಕ್ರಿಯೆ ಪುಟದ ಮೂಲಕ ದಯವಿಟ್ಟು ಯಾವುದೇ ಸಮಸ್ಯೆಗಳು ಅಥವಾ ಸಲಹೆಗಳನ್ನು ವರದಿ ಮಾಡಿ."
+
+#: templates/history.html:6
+msgid "Diagnosis History"
+msgstr "ರೋಗನಿರ್ಣಯ ಇತಿಹಾಸ"
+
+#: templates/history.html:9
+msgid "Controls"
+msgstr "ನಿಯಂತ್ರಣಗಳು"
+
+#: templates/history.html:12
+msgid "Sort by:"
+msgstr "ಇದರ ಮೂಲಕ ವಿಂಗಡಿಸಿ:"
+
+#: templates/history.html:14
+msgid "Most Recent"
+msgstr "ತೀರಾ ಇತ್ತೀಚಿನದು"
+
+#: templates/history.html:15
+msgid "Oldest First"
+msgstr "ಹಳೆಯದು ಮೊದಲು"
+
+#: templates/history.html:16
+msgid "Highest Confidence"
+msgstr "ಅತ್ಯುನ್ನತ ವಿಶ್ವಾಸ"
+
+#: templates/history.html:17
+msgid "Lowest Confidence"
+msgstr "ಕಡಿಮೆ ವಿಶ್ವಾಸ"
+
+#: templates/history.html:22
+msgid "Filter by crop:"
+msgstr "ಬೆಳೆಯ ಮೂಲಕ ಫಿಲ್ಟರ್ ಮಾಡಿ:"
+
+#: templates/history.html:24 templates/schemes.html:63
+msgid "All Crops"
+msgstr "ಎಲ್ಲಾ ಬೆಳೆಗಳು"
+
+#: templates/history.html:32
+msgid "Recent Diagnoses"
+msgstr "ಇತ್ತೀಚಿನ ರೋಗನಿರ್ಣಯಗಳು"
+
+#: templates/history.html:34
+msgid "Loading history..."
+msgstr "ಇತಿಹಾಸ ಲೋಡ್ ಆಗುತ್ತಿದೆ..."
+
+#: templates/history.html:39
+msgid "Diagnosis Details"
+msgstr "ರೋಗನಿರ್ಣಯ ವಿವರಗಳು"
+
+#: templates/history.html:47 templates/history.html:52
+msgid "Select an item to view details"
+msgstr "ವಿವರಗಳನ್ನು ವೀಕ್ಷಿಸಲು ಐಟಂ ಆಯ್ಕೆಮಾಡಿ"
+
+#: templates/history.html:57
+msgid "View Full Image"
+msgstr "ಪೂರ್ಣ ಚಿತ್ರವನ್ನು ವೀಕ್ಷಿಸಿ"
+
+#: templates/history.html:58
+msgid "Re-diagnose"
+msgstr "ಮರು-ರೋಗನಿರ್ಣಯ"
+
+#: templates/history.html:59
+msgid "Delete Selected"
+msgstr "ಆಯ್ಕೆಮಾಡಿದನ್ನು ಅಳಿಸಿ"
+
+#: templates/history.html:65
+msgid "Export All History"
+msgstr "ಎಲ್ಲಾ ಇತಿಹಾಸವನ್ನು ರಫ್ತು ಮಾಡಿ"
+
+#: templates/history.html:68
+msgid "Import History"
+msgstr "ಇತಿಹಾಸವನ್ನು ಆಮದು ಮಾಡಿಕೊಳ್ಳಿ"
+
+#: templates/history.html:70
+msgid "Clear All History"
+msgstr "ಎಲ್ಲಾ ಇತಿಹಾಸವನ್ನು ತೆರವುಗೊಳಿಸಿ"
+
+#: templates/index.html:15
+msgid "AI-powered detection & Real-time Risk Analysis"
+msgstr "AI-ಚಾಲಿತ ಪತ್ತೆ ಮತ್ತು ನೈಜ-ಸಮಯದ ಅಪಾಯದ ವಿಶ್ಲೇಷಣೆ"
+
+#: templates/index.html:22
+msgid "Diagnose Crop"
+msgstr "ಬೆಳೆ ರೋಗ ಪತ್ತೆ ಮಾಡಿ"
+
+#: templates/index.html:27
+msgid "View History"
+msgstr "ಇತಿಹಾಸವನ್ನು ವೀಕ್ಷಿಸಿ"
+
+#: templates/index.html:32
+msgid "Community Experts"
+msgstr "ಸಮುದಾಯ ತಜ್ಞರು"
+
+#: templates/index.html:44
+msgid "Govt Schemes"
+msgstr "ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು"
+
+#: templates/index.html:49
+msgid "Help & Guide"
+msgstr "ಸಹಾಯ ಮತ್ತು ಮಾರ್ಗದರ್ಶಿ"
+
+#: templates/index.html:67
+msgid "Live Disease Forecast"
+msgstr "ಲೈವ್ ರೋಗ ಮುನ್ಸೂಚನೆ"
+
+#: templates/index.html:71
+msgid "Enter City (e.g. Pune)"
+msgstr "ನಗರವನ್ನು ನಮೂದಿಸಿ (ಉದಾ. ಪುಣೆ)"
+
+#: templates/index.html:75
+msgid "Check"
+msgstr "ಪರಿಶೀಲಿಸಿ"
+
+#: templates/index.html:84
+msgid "Risk"
+msgstr "ಅಪಾಯ"
+
+#: templates/index.html:90
+msgid "Grow smarter • Stay healthier"
+msgstr "ಚುರುಕಾಗಿ ಬೆಳೆಯಿರಿ • ಆರೋಗ್ಯವಾಗಿರಿ"
+
+#: templates/index.html:99
+msgid "Please enter a city!"
+msgstr "ದಯವಿಟ್ಟು ನಗರವನ್ನು ನಮೂದಿಸಿ!"
+
+#: templates/index.html:141
+msgid "Failed to connect to weather service."
+msgstr "ಹವಾಮಾನ ಸೇವೆಗೆ ಸಂಪರ್ಕಿಸಲು ವಿಫಲವಾಗಿದೆ."
+
+#: templates/schemes.html:9
+msgid "Government Schemes & Subsidies"
+msgstr "ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು ಮತ್ತು ಸಬ್ಸಿಡಿಗಳು"
+
+#: templates/schemes.html:10
+msgid "Find financial aid, insurance, and subsidies tailored for you."
+msgstr "ನಿಮಗಾಗಿ ಆರ್ಥಿಕ ಸಹಾಯ, ವಿಮೆ ಮತ್ತು ಸಬ್ಸಿಡಿಗಳನ್ನು ಹುಡುಕಿ."
+
+#: templates/schemes.html:16
+msgid "State"
+msgstr "ರಾಜ್ಯ"
+
+#: templates/schemes.html:18
+msgid "All India"
+msgstr "ಅಖಿಲ ಭಾರತ"
+
+#: templates/schemes.html:20
+msgid "Andhra Pradesh"
+msgstr "ಆಂಧ್ರಪ್ರದೇಶ"
+
+#: templates/schemes.html:21
+msgid "Arunachal Pradesh"
+msgstr "ಅರುಣಾಚಲ ಪ್ರದೇಶ"
+
+#: templates/schemes.html:22
+msgid "Assam"
+msgstr "ಅಸ್ಸಾಂ"
+
+#: templates/schemes.html:23
+msgid "Bihar"
+msgstr "ಬಿಹಾರ"
+
+#: templates/schemes.html:24
+msgid "Chhattisgarh"
+msgstr "ಛತ್ತೀಸ್‌ಗಢ"
+
+#: templates/schemes.html:25
+msgid "Goa"
+msgstr "ಗೋವಾ"
+
+#: templates/schemes.html:26
+msgid "Gujarat"
+msgstr "ಗುಜರಾತ್"
+
+#: templates/schemes.html:27
+msgid "Haryana"
+msgstr "ಹರಿಯಾಣ"
+
+#: templates/schemes.html:28
+msgid "Himachal Pradesh"
+msgstr "ಹಿಮಾಚಲ ಪ್ರದೇಶ"
+
+#: templates/schemes.html:29
+msgid "Jharkhand"
+msgstr "ಜಾರ್ಖಂಡ್"
+
+#: templates/schemes.html:30
+msgid "Karnataka"
+msgstr "ಕರ್ನಾಟಕ"
+
+#: templates/schemes.html:31
+msgid "Kerala"
+msgstr "ಕೇರಳ"
+
+#: templates/schemes.html:32
+msgid "Madhya Pradesh"
+msgstr "ಮಧ್ಯಪ್ರದೇಶ"
+
+#: templates/schemes.html:33
+msgid "Maharashtra"
+msgstr "ಮಹಾರಾಷ್ಟ್ರ"
+
+#: templates/schemes.html:34
+msgid "Manipur"
+msgstr "ಮಣಿಪುರ"
+
+#: templates/schemes.html:35
+msgid "Meghalaya"
+msgstr "ಮೇಘಾಲಯ"
+
+#: templates/schemes.html:36
+msgid "Mizoram"
+msgstr "ಮಿಜೋರಾಂ"
+
+#: templates/schemes.html:37
+msgid "Nagaland"
+msgstr "ನಾಗಾಲ್ಯಾಂಡ್"
+
+#: templates/schemes.html:38
+msgid "Odisha"
+msgstr "ಒಡಿಶಾ"
+
+#: templates/schemes.html:39
+msgid "Punjab"
+msgstr "ಪಂಜಾಬ್"
+
+#: templates/schemes.html:40
+msgid "Rajasthan"
+msgstr "ರಾಜಸ್ಥಾನ"
+
+#: templates/schemes.html:41
+msgid "Sikkim"
+msgstr "ಸಿಕ್ಕಿಂ"
+
+#: templates/schemes.html:42
+msgid "Tamil Nadu"
+msgstr "ತಮಿಳುನಾಡು"
+
+#: templates/schemes.html:43
+msgid "Telangana"
+msgstr "ತೆಲಂಗಾಣ"
+
+#: templates/schemes.html:44
+msgid "Tripura"
+msgstr "ತ್ರಿಪುರಾ"
+
+#: templates/schemes.html:45
+msgid "Uttar Pradesh"
+msgstr "ಉತ್ತರ ಪ್ರದೇಶ"
+
+#: templates/schemes.html:46
+msgid "Uttarakhand"
+msgstr "ಉತ್ತರಾಖಂಡ್"
+
+#: templates/schemes.html:47
+msgid "West Bengal"
+msgstr "ಪಶ್ಚಿಮ ಬಂಗಾಳ"
+
+#: templates/schemes.html:49
+msgid "Andaman & Nicobar Islands"
+msgstr "ಅಂಡಮಾನ್ ಮತ್ತು ನಿಕೋಬಾರ್ ದ್ವೀಪಗಳು"
+
+#: templates/schemes.html:50
+msgid "Chandigarh"
+msgstr "ಚಂಡೀಗಢ"
+
+#: templates/schemes.html:51
+msgid "Dadra & Nagar Haveli and Daman & Diu"
+msgstr "ದಾದ್ರಾ ಮತ್ತು ನಗರ ಹವೇಲಿ ಮತ್ತು ದಮನ್ ಮತ್ತು ದಿಯು"
+
+#: templates/schemes.html:52
+msgid "Delhi"
+msgstr "ದೆಹಲಿ"
+
+#: templates/schemes.html:53
+msgid "Jammu & Kashmir"
+msgstr "ಜಮ್ಮು ಮತ್ತು ಕಾಶ್ಮೀರ"
+
+#: templates/schemes.html:54
+msgid "Ladakh"
+msgstr "ಲಡಾಖ್"
+
+#: templates/schemes.html:55
+msgid "Lakshadweep"
+msgstr "ಲಕ್ಷದ್ವೀಪ"
+
+#: templates/schemes.html:56
+msgid "Puducherry"
+msgstr "ಪುದುಚೇರಿ"
+
+#: templates/schemes.html:61
+msgid "Crop Type"
+msgstr "ಬೆಳೆ ಪ್ರಕಾರ"
+
+#: templates/schemes.html:65
+msgid "Apple"
+msgstr "ಸೇಬು"
+
+#: templates/schemes.html:66
+msgid "Corn (Maize)"
+msgstr "ಜೋಳ (ಮೆಕ್ಕೆ ಜೋಳ)"
+
+#: templates/schemes.html:67
+msgid "Grape"
+msgstr "ದ್ರಾಕ್ಷಿ"
+
+#: templates/schemes.html:68
+msgid "Potato"
+msgstr "ಆಲೂಗಡ್ಡೆ"
+
+#: templates/schemes.html:69
+msgid "Tomato"
+msgstr "ಟೊಮೆಟೊ"
+
+#: templates/schemes.html:70
+msgid "Soybean"
+msgstr "ಸೋಯಾಬೀನ್"
+
+#: templates/schemes.html:71
+msgid "Orange"
+msgstr "ಕಿತ್ತಳೆ"
+
+#: templates/schemes.html:72
+msgid "Strawberry"
+msgstr "ಸ್ಟ್ರಾಬೆರಿ"
+
+#: templates/schemes.html:76
+msgid "Find Schemes"
+msgstr "ಯೋಜನೆಗಳನ್ನು ಹುಡುಕಿ"
+
+#: templates/schemes.html:95
+msgid "Expired"
+msgstr "ಅವಧಿ ಮುಗಿದಿದೆ"
+
+#: templates/schemes.html:97
+msgid "Ending Soon"
+msgstr "ಶೀಘ್ರದಲ್ಲೇ ಮುಗಿಯಲಿದೆ"
+
+#: templates/schemes.html:99
+msgid "Active"
+msgstr "ಸಕ್ರಿಯ"
+
+#: templates/schemes.html:109
+msgid "Benefit"
+msgstr "ಪ್ರಯೋಜನ"
+
+#: templates/schemes.html:115
+msgid "Deadline"
+msgstr "ಗಡುವು"
+
+#: templates/schemes.html:125
+msgid "Apply Now"
+msgstr "ಈಗ ಅನ್ವಯಿಸಿ"
+
+#: templates/schemes.html:136
+msgid "No schemes found matching your filters."
+msgstr "ನಿಮ್ಮ ಫಿಲ್ಟರ್‌ಗಳಿಗೆ ಹೊಂದಿಕೆಯಾಗುವ ಯಾವುದೇ ಯೋಜನೆಗಳು ಕಂಡುಬಂದಿಲ್ಲ."
+
+#: templates/schemes.html:137
+msgid "Try selecting \"All\" to see Global Schemes."
+msgstr "ಜಾಗತಿಕ ಯೋಜನೆಗಳನ್ನು ನೋಡಲು \"ಎಲ್ಲಾ\" ಆಯ್ಕೆ ಮಾಡಲು ಪ್ರಯತ್ನಿಸಿ."
+
+#: templates/terms.html:6
+msgid "Last Updated:"
+msgstr "ಕೊನೆಯದಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ:"
+
+#: templates/terms.html:9
+msgid "Acceptance of Terms"
+msgstr "ನಿಯಮಗಳ ಅಂಗೀಕಾರ"
+
+#: templates/terms.html:10
+msgid ""
+"By accessing and using Crop Doctor AI, you accept and agree to be bound "
+"by the terms and provision of this agreement."
+msgstr "ಕ್ರಾಪ್ ಡಾಕ್ಟರ್ ಎಐ ಅನ್ನು ಪ್ರವೇಶಿಸುವ ಮತ್ತು ಬಳಸುವ ಮೂಲಕ, ಈ ಒಪ್ಪಂದದ ನಿಯಮಗಳು ಮತ್ತು ನಿಬಂಧನೆಗಳಿಗೆ ಬದ್ಧರಾಗಿರಲು ನೀವು ಒಪ್ಪಿಕೊಳ್ಳುತ್ತೀರಿ."
+
+#: templates/terms.html:12
+msgid "Educational Use Only (Disclaimer)"
+msgstr "ಶೈಕ್ಷಣಿಕ ಬಳಕೆ ಮಾತ್ರ (ಹಕ್ಕು ನಿರಾಕರಣೆ)"
+
+#: templates/terms.html:14
+msgid "This is an AI-assisted diagnostic tool."
+msgstr "ಇದು AI-ಸಹಾಯದ ರೋಗನಿರ್ಣಯ ಸಾಧನವಾಗಿದೆ."
+
+#: templates/terms.html:15
+msgid ""
+"The results provided by Crop Doctor AI are for informational purposes "
+"only. While we strive for accuracy, this tool should not replace "
+"professional agricultural advice or lab testing. We are not liable for "
+"any crop loss or financial damage resulting from reliance on this tool."
+msgstr "ಕ್ರಾಪ್ ಡಾಕ್ಟರ್ ಎಐ ಒದಗಿಸಿದ ಫಲಿತಾಂಶಗಳು ಮಾಹಿತಿ ಉದ್ದೇಶಗಳಿಗಾಗಿ ಮಾತ್ರ. ನಾವು ನಿಖರತೆಗಾಗಿ ಶ್ರಮಿಸುತ್ತಿರುವಾಗ, ಈ ಉಪಕರಣವು ವೃತ್ತಿಪರ ಕೃಷಿ ಸಲಹೆ ಅಥವಾ ಪ್ರಯೋಗಾಲಯ ಪರೀಕ್ಷೆಯನ್ನು ಬದಲಾಯಿಸಬಾರದು. ಈ ಉಪಕರಣದ ಮೇಲಿನ ಅವಲಂಬನೆಯಿಂದ ಉಂಟಾದ ಯಾವುದೇ ಬೆಳೆ ನಷ್ಟ ಅಥವಾ ಆರ್ಥಿಕ ಹಾನಿಗೆ ನಾವು ಜವಾಬ್ದಾರರಾಗಿರುವುದಿಲ್ಲ."
+
+#: templates/terms.html:18
+msgid "User Conduct"
+msgstr "ಬಳಕೆದಾರ ನಡವಳಿಕೆ"
+
+#: templates/terms.html:19
+msgid ""
+"You agree not to upload malicious code, illegal content, or images that "
+"do not belong to you."
+msgstr "ನಿಮಗೆ ಸೇರಿರದ ದುರುದ್ದೇಶಪೂರಿತ ಕೋಡ್, ಕಾನೂನುಬಾಹಿರ ವಿಷಯ ಅಥವಾ ಚಿತ್ರಗಳನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡದಿರಲು ನೀವು ಒಪ್ಪುತ್ತೀರಿ."
+
+#: templates/terms.html:21
+msgid "Changes to Terms"
+msgstr "ನಿಯಮಗಳಲ್ಲಿ ಬದಲಾವಣೆಗಳು"
+
+#: templates/terms.html:22
+msgid ""
+"We reserve the right to modify these terms at any time. Continued use of "
+"the service constitutes acceptance of new terms."
+msgstr "ಯಾವುದೇ ಸಮಯದಲ್ಲಿ ಈ ನಿಯಮಗಳನ್ನು ಮಾರ್ಪಡಿಸುವ ಹಕ್ಕನ್ನು ನಾವು ಕಾಯ್ದಿರಿಸಿದ್ದೇವೆ. ಸೇವೆಯ ಮುಂದುವರಿದ ಬಳಕೆಯು ಹೊಸ ನಿಯಮಗಳ ಸ್ವೀಕಾರವನ್ನು ರೂಪಿಸುತ್ತದೆ."
+
+#: templates/privacy.html:11
+msgid "Information We Collect"
+msgstr "ನಾವು ಸಂಗ್ರಹಿಸುವ ಮಾಹಿತಿ"
+
+#: templates/privacy.html:12
+msgid "We strictly limit the data we collect. When you use Crop Doctor AI, we may process:"
+msgstr "ನಾವು ಸಂಗ್ರಹಿಸುವ ಡೇಟಾವನ್ನು ನಾವು ಕಟ್ಟುನಿಟ್ಟಾಗಿ ಮಿತಿಗೊಳಿಸುತ್ತೇವೆ. ನೀವು ಕ್ರಾಪ್ ಡಾಕ್ಟರ್ AI ಅನ್ನು ಬಳಸುವಾಗ, ನಾವು ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಬಹುದು:"
+
+#: templates/privacy.html:14
+msgid "Images:"
+msgstr "ಚಿತ್ರಗಳು:"
+
+#: templates/privacy.html:14
+msgid "Photos of crops you upload for diagnosis."
+msgstr "ರೋಗನಿರ್ಣಯಕ್ಕಾಗಿ ನೀವು ಅಪ್‌ಲೋಡ್ ಮಾಡುವ ಬೆಳೆಗಳ ಫೋಟೋಗಳು."
+
+#: templates/privacy.html:15
+msgid "Device Data:"
+msgstr "ಸಾಧನ ಡೇಟಾ:"
+
+#: templates/privacy.html:15
+msgid "Basic information for analytics (e.g., browser type)."
+msgstr "ವಿಶ್ಲೇಷಣೆಗಾಗಿ ಮೂಲ ಮಾಹಿತಿ (ಉದಾ., ಬ್ರೌಸರ್ ಪ್ರಕಾರ)."
+
+#: templates/privacy.html:19
+msgid "How We Use Your Images"
+msgstr "ನಿಮ್ಮ ಚಿತ್ರಗಳನ್ನು ನಾವು ಹೇಗೆ ಬಳಸುತ್ತೇವೆ"
+
+#: templates/privacy.html:20
+msgid "Your privacy is our priority. Images uploaded for diagnosis are processed temporarily to provide results."
+msgstr "ನಿಮ್ಮ ಗೌಪ್ಯತೆ ನಮ್ಮ ಆದ್ಯತೆಯಾಗಿದೆ. ಫಲಿತಾಂಶಗಳನ್ನು ಒದಗಿಸಲು ರೋಗನಿರ್ಣಯಕ್ಕಾಗಿ ಅಪ್‌ಲೋಡ್ ಮಾಡಲಾದ ಚಿತ್ರಗಳನ್ನು ತಾತ್ಕಾಲಿಕವಾಗಿ ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲಾಗುತ್ತದೆ."
+
+#: templates/privacy.html:23
+msgid "Important Note:"
+msgstr "ಪ್ರಮುಖ ಟಿಪ್ಪಣಿ:"
+
+#: templates/privacy.html:24
+msgid "We do not sell your personal photos. Images are used solely for generating the disease diagnosis report."
+msgstr "ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಫೋಟೋಗಳನ್ನು ನಾವು ಮಾರಾಟ ಮಾಡುವುದಿಲ್ಲ. ರೋಗನಿರ್ಣಯ ವರದಿಯನ್ನು ರಚಿಸಲು ಮಾತ್ರ ಚಿತ್ರಗಳನ್ನು ಬಳಸಲಾಗುತ್ತದೆ."
+
+#: templates/privacy.html:28
+msgid "Local Storage"
+msgstr "ಸ್ಥಳೀಯ ಸಂಗ್ರಹಣೆ"
+
+#: templates/privacy.html:29
+msgid "To improve performance (Offline Mode), some data models and history logs are stored locally on your device's browser. You can clear this anytime via your browser settings."
+msgstr "ಕಾರ್ಯಕ್ಷಮತೆಯನ್ನು ಸುಧಾರಿಸಲು (ಆಫ್‌ಲೈನ್ ಮೋಡ್), ಕೆಲವು ಡೇಟಾ ಮಾದರಿಗಳು ಮತ್ತು ಇತಿಹಾಸ ಲಾಗ್‌ಗಳನ್ನು ನಿಮ್ಮ ಸಾಧನದ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಸ್ಥಳೀಯವಾಗಿ ಸಂಗ್ರಹಿಸಲಾಗುತ್ತದೆ. ನಿಮ್ಮ ಬ್ರೌಸರ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳ ಮೂಲಕ ನೀವು ಇದನ್ನು ಯಾವಾಗ ಬೇಕಾದರೂ ತೆರವುಗೊಳಿಸಬಹುದು."
+
+#: templates/privacy.html:33
+msgid "Contact Us"
+msgstr "ನಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಿ"
+
+#: templates/privacy.html:34
+msgid "If you have questions about this policy, please contact us at"
+msgstr "ಈ ನೀತಿಯ ಕುರಿತು ನೀವು ಪ್ರಶ್ನೆಗಳನ್ನು ಹೊಂದಿದ್ದರೆ, ದಯವಿಟ್ಟು ನಮ್ಮನ್ನು ಇಲ್ಲಿ ಸಂಪರ್ಕಿಸಿ"
+
+#: venv/Lib/site-packages/click/_termui_impl.py:613
+#, python-brace-format
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/Lib/site-packages/click/_termui_impl.py:617
+#, python-brace-format
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1114
+#: venv/Lib/site-packages/click/core.py:1151
+#, python-brace-format
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1170
+msgid "Options"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1245
+#, python-brace-format
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/core.py:1264
+#, python-brace-format
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1448
+msgid "Aborted!"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1822
+msgid "Commands"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1853
+msgid "Missing command."
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1931
+#, python-brace-format
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:2355
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:2378
+#, python-brace-format
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/core.py:2567
+#, python-brace-format
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3015
+#, python-brace-format
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3018
+#, python-brace-format
+msgid "default: {default}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3022
+msgid "required"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3082
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/Lib/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/Lib/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/Lib/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:50
+#: venv/Lib/site-packages/click/exceptions.py:89
+#, python-brace-format
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:81
+#, python-brace-format
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:130
+#, python-brace-format
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:132
+#, python-brace-format
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:196
+#, python-brace-format
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:203
+#, python-brace-format
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:223
+#, python-brace-format
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:235
+#, python-brace-format
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:289
+#, python-brace-format
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/parser.py:199
+#, python-brace-format
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/Lib/site-packages/click/parser.py:381
+#, python-brace-format
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/Lib/site-packages/click/parser.py:444
+#, python-brace-format
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/shell_completion.py:332
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/Lib/site-packages/click/shell_completion.py:339
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:165
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:181
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:183
+#, python-brace-format
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:194
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:253
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:872
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:332
+#, python-brace-format
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:369
+#, python-brace-format
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/types.py:460
+#, python-brace-format
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/types.py:482
+#, python-brace-format
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:538
+#, python-brace-format
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:719
+#, python-brace-format
+msgid "{value!r} is not a valid boolean. Recognized values: {states}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:747
+#, python-brace-format
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:937
+msgid "file"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:939
+msgid "directory"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:941
+msgid "path"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:988
+#, python-brace-format
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:997
+#, python-brace-format
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1005
+#, python-brace-format
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1014
+#, python-brace-format
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1023
+#, python-brace-format
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1032
+#, python-brace-format
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1099
+#, python-brace-format
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:407
+#, python-format
+msgid "Content purported to be compressed with %s but failed to decompress."
+msgstr ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:571
+#, python-format
+msgid "Unsupported value for qop: %s."
+msgstr ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:575
+#: venv/Lib/site-packages/httplib2/__init__.py:653
+#, python-format
+msgid "Unsupported value for algorithm: %s.algorithm"
+msgstr ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:648
+msgid "The challenge doesn't contain a server nonce, or this one is empty."
+msgstr ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:658
+#, python-format
+msgid "Unsupported value for pw-algorithm: %s.pw-algorithm"
+msgstr ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:1471
+msgid "Redirected but the response is missing a Location: header."
+msgstr ""
+
+msgid "Dr. Crop is thinking"
+msgstr "ಡಾ. ಕ್ರಾಪ್ ಯೋಚಿಸುತ್ತಿದ್ದಾರೆ..."
+
+# --- About Page ---
+#: templates/about.html
+msgid "About Crop Disease Detection App"
+msgstr "ಬೆಳೆ ರೋಗ ಪತ್ತೆ ಅಪ್ಲಿಕೇಶನ್ ಬಗ್ಗೆ"
+
+msgid "Application Overview"
+msgstr "ಅಪ್ಲಿಕೇಶನ್ ಅವಲೋಕನ"
+
+msgid "The Crop Disease Detection App is an innovative tool designed to assist farmers and agricultural enthusiasts in identifying common plant leaf diseases using advanced machine learning models. Our goal is to provide quick, accessible, and preliminary diagnoses to help in timely intervention and better crop management."
+msgstr "ಬೆಳೆ ರೋಗ ಪತ್ತೆ ಅಪ್ಲಿಕೇಶನ್ ಸುಧಾರಿತ ಯಂತ್ರ ಕಲಿಕೆ ಮಾದರಿಗಳನ್ನು ಬಳಸಿಕೊಂಡು ಸಾಮಾನ್ಯ ಸಸ್ಯ ಎಲೆ ರೋಗಗಳನ್ನು ಗುರುತಿಸಲು ರೈತರಿಗೆ ಸಹಾಯ ಮಾಡಲು ವಿನ್ಯಾಸಗೊಳಿಸಲಾದ ನವೀನ ಸಾಧನವಾಗಿದೆ."
+
+msgid "Key Features:"
+msgstr "ಪ್ರಮುಖ ಲಕ್ಷಣಗಳು:"
+
+msgid "AI-powered disease detection for various crops."
+msgstr "ವಿವಿಧ ಬೆಳೆಗಳಿಗೆ ಎಐ-ಚಾಲಿತ ರೋಗ ಪತ್ತೆ."
+
+msgid "Image upload and live camera capture capabilities (browser dependent)."
+msgstr "ಚಿತ್ರ ಅಪ್‌ಲೋಡ್ ಮತ್ತು ಲೈವ್ ಕ್ಯಾಮೆರಾ ಸೆರೆಹಿಡಿಯುವ ಸಾಮರ್ಥ್ಯಗಳು."
+
+msgid "Image enhancement tools for better analysis."
+msgstr "ಉತ್ತಮ ವಿಶ್ಲೇಷಣೆಗಾಗಿ ಚಿತ್ರ ವರ್ಧನೆ ಉಪಕರಣಗಳು."
+
+msgid "Detailed diagnosis reports with confidence scores and treatment suggestions."
+msgstr "ವಿಶ್ವಾಸಾರ್ಹ ಅಂಕಗಳು ಮತ್ತು ಚಿಕಿತ್ಸಾ ಸಲಹೆಗಳೊಂದಿಗೆ ವಿವರವಾದ ರೋಗನಿರ್ಣಯ ವರದಿಗಳು."
+
+msgid "History tracking of past diagnoses."
+msgstr "ಹಿಂದಿನ ರೋಗನಿರ್ಣಯಗಳ ಇತಿಹಾಸ ಟ್ರ್ಯಾಕಿಂಗ್."
+
+msgid "User feedback system for continuous improvement."
+msgstr "ನಿರಂತರ ಸುಧಾರಣೆಗಾಗಿ ಬಳಕೆದಾರರ ಪ್ರತಿಕ್ರಿಯೆ ವ್ಯವಸ್ಥೆ."
+
+msgid "Development Information:"
+msgstr "ಅಭಿವೃದ್ಧಿ ಮಾಹಿತಿ:"
+
+msgid "Developed by: [AYUSH CHOUBEY]"
+msgstr "ಅಭಿವೃದ್ಧಿಪಡಿಸಿದವರು: [ಆಯುಷ್ ಚೌಬೆ]"
+
+msgid "Version: 1.0.0"
+msgstr "ಆವೃತ್ತಿ: 1.0.0"
+
+msgid "Release Date: January 13, 2026"
+msgstr "ಬಿಡುಗಡೆ ದಿನಾಂಕ: ಜನವರಿ 13, 2026"
+
+msgid "Technologies Used:"
+msgstr "ಬಳಸಲಾದ ತಂತ್ರಜ್ಞಾನಗಳು:"
+
+msgid "Contact Us:"
+msgstr "ನಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಿ:"
+
+msgid "For support or inquiries, please contact:"
+msgstr "ಬೆಂಬಲ ಅಥವಾ ವಿಚಾರಣೆಗಾಗಿ, ದಯವಿಟ್ಟು ಸಂಪರ್ಕಿಸಿ:"
+
+msgid "Visit our website/repository:"
+msgstr "ನಮ್ಮ ವೆಬ್‌ಸೈಟ್‌ಗೆ ಭೇಟಿ ನೀಡಿ:"
+
+msgid "Disclaimer:"
+msgstr "ಹಕ್ಕು ನಿರಾಕರಣೆ:"
+
+msgid "This application is a diagnostic aid and should not replace professional agricultural advice. Always consult with a qualified agronomist or plant pathologist for definitive diagnoses and treatment plans."
+msgstr "ಈ ಅಪ್ಲಿಕೇಶನ್ ರೋಗನಿರ್ಣಯದ ಸಹಾಯವಾಗಿದೆ ಮತ್ತು ವೃತ್ತಿಪರ ಕೃಷಿ ಸಲಹೆಯನ್ನು ಬದಲಿಸಬಾರದು. ನಿಖರವಾದ ರೋಗನಿರ್ಣಯ ಮತ್ತು ಚಿಕಿತ್ಸಾ ಯೋಜನೆಗಳಿಗಾಗಿ ಯಾವಾಗಲೂ ಅರ್ಹ ಕೃಷಿ ವಿಜ್ಞಾನಿಯನ್ನು ಸಂಪರ್ಕಿಸಿ."
+
+# --- Library Page ---
+#: templates/library.html
+msgid "Plant Disease Encyclopedia"
+msgstr "ಸಸ್ಯ ರೋಗ ವಿಶ್ವಕೋಶ"
+
+msgid "Browse our comprehensive database of crop diseases, symptoms, and treatments. Educate yourself to prevent outbreaks before they happen."
+msgstr "ಬೆಳೆ ರೋಗಗಳು, ಲಕ್ಷಣಗಳು ಮತ್ತು ಚಿಕಿತ್ಸೆಗಳ ನಮ್ಮ ಸಮಗ್ರ ಡೇಟಾಬೇಸ್ ಅನ್ನು ಬ್ರೌಸ್ ಮಾಡಿ."
+
+msgid "Search for 'Apple', 'Blight', or 'Rust'..."
+msgstr "'ಸೇಬು', 'ಬ್ಲೈಟ್', ಅಥವಾ 'ರಸ್ಟ್' ಗಾಗಿ ಹುಡುಕಿ..."
+
+msgid "KEY SYMPTOMS"
+msgstr "ಪ್ರಮುಖ ಲಕ್ಷಣಗಳು"
+
+msgid "Read Full Guide"
+msgstr "ಸಂಪೂರ್ಣ ಮಾರ್ಗದರ್ಶಿಯನ್ನು ಓದಿ"
+
+msgid "Healthy"
+msgstr "ಆರೋಗ್ಯಕರ"
+
+msgid "Disease"
+msgstr "ರೋಗ"
+
+msgid "CropDoctor AI"
+msgstr "ಕ್ರಾಪ್ ಡಾಕ್ಟರ್ ಎಐ"
+
+msgid "Grow Smarter • Harvest Better"
+msgstr "ಜಾಣತನದಿಂದ ಬೆಳೆಯಿರಿ • ಉತ್ತಮ ಇಳುವರಿ ಪಡೆಯಿರಿ"
+
+msgid "Listen"
+msgstr "ಕೇಳಿ"
+
+msgid "Type or speak..."
+msgstr "ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಮಾತನಾಡಿ..."

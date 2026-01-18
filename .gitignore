@@ -3,3 +3,4 @@ models
 uploads
 venv
 app_data.json
+.env

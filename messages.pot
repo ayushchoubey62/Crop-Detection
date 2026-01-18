@@ -1,0 +1,1422 @@
+# Translations template for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-12 20:42+0530\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: templates/base.html:169
+msgid "Diagnose"
+msgstr ""
+
+#: templates/base.html:174
+msgid "History"
+msgstr ""
+
+#: templates/base.html:179 templates/base.html:261 templates/help.html:96
+#: templates/index.html:54
+msgid "Feedback"
+msgstr ""
+
+#: templates/base.html:184
+msgid "Help"
+msgstr ""
+
+#: templates/base.html:189
+msgid "Community"
+msgstr ""
+
+#: templates/base.html:194 templates/index.html:59
+msgid "About"
+msgstr ""
+
+#: templates/base.html:199
+msgid "Library"
+msgstr ""
+
+#: templates/base.html:204
+msgid "Schemes"
+msgstr ""
+
+#: templates/base.html:236 templates/base.html:297
+msgid "Crop Doctor AI"
+msgstr ""
+
+#: templates/base.html:239
+msgid ""
+"Empowering farmers with advanced AI to detect crop diseases early, "
+"estimate yields, and protect harvests."
+msgstr ""
+
+#: templates/base.html:256
+msgid "Product"
+msgstr ""
+
+#: templates/base.html:258
+msgid "Smart Diagnosis"
+msgstr ""
+
+#: templates/base.html:259
+msgid "History Log"
+msgstr ""
+
+#: templates/base.html:260
+msgid "Community Forum"
+msgstr ""
+
+#: templates/base.html:266
+msgid "Resources"
+msgstr ""
+
+#: templates/base.html:268
+msgid "Help Center"
+msgstr ""
+
+#: templates/base.html:269
+msgid "Government Schemes"
+msgstr ""
+
+#: templates/base.html:270 templates/index.html:37
+msgid "Disease Library"
+msgstr ""
+
+#: templates/base.html:271
+msgid "About Us"
+msgstr ""
+
+#: templates/base.html:276
+msgid "Support"
+msgstr ""
+
+#: templates/base.html:297
+msgid "All rights reserved."
+msgstr ""
+
+#: templates/base.html:300
+msgid "Privacy Policy"
+msgstr ""
+
+#: templates/base.html:301 templates/terms.html:5
+msgid "Terms of Service"
+msgstr ""
+
+#: templates/community.html:18
+msgid "Community & Expert Hub"
+msgstr ""
+
+#: templates/community.html:20
+msgid "Connect with experts and other farmers to solve crop issues."
+msgstr ""
+
+#: templates/community.html:26
+msgid "Are you a Doctor? Join as Expert"
+msgstr ""
+
+#: templates/community.html:35
+msgid "Total Issues"
+msgstr ""
+
+#: templates/community.html:45
+msgid "Expert Verified"
+msgstr ""
+
+#: templates/community.html:55
+msgid "Pending Review"
+msgstr ""
+
+#: templates/community.html:63
+msgid "Search crops, diseases, or questions..."
+msgstr ""
+
+#: templates/community.html:70
+msgid "All Posts"
+msgstr ""
+
+#: templates/community.html:71
+msgid "Verified"
+msgstr ""
+
+#: templates/community.html:72
+msgid "Pending"
+msgstr ""
+
+#: templates/community.html:200
+msgid "No posts found"
+msgstr ""
+
+#: templates/community.html:201
+msgid "Try adjusting your search filters."
+msgstr ""
+
+#: templates/community.html:212
+msgid "Join as an Expert"
+msgstr ""
+
+#: templates/community.html:214
+msgid "Verify your identity to get the"
+msgstr ""
+
+#: templates/community.html:214
+msgid "Green Badge"
+msgstr ""
+
+#: templates/community.html:214
+msgid "and help farmers."
+msgstr ""
+
+#: templates/community.html:219
+msgid "Full Name"
+msgstr ""
+
+#: templates/community.html:224
+msgid "I am a..."
+msgstr ""
+
+#: templates/community.html:226
+msgid "Doctor / Pathologist (Dr.)"
+msgstr ""
+
+#: templates/community.html:227
+msgid "Medical/Agri Shop Owner"
+msgstr ""
+
+#: templates/community.html:228
+msgid "Agronomist / Scientist"
+msgstr ""
+
+#: templates/community.html:233
+msgid "Email Address"
+msgstr ""
+
+#: templates/community.html:238
+msgid "Verification Details"
+msgstr ""
+
+#: templates/community.html:243
+msgid "Submit Application"
+msgstr ""
+
+#: templates/diagnose.html:32 templates/index.html:14
+msgid "Crop Disease Diagnosis"
+msgstr ""
+
+#: templates/diagnose.html:35
+msgid "Image Tools"
+msgstr ""
+
+#: templates/diagnose.html:38
+msgid "Upload Image"
+msgstr ""
+
+#: templates/diagnose.html:39
+msgid "Clear Image"
+msgstr ""
+
+#: templates/diagnose.html:43
+msgid "Live Preview"
+msgstr ""
+
+#: templates/diagnose.html:49
+msgid "Field Mode (Offline)"
+msgstr ""
+
+#: templates/diagnose.html:54
+msgid "Crop Image"
+msgstr ""
+
+#: templates/diagnose.html:55
+msgid "Apply Crop"
+msgstr ""
+
+#: templates/diagnose.html:56
+msgid "Reset Crop"
+msgstr ""
+
+#: templates/diagnose.html:58
+msgid "Ready to upload image"
+msgstr ""
+
+#: templates/diagnose.html:65
+msgid "Image Preview"
+msgstr ""
+
+#: templates/diagnose.html:68
+msgid "No image uploaded"
+msgstr ""
+
+#: templates/diagnose.html:73
+msgid "Compare Original"
+msgstr ""
+
+#: templates/diagnose.html:79
+msgid "Diagnosis Results"
+msgstr ""
+
+#: templates/diagnose.html:81
+msgid "No diagnosis available. Upload an image to start."
+msgstr ""
+
+#: templates/diagnose.html:87 templates/help.html:76
+msgid "Image Enhancement Tools"
+msgstr ""
+
+#: templates/diagnose.html:90
+msgid "Basic Adjustments"
+msgstr ""
+
+#: templates/diagnose.html:92
+msgid "Brightness"
+msgstr ""
+
+#: templates/diagnose.html:97
+msgid "Contrast"
+msgstr ""
+
+#: templates/diagnose.html:102
+msgid "Saturation"
+msgstr ""
+
+#: templates/diagnose.html:109
+msgid "Advanced Adjustments"
+msgstr ""
+
+#: templates/diagnose.html:111
+msgid "Edge Enhance"
+msgstr ""
+
+#: templates/diagnose.html:116
+msgid "Blur Reduce"
+msgstr ""
+
+#: templates/diagnose.html:121
+msgid "Color Balance"
+msgstr ""
+
+#: templates/diagnose.html:128
+msgid "Presets"
+msgstr ""
+
+#: templates/diagnose.html:130
+msgid "Auto Contrast"
+msgstr ""
+
+#: templates/diagnose.html:131
+msgid "Sharpen"
+msgstr ""
+
+#: templates/diagnose.html:132
+msgid "Grayscale"
+msgstr ""
+
+#: templates/diagnose.html:133
+msgid "Reset Filters"
+msgstr ""
+
+#: templates/diagnose.html:140
+msgid "Save Report"
+msgstr ""
+
+#: templates/diagnose.html:141
+msgid "Print Report"
+msgstr ""
+
+#: templates/diagnose.html:142 templates/feedback.html:74
+#: templates/help.html:33 templates/history.html:72
+msgid "Back to Home"
+msgstr ""
+
+#: templates/diagnose.html:375
+msgid "Image uploaded. Analyzing..."
+msgstr ""
+
+#: templates/diagnose.html:596
+msgid "Analyzing on device (Offline)..."
+msgstr ""
+
+#: templates/diagnose.html:714
+msgid "Offline Analysis Complete"
+msgstr ""
+
+#: templates/diagnose.html:1521
+msgid "Environmental Risk Analysis"
+msgstr ""
+
+#: templates/diagnose.html:1523
+msgid "Live Data"
+msgstr ""
+
+#: templates/diagnose.html:1528
+msgid ""
+"Pathogens spread differently depending on the weather. Check your farm's "
+"current risk status."
+msgstr ""
+
+#: templates/diagnose.html:1532
+msgid "Enter Farm Location (e.g. Pune)"
+msgstr ""
+
+#: templates/diagnose.html:1536
+msgid "Analyze Risk"
+msgstr ""
+
+#: templates/feedback.html:4
+msgid "User Feedback & Support"
+msgstr ""
+
+#: templates/feedback.html:9
+msgid "Feedback Type"
+msgstr ""
+
+#: templates/feedback.html:13
+msgid "Suggestion"
+msgstr ""
+
+#: templates/feedback.html:17
+msgid "Bug Report"
+msgstr ""
+
+#: templates/feedback.html:21
+msgid "Feature Request"
+msgstr ""
+
+#: templates/feedback.html:25
+msgid "General Feedback"
+msgstr ""
+
+#: templates/feedback.html:32
+msgid "Contact Email (optional):"
+msgstr ""
+
+#: templates/feedback.html:38
+msgid "Rating"
+msgstr ""
+
+#: templates/feedback.html:41
+msgid "Poor"
+msgstr ""
+
+#: templates/feedback.html:41
+msgid "Fair"
+msgstr ""
+
+#: templates/feedback.html:41
+msgid "Good"
+msgstr ""
+
+#: templates/feedback.html:41
+msgid "Very Good"
+msgstr ""
+
+#: templates/feedback.html:41
+msgid "Excellent"
+msgstr ""
+
+#: templates/feedback.html:55
+msgid "Your Feedback:"
+msgstr ""
+
+#: templates/feedback.html:56
+msgid "Please describe your feedback in detail..."
+msgstr ""
+
+#: templates/feedback.html:63
+msgid "Attach screenshot (if applicable)"
+msgstr ""
+
+#: templates/feedback.html:66
+msgid "Select Screenshot"
+msgstr ""
+
+#: templates/feedback.html:72
+msgid "Submit Feedback"
+msgstr ""
+
+#: templates/feedback.html:73
+msgid "Reset Form"
+msgstr ""
+
+#: templates/help.html:7
+msgid "Crop Disease Diagnosis Guide"
+msgstr ""
+
+#: templates/help.html:8
+msgid "Comprehensive user manual and troubleshooting guide"
+msgstr ""
+
+#: templates/help.html:14
+msgid "Search the guide..."
+msgstr ""
+
+#: templates/help.html:15
+msgid "Search"
+msgstr ""
+
+#: templates/help.html:20
+msgid "Table of Contents"
+msgstr ""
+
+#: templates/help.html:34
+msgid "Print This Guide"
+msgstr ""
+
+#: templates/help.html:47
+msgid "Getting Started"
+msgstr ""
+
+#: templates/help.html:49
+msgid "Welcome to Crop Disease Diagnosis"
+msgstr ""
+
+#: templates/help.html:49
+msgid ""
+"This AI-powered application helps farmers and agricultural professionals "
+"identify diseases in crop leaves through image analysis."
+msgstr ""
+
+#: templates/help.html:50
+msgid "System Requirements"
+msgstr ""
+
+#: templates/help.html:50
+msgid ""
+"• Modern web browser\\n• Internet connection\\n• Sufficient device "
+"storage for image uploads\\n• Webcam or camera for live capture (browser "
+"support dependent)"
+msgstr ""
+
+#: templates/help.html:51
+msgid "First Time Setup"
+msgstr ""
+
+#: templates/help.html:51
+msgid ""
+"1. Ensure your browser is up-to-date.\\n2. No specific software "
+"installation is required for the web app.\\n3. Make sure you have a "
+"stable internet connection."
+msgstr ""
+
+#: templates/help.html:56
+msgid "Image Capture Guidelines"
+msgstr ""
+
+#: templates/help.html:58
+msgid "Optimal Image Quality"
+msgstr ""
+
+#: templates/help.html:58
+msgid ""
+"• Capture in well-lit conditions\\n• Focus on the leaf surface\\n• "
+"Include both healthy and affected areas\\n• Avoid shadows and glare"
+msgstr ""
+
+#: templates/help.html:59
+msgid "Recommended Practices"
+msgstr ""
+
+#: templates/help.html:59
+msgid ""
+"- Place leaf on neutral background\\n- Include scale reference if "
+"possible\\n- Capture multiple angles for severe cases"
+msgstr ""
+
+#: templates/help.html:60
+msgid "Common Mistakes"
+msgstr ""
+
+#: templates/help.html:60
+msgid ""
+"× Blurry or out-of-focus images\\n× Images with multiple leaves\\n× "
+"Extreme close-ups without context\\n× Poor lighting conditions"
+msgstr ""
+
+#: templates/help.html:65
+msgid "Diagnosis Process"
+msgstr ""
+
+#: templates/help.html:67
+msgid "Step-by-Step Guide"
+msgstr ""
+
+#: templates/help.html:67
+msgid ""
+"1. Navigate to Diagnosis page.\\n2. Upload an image or use your device "
+"camera.\\n3. Adjust image using enhancement tools if needed.\\n4. View "
+"the diagnosis results, including confidence score and details.\\n5. Save "
+"or print the comprehensive report."
+msgstr ""
+
+#: templates/help.html:68
+msgid "Understanding Results"
+msgstr ""
+
+#: templates/help.html:68
+msgid ""
+"• Confidence scores indicate prediction reliability.\\n• Multiple results"
+" may appear for similar diseases.\\n• Low confidence suggests retaking "
+"the image with better quality."
+msgstr ""
+
+#: templates/help.html:69
+msgid "Troubleshooting Diagnosis"
+msgstr ""
+
+#: templates/help.html:69
+msgid ""
+"If you get poor results:\\n- Try different image adjustments.\\n- Capture"
+" a clearer image.\\n- Ensure the image is of a single crop leaf."
+msgstr ""
+
+#: templates/help.html:74
+msgid "Advanced Features"
+msgstr ""
+
+#: templates/help.html:76
+msgid ""
+"• Brightness/Contrast adjustment\\n• Color saturation controls\\n• "
+"Sharpening filters\\n• Cropping functionality\\n• Auto-contrast and "
+"grayscale presets"
+msgstr ""
+
+#: templates/help.html:77
+msgid "History Management"
+msgstr ""
+
+#: templates/help.html:77
+msgid ""
+"• View past diagnoses.\\n• Filter by date/crop type.\\n• Export complete "
+"history to JSON.\\n• Import history from JSON.\\n• Re-diagnose or view "
+"image from history."
+msgstr ""
+
+#: templates/help.html:78
+msgid "Feedback System"
+msgstr ""
+
+#: templates/help.html:78
+msgid ""
+"• Submit suggestions, bug reports, or feature requests.\\n• Optionally "
+"attach screenshots.\\n• Rate your overall experience."
+msgstr ""
+
+#: templates/help.html:83
+msgid "Troubleshooting"
+msgstr ""
+
+#: templates/help.html:85
+msgid "Common Issues"
+msgstr ""
+
+#: templates/help.html:85
+msgid ""
+"• Image upload failed: Check file size and format.\\n• Slow performance: "
+"Ensure a stable internet connection; large images take longer.\\n• "
+"Incorrect results: Verify image quality and ensure it is a single crop "
+"leaf."
+msgstr ""
+
+#: templates/help.html:86
+msgid "Error Messages"
+msgstr ""
+
+#: templates/help.html:86
+msgid ""
+"- Invalid image: Try a different format (JPG, PNG, BMP).\\n- Low "
+"confidence: Retake image with better lighting/focus.\\n- Server error: "
+"Contact support or try again later."
+msgstr ""
+
+#: templates/help.html:87
+msgid "FAQ"
+msgstr ""
+
+#: templates/help.html:87
+msgid ""
+"Q: Can I use this for any crop?\\nA: Currently supports 15 major crops "
+"(see full list in About page).\\n\\nQ: How accurate are the results?\\nA:"
+" Accuracy depends on image quality and model training data. Average "
+"accuracy is high in controlled conditions."
+msgstr ""
+
+#: templates/help.html:92
+msgid "Support & Resources"
+msgstr ""
+
+#: templates/help.html:94
+msgid "Contact Information"
+msgstr ""
+
+#: templates/help.html:94
+msgid ""
+"• Email: support@cropdiagnosis.com (placeholder)\\n• For real support, "
+"use the Feedback page or check our official website (if available)."
+msgstr ""
+
+#: templates/help.html:95
+msgid "Additional Resources"
+msgstr ""
+
+#: templates/help.html:95
+msgid ""
+"- Video tutorials (if available)\\n- Community forums (if available)\\n- "
+"External agricultural resources."
+msgstr ""
+
+#: templates/help.html:96
+msgid ""
+"We value your input! Please report any issues or suggestions through the "
+"dedicated Feedback page in the navigation menu."
+msgstr ""
+
+#: templates/history.html:6
+msgid "Diagnosis History"
+msgstr ""
+
+#: templates/history.html:9
+msgid "Controls"
+msgstr ""
+
+#: templates/history.html:12
+msgid "Sort by:"
+msgstr ""
+
+#: templates/history.html:14
+msgid "Most Recent"
+msgstr ""
+
+#: templates/history.html:15
+msgid "Oldest First"
+msgstr ""
+
+#: templates/history.html:16
+msgid "Highest Confidence"
+msgstr ""
+
+#: templates/history.html:17
+msgid "Lowest Confidence"
+msgstr ""
+
+#: templates/history.html:22
+msgid "Filter by crop:"
+msgstr ""
+
+#: templates/history.html:24 templates/schemes.html:63
+msgid "All Crops"
+msgstr ""
+
+#: templates/history.html:32
+msgid "Recent Diagnoses"
+msgstr ""
+
+#: templates/history.html:34
+msgid "Loading history..."
+msgstr ""
+
+#: templates/history.html:39
+msgid "Diagnosis Details"
+msgstr ""
+
+#: templates/history.html:47 templates/history.html:52
+msgid "Select an item to view details"
+msgstr ""
+
+#: templates/history.html:57
+msgid "View Full Image"
+msgstr ""
+
+#: templates/history.html:58
+msgid "Re-diagnose"
+msgstr ""
+
+#: templates/history.html:59
+msgid "Delete Selected"
+msgstr ""
+
+#: templates/history.html:65
+msgid "Export All History"
+msgstr ""
+
+#: templates/history.html:68
+msgid "Import History"
+msgstr ""
+
+#: templates/history.html:70
+msgid "Clear All History"
+msgstr ""
+
+#: templates/index.html:15
+msgid "AI-powered detection & Real-time Risk Analysis"
+msgstr ""
+
+#: templates/index.html:22
+msgid "Diagnose Crop"
+msgstr ""
+
+#: templates/index.html:27
+msgid "View History"
+msgstr ""
+
+#: templates/index.html:32
+msgid "Community Experts"
+msgstr ""
+
+#: templates/index.html:44
+msgid "Govt Schemes"
+msgstr ""
+
+#: templates/index.html:49
+msgid "Help & Guide"
+msgstr ""
+
+#: templates/index.html:67
+msgid "Live Disease Forecast"
+msgstr ""
+
+#: templates/index.html:71
+msgid "Enter City (e.g. Pune)"
+msgstr ""
+
+#: templates/index.html:75
+msgid "Check"
+msgstr ""
+
+#: templates/index.html:84
+msgid "Risk"
+msgstr ""
+
+#: templates/index.html:90
+msgid "Grow smarter • Stay healthier"
+msgstr ""
+
+#: templates/index.html:99
+msgid "Please enter a city!"
+msgstr ""
+
+#: templates/index.html:141
+msgid "Failed to connect to weather service."
+msgstr ""
+
+#: templates/schemes.html:9
+msgid "Government Schemes & Subsidies"
+msgstr ""
+
+#: templates/schemes.html:10
+msgid "Find financial aid, insurance, and subsidies tailored for you."
+msgstr ""
+
+#: templates/schemes.html:16
+msgid "State"
+msgstr ""
+
+#: templates/schemes.html:18
+msgid "All India"
+msgstr ""
+
+#: templates/schemes.html:20
+msgid "Andhra Pradesh"
+msgstr ""
+
+#: templates/schemes.html:21
+msgid "Arunachal Pradesh"
+msgstr ""
+
+#: templates/schemes.html:22
+msgid "Assam"
+msgstr ""
+
+#: templates/schemes.html:23
+msgid "Bihar"
+msgstr ""
+
+#: templates/schemes.html:24
+msgid "Chhattisgarh"
+msgstr ""
+
+#: templates/schemes.html:25
+msgid "Goa"
+msgstr ""
+
+#: templates/schemes.html:26
+msgid "Gujarat"
+msgstr ""
+
+#: templates/schemes.html:27
+msgid "Haryana"
+msgstr ""
+
+#: templates/schemes.html:28
+msgid "Himachal Pradesh"
+msgstr ""
+
+#: templates/schemes.html:29
+msgid "Jharkhand"
+msgstr ""
+
+#: templates/schemes.html:30
+msgid "Karnataka"
+msgstr ""
+
+#: templates/schemes.html:31
+msgid "Kerala"
+msgstr ""
+
+#: templates/schemes.html:32
+msgid "Madhya Pradesh"
+msgstr ""
+
+#: templates/schemes.html:33
+msgid "Maharashtra"
+msgstr ""
+
+#: templates/schemes.html:34
+msgid "Manipur"
+msgstr ""
+
+#: templates/schemes.html:35
+msgid "Meghalaya"
+msgstr ""
+
+#: templates/schemes.html:36
+msgid "Mizoram"
+msgstr ""
+
+#: templates/schemes.html:37
+msgid "Nagaland"
+msgstr ""
+
+#: templates/schemes.html:38
+msgid "Odisha"
+msgstr ""
+
+#: templates/schemes.html:39
+msgid "Punjab"
+msgstr ""
+
+#: templates/schemes.html:40
+msgid "Rajasthan"
+msgstr ""
+
+#: templates/schemes.html:41
+msgid "Sikkim"
+msgstr ""
+
+#: templates/schemes.html:42
+msgid "Tamil Nadu"
+msgstr ""
+
+#: templates/schemes.html:43
+msgid "Telangana"
+msgstr ""
+
+#: templates/schemes.html:44
+msgid "Tripura"
+msgstr ""
+
+#: templates/schemes.html:45
+msgid "Uttar Pradesh"
+msgstr ""
+
+#: templates/schemes.html:46
+msgid "Uttarakhand"
+msgstr ""
+
+#: templates/schemes.html:47
+msgid "West Bengal"
+msgstr ""
+
+#: templates/schemes.html:49
+msgid "Andaman & Nicobar Islands"
+msgstr ""
+
+#: templates/schemes.html:50
+msgid "Chandigarh"
+msgstr ""
+
+#: templates/schemes.html:51
+msgid "Dadra & Nagar Haveli and Daman & Diu"
+msgstr ""
+
+#: templates/schemes.html:52
+msgid "Delhi"
+msgstr ""
+
+#: templates/schemes.html:53
+msgid "Jammu & Kashmir"
+msgstr ""
+
+#: templates/schemes.html:54
+msgid "Ladakh"
+msgstr ""
+
+#: templates/schemes.html:55
+msgid "Lakshadweep"
+msgstr ""
+
+#: templates/schemes.html:56
+msgid "Puducherry"
+msgstr ""
+
+#: templates/schemes.html:61
+msgid "Crop Type"
+msgstr ""
+
+#: templates/schemes.html:65
+msgid "Apple"
+msgstr ""
+
+#: templates/schemes.html:66
+msgid "Corn (Maize)"
+msgstr ""
+
+#: templates/schemes.html:67
+msgid "Grape"
+msgstr ""
+
+#: templates/schemes.html:68
+msgid "Potato"
+msgstr ""
+
+#: templates/schemes.html:69
+msgid "Tomato"
+msgstr ""
+
+#: templates/schemes.html:70
+msgid "Soybean"
+msgstr ""
+
+#: templates/schemes.html:71
+msgid "Orange"
+msgstr ""
+
+#: templates/schemes.html:72
+msgid "Strawberry"
+msgstr ""
+
+#: templates/schemes.html:76
+msgid "Find Schemes"
+msgstr ""
+
+#: templates/schemes.html:95
+msgid "Expired"
+msgstr ""
+
+#: templates/schemes.html:97
+msgid "Ending Soon"
+msgstr ""
+
+#: templates/schemes.html:99
+msgid "Active"
+msgstr ""
+
+#: templates/schemes.html:109
+msgid "Benefit"
+msgstr ""
+
+#: templates/schemes.html:115
+msgid "Deadline"
+msgstr ""
+
+#: templates/schemes.html:125
+msgid "Apply Now"
+msgstr ""
+
+#: templates/schemes.html:136
+msgid "No schemes found matching your filters."
+msgstr ""
+
+#: templates/schemes.html:137
+msgid "Try selecting \"All\" to see Global Schemes."
+msgstr ""
+
+#: templates/terms.html:6
+msgid "Last Updated:"
+msgstr ""
+
+#: templates/terms.html:9
+msgid "Acceptance of Terms"
+msgstr ""
+
+#: templates/terms.html:10
+msgid ""
+"By accessing and using Crop Doctor AI, you accept and agree to be bound "
+"by the terms and provision of this agreement."
+msgstr ""
+
+#: templates/terms.html:12
+msgid "Educational Use Only (Disclaimer)"
+msgstr ""
+
+#: templates/terms.html:14
+msgid "This is an AI-assisted diagnostic tool."
+msgstr ""
+
+#: templates/terms.html:15
+msgid ""
+"The results provided by Crop Doctor AI are for informational purposes "
+"only. While we strive for accuracy, this tool should not replace "
+"professional agricultural advice or lab testing. We are not liable for "
+"any crop loss or financial damage resulting from reliance on this tool."
+msgstr ""
+
+#: templates/terms.html:18
+msgid "User Conduct"
+msgstr ""
+
+#: templates/terms.html:19
+msgid ""
+"You agree not to upload malicious code, illegal content, or images that "
+"do not belong to you."
+msgstr ""
+
+#: templates/terms.html:21
+msgid "Changes to Terms"
+msgstr ""
+
+#: templates/terms.html:22
+msgid ""
+"We reserve the right to modify these terms at any time. Continued use of "
+"the service constitutes acceptance of new terms."
+msgstr ""
+
+#: venv/Lib/site-packages/click/_termui_impl.py:613
+#, python-brace-format
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/Lib/site-packages/click/_termui_impl.py:617
+#, python-brace-format
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1114
+#: venv/Lib/site-packages/click/core.py:1151
+#, python-brace-format
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1170
+msgid "Options"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1245
+#, python-brace-format
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/core.py:1264
+#, python-brace-format
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1448
+msgid "Aborted!"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1822
+msgid "Commands"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1853
+msgid "Missing command."
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:1931
+#, python-brace-format
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:2355
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:2378
+#, python-brace-format
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/core.py:2567
+#, python-brace-format
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3015
+#, python-brace-format
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3018
+#, python-brace-format
+msgid "default: {default}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3022
+msgid "required"
+msgstr ""
+
+#: venv/Lib/site-packages/click/core.py:3082
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/Lib/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/Lib/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/Lib/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:50
+#: venv/Lib/site-packages/click/exceptions.py:89
+#, python-brace-format
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:81
+#, python-brace-format
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:130
+#, python-brace-format
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:132
+#, python-brace-format
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:196
+#, python-brace-format
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:203
+#, python-brace-format
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:223
+#, python-brace-format
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:235
+#, python-brace-format
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/Lib/site-packages/click/exceptions.py:289
+#, python-brace-format
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/parser.py:199
+#, python-brace-format
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/Lib/site-packages/click/parser.py:381
+#, python-brace-format
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/Lib/site-packages/click/parser.py:444
+#, python-brace-format
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/shell_completion.py:332
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/Lib/site-packages/click/shell_completion.py:339
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:165
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:181
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:183
+#, python-brace-format
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:194
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:253
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/Lib/site-packages/click/termui.py:872
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:332
+#, python-brace-format
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:369
+#, python-brace-format
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/types.py:460
+#, python-brace-format
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/click/types.py:482
+#, python-brace-format
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:538
+#, python-brace-format
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:719
+#, python-brace-format
+msgid "{value!r} is not a valid boolean. Recognized values: {states}"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:747
+#, python-brace-format
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:937
+msgid "file"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:939
+msgid "directory"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:941
+msgid "path"
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:988
+#, python-brace-format
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:997
+#, python-brace-format
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1005
+#, python-brace-format
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1014
+#, python-brace-format
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1023
+#, python-brace-format
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1032
+#, python-brace-format
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/Lib/site-packages/click/types.py:1099
+#, python-brace-format
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:407
+#, python-format
+msgid "Content purported to be compressed with %s but failed to decompress."
+msgstr ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:571
+#, python-format
+msgid "Unsupported value for qop: %s."
+msgstr ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:575
+#: venv/Lib/site-packages/httplib2/__init__.py:653
+#, python-format
+msgid "Unsupported value for algorithm: %s.algorithm"
+msgstr ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:648
+msgid "The challenge doesn't contain a server nonce, or this one is empty."
+msgstr ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:658
+#, python-format
+msgid "Unsupported value for pw-algorithm: %s.pw-algorithm"
+msgstr ""
+
+#: venv/Lib/site-packages/httplib2/__init__.py:1471
+msgid "Redirected but the response is missing a Location: header."
+msgstr ""
+

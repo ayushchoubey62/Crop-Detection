@@ -104,6 +104,9 @@ class_labels = {
     'Tomato_healthy': 37
 }
 
+# Create a reverse map (Number -> Name) ONCE at startup for speed
+index_to_label = {v: k for k, v in class_labels.items()}
+
 # --- Database Helper Functions ---
 def get_db_connection():
     """Creates a connection to the SQLite database."""
@@ -197,8 +200,32 @@ def init_db():
             )
         ''')
         
+        # --- NEW TABLE FOR IOT SENSORS ---
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS soil_readings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                device_id TEXT,
+                moisture REAL,
+                temperature REAL,
+                humidity REAL,
+                pump_status TEXT,
+                timestamp TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
         
-        # ✅ NEW ROBUST DATA (Verified HTTPS Links)
+        # 1. NEW: Disease Heatmap Table
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS disease_heatmap (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                disease_name TEXT NOT NULL,
+                crop_type TEXT NOT NULL,
+                latitude REAL,
+                longitude REAL,
+                city TEXT,
+                timestamp TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
         schemes_data = [
             # --- ALL INDIA SCHEMES (Visible to everyone) ---
             ('Mission for Integrated Development of Horticulture (MIDH)', 'Ministry of Agriculture', 
@@ -310,163 +337,457 @@ def send_token_email(recipient_email, recipient_name, token, role):
         print(f"❌ Failed to send email: {e}")
         return False
 
-# --- Standardized Disease Information Dictionary ---
-# Keys here MUST exactly match the 'predicted_label' from the model output,
-# except for 'healthy' which is a generic key.
 disease_info = {
     "Apple_Apple_scab": {
         "description": "Apple scab is a common fungal disease that affects apple and crabapple trees. It causes olive-green to brown spots on leaves, fruit, and twigs. Severe infections can lead to premature leaf drop and deformed fruit.",
-        "symptoms": "Olive-green to brown spots on leaves, often with a velvety texture. Spots on fruit are dark, circular, and may become corky or cracked. Twig lesions can also occur."
+        "symptoms": "Olive-green to brown spots on leaves, often with a velvety texture. Spots on fruit are dark, circular, and may become corky or cracked. Twig lesions can also occur.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Sanitation: Rake and destroy all fallen leaves and fruit to remove the fungal source."},
+            {"day": 2, "task": "Pruning: Prune the tree to open the canopy and improve air circulation (sunlight kills spores)."},
+            {"day": 3, "task": "Fungicide: Apply a fungicide containing Captan, Sulfur, or Myclobutanil."},
+            {"day": 4, "task": "Moisture Control: Avoid overhead irrigation; water only at the base of the tree."},
+            {"day": 5, "task": "Monitor: Inspect fruit and younger leaves for new velvety olive-green spots."},
+            {"day": 6, "task": "Nutrient Boost: Apply a foliar spray of seaweed extract to boost tree resistance."},
+            {"day": 7, "task": "Re-Diagnose: Use CropDoctor AI to check if the disease spread has halted."}
+        ]
     },
     "Apple_Black_rot": {
         "description": "Black rot is a fungal disease that affects apple trees, causing lesions on leaves, cankers on branches, and a characteristic black rot on fruit. It can lead to significant yield losses.",
-        "symptoms": "Leaf spots are purplish with a brown center. Cankers on branches are sunken and discolored. Fruit rot begins as a brown spot that rapidly expands and turns black, often with concentric rings."
+        "symptoms": "Leaf spots are purplish with a brown center. Cankers on branches are sunken and discolored. Fruit rot begins as a brown spot that rapidly expands and turns black, often with concentric rings.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Remove Mummies: Remove all dried, shriveled fruits (mummies) from the tree and ground."},
+            {"day": 2, "task": "Prune Cankers: Prune out dead wood and cankers (infected bark) 4 inches below the visible rot."},
+            {"day": 3, "task": "Fungicide: Apply a fungicide like Captan or Mancozeb to protect healthy tissue."},
+            {"day": 4, "task": "Tool Cleaning: Sterilize pruning tools with bleach or alcohol after every cut."},
+            {"day": 5, "task": "Observation: Check leaves for 'frog-eye' leaf spots which indicate active spread."},
+            {"day": 6, "task": "Insect Control: Check for insects causing wounds on fruit (wounds allow fungus entry)."},
+            {"day": 7, "task": "Re-Diagnose: Take a photo of the affected area to track healing or new spread."}
+        ]
     },
     "Apple_Cedar_apple_rust": {
         "description": "Cedar-apple rust is a fungal disease that requires two hosts: apple/crabapple and cedar/juniper. It causes bright orange spots on apple leaves and can deform fruit.",
-        "symptoms": "Bright orange-yellow spots on apple leaves, often with small black dots (spermagonia) in the center. Galls may form on cedar trees, producing gelatinous orange horns in wet weather."
+        "symptoms": "Bright orange-yellow spots on apple leaves, often with small black dots (spermagonia) in the center. Galls may form on cedar trees, producing gelatinous orange horns in wet weather.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Identify Source: Look for Juniper/Cedar trees nearby (within 100-500 meters)."},
+            {"day": 2, "task": "Remove Galls: If Cedars are yours, prune off the brown woody galls before they produce orange horns."},
+            {"day": 3, "task": "Fungicide: Apply Myclobutanil or Sulfur-based fungicide to the *Apple* tree."},
+            {"day": 4, "task": "Pruning: Remove heavily infected apple leaves to reduce spore load (if infection is light)."},
+            {"day": 5, "task": "Observation: Check apple fruit bottoms for infection (can cause deformity)."},
+            {"day": 6, "task": "General Care: Mulch around the base of the apple tree to retain moisture."},
+            {"day": 7, "task": "Re-Diagnose: Check if new orange spots are appearing on fresh growth."}
+        ]
     },
-    "Blueberry_healthy": { # This will map to 'healthy' key
+    "Blueberry_healthy": {
         "description": "The blueberry plant appears healthy. Continue with good plant care practices to maintain its health.",
-        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy berry development."
+        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy berry development.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Soil Acid Check: Blueberries need acidic soil (pH 4.5-5.5). Test and amend if needed."},
+            {"day": 3, "task": "Hydration: Ensure soil is consistently moist but well-drained."},
+            {"day": 5, "task": "Pest Watch: Inspect for Spotted Wing Drosophila or birds eating berries."},
+            {"day": 7, "task": "Mulching: Add pine bark or sawdust mulch to conserve acidity and moisture."}
+        ]
     },
     "Cherry_Powdery_mildew": {
         "description": "Powdery mildew is a fungal disease that appears as white, powdery patches on the surface of leaves, stems, and sometimes fruit. Severe infections can stunt growth and reduce yield.",
-        "symptoms": "White, powdery spots on leaves, stems, and fruit. Leaves may curl, distort, or turn yellow. Young leaves are often more susceptible."
+        "symptoms": "White, powdery spots on leaves, stems, and fruit. Leaves may curl, distort, or turn yellow. Young leaves are often more susceptible.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Wash Foliage: Spray leaves with water in the *morning* to wash off spores (mildew hates water)."},
+            {"day": 2, "task": "Fungicide: Apply Sulfur dust, Potassium Bicarbonate, or Neem Oil."},
+            {"day": 3, "task": "Pruning: Thin out the canopy to increase sunlight penetration (sunlight kills mildew)."},
+            {"day": 4, "task": "Nitrogen Control: Avoid high-nitrogen fertilizers which promote susceptible soft growth."},
+            {"day": 5, "task": "Monitor: Check young shoots for leaf curling or white powder."},
+            {"day": 6, "task": "Clean Up: Remove fallen leaves from the base of the tree."},
+            {"day": 7, "task": "Re-Diagnose: Verify that white patches are receding or turning gray (dying)."}
+        ]
     },
-    "Cherry_healthy": { # This will map to 'healthy' key
+    "Cherry_healthy": {
         "description": "The cherry plant appears healthy. Continue with good plant care practices to maintain its health.",
-        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy fruit development."
+        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy fruit development.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Routine Check: Look for aphids or borers on the trunk and stems."},
+            {"day": 3, "task": "Watering: Deep water the tree root zone (avoid frequent shallow watering)."},
+            {"day": 5, "task": "Bird Protection: Check bird netting if fruit is ripening."},
+            {"day": 7, "task": "Weeding: Keep the base of the tree free of weeds and grass."}
+        ]
     },
     "Corn_Cercospora_leaf_spot_Gray_leaf_spot": {
         "description": "Cercospora leaf spot (also known as Gray leaf spot) is a fungal disease of corn characterized by rectangular, gray-to-tan lesions on leaves. Severe infections can lead to significant yield loss.",
-        "symptoms": "Long, narrow, rectangular lesions (1-2 inches long) that are gray to tan in color. Lesions are typically restricted by leaf veins. May appear water-soaked initially."
+        "symptoms": "Long, narrow, rectangular lesions (1-2 inches long) that are gray to tan in color. Lesions are typically restricted by leaf veins. May appear water-soaked initially.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Assessment: Estimate percentage of leaf area infected. If >50%, harvest may be impacted."},
+            {"day": 2, "task": "Fungicide: Apply a fungicide with Azoxystrobin or Propiconazole if the crop is not yet mature."},
+            {"day": 3, "task": "Residue Management: Plan to plow under crop debris after harvest (fungus overwinters there)."},
+            {"day": 4, "task": "Observation: Check if lesions are expanding or merging."},
+            {"day": 5, "task": "Rotation Plan: Mark this field for crop rotation (do not plant corn here next year)."},
+            {"day": 6, "task": "Nutrients: Ensure Potassium levels are adequate (helps reduce disease severity)."},
+            {"day": 7, "task": "Re-Diagnose: Monitor upper leaves to see if the disease is climbing the plant."}
+        ]
     },
     "Corn_Common_rust": {
         "description": "Common rust is a fungal disease of corn characterized by the formation of reddish-brown pustules on leaves. Severe infections can reduce photosynthetic area and impact yield.",
-        "symptoms": "Small, cinnamon-brown to reddish-brown pustules on both upper and lower leaf surfaces. Pustules may rupture, releasing powdery spores."
+        "symptoms": "Small, cinnamon-brown to reddish-brown pustules on both upper and lower leaf surfaces. Pustules may rupture, releasing powdery spores.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Monitor Spread: Check if pustules are on upper leaves (ear leaf and above)."},
+            {"day": 2, "task": "Fungicide: If infection is early and severe, apply Mancozeb or Pyraclostrobin."},
+            {"day": 3, "task": "Variety Check: Note if this hybrid variety is susceptible for future planting decisions."},
+            {"day": 4, "task": "Cool & Wet Watch: Rust spreads in cool/humid weather; monitor closely if rain is forecast."},
+            {"day": 5, "task": "Nutrient Check: High nitrogen can increase severity; ensure balanced fertilization."},
+            {"day": 6, "task": "Observation: Look for black pustules (teliospores) indicating the end of the cycle."},
+            {"day": 7, "task": "Re-Diagnose: Check if new orange pustules are appearing on fresh leaves."}
+        ]
     },
     "Corn_Northern_Leaf_Blight": {
         "description": "Northern Leaf Blight is a fungal disease of corn that causes long, elliptical, gray-green lesions on leaves. It can significantly reduce photosynthetic area and affect grain fill.",
-        "symptoms": "Long, elliptical, gray-green to tan lesions on leaves, typically 1 to 6 inches long. Lesions may coalesce, blighting large areas of the leaf."
+        "symptoms": "Long, elliptical, gray-green to tan lesions on leaves, typically 1 to 6 inches long. Lesions may coalesce, blighting large areas of the leaf.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Identification: Confirm cigar-shaped lesions. Distinguish from Gray Leaf Spot (rectangular)."},
+            {"day": 2, "task": "Fungicide: Apply protection (Strobilurin/Triazole) if silking is occurring."},
+            {"day": 3, "task": "Residue: Note that this fungus survives in debris; plan for tillage or rotation."},
+            {"day": 4, "task": "Observation: Check lower leaves first, as infection usually moves upward."},
+            {"day": 5, "task": "Weed Control: Remove grassy weeds that might host the pathogen."},
+            {"day": 6, "task": "Harvest Plan: If severe, plan for early harvest to prevent stalk rot (secondary issue)."},
+            {"day": 7, "task": "Re-Diagnose: Scan the 'Ear Leaf' (the most important leaf) for lesions."}
+        ]
     },
-    "Corn_healthy": { # This will map to 'healthy' key
+    "Corn_healthy": {
         "description": "The corn plant appears healthy. Continue with good plant care practices to maintain its health.",
-        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy stalk and ear development."
+        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy stalk and ear development.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Scouting: Walk the field in a 'W' pattern to check for random issues."},
+            {"day": 3, "task": "Watering: Corn needs significant water during silking/tasseling."},
+            {"day": 5, "task": "Nutrients: Check for yellowing (Nitrogen deficiency) or purple leaves (Phosphorus deficiency)."},
+            {"day": 7, "task": "Stem Check: Squeeze the lower stalk to check for firmness (stalk health)."}
+        ]
     },
     "Grape_Black_rot": {
         "description": "Black rot is a destructive fungal disease of grapes that affects leaves, shoots, and fruit. It causes characteristic black, shriveled mummies on the fruit.",
-        "symptoms": "Small, circular, reddish-brown spots on leaves that enlarge and turn tan with dark borders. Black, shriveled, raisin-like fruit mummies. Lesions on shoots and tendrils."
+        "symptoms": "Small, circular, reddish-brown spots on leaves that enlarge and turn tan with dark borders. Black, shriveled, raisin-like fruit mummies. Lesions on shoots and tendrils.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Sanitation: Remove ALL shriveled, black 'mummy' berries from the vine and ground."},
+            {"day": 2, "task": "Leaf Pruning: Remove infected leaves to improve air circulation around clusters."},
+            {"day": 3, "task": "Fungicide: Apply Mancozeb, Captan, or Myclobutanil immediately."},
+            {"day": 4, "task": "Weed Control: Clear tall weeds under vines that trap humidity."},
+            {"day": 5, "task": "Monitor: Check healthy grape clusters for tiny brown spots (early infection)."},
+            {"day": 6, "task": "Canopy Management: Tuck shoots to expose fruit to sunlight and wind."},
+            {"day": 7, "task": "Re-Diagnose: Monitor existing spots; they should stop expanding if treatment works."}
+        ]
     },
     "Grape_Esca_Black_Measles": {
         "description": "Esca (also known as Black Measles) is a complex of fungal diseases affecting grapevines, leading to wood decay and foliar symptoms. It can cause sudden vine collapse or chronic decline.",
-        "symptoms": "Foliar symptoms include interveinal chlorosis (yellowing) followed by necrosis (browning), often with a 'tiger-stripe' pattern. Fruit may develop dark spots and shrivel. Wood symptoms include dark streaking and decay."
+        "symptoms": "Foliar symptoms include interveinal chlorosis (yellowing) followed by necrosis (browning), often with a 'tiger-stripe' pattern. Fruit may develop dark spots and shrivel. Wood symptoms include dark streaking and decay.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Mark Vine: Tag the infected vine. Esca is chronic; the vine may need replacement eventually."},
+            {"day": 2, "task": "Trunk Inspection: Check trunk for cracks or fungal conks. No cure for trunk rot."},
+            {"day": 3, "task": "Pruning: Wait for dry weather, then prune out dead arms/canes."},
+            {"day": 4, "task": "Wound Protection: Paint large pruning cuts with fungicidal paste to prevent new infection."},
+            {"day": 5, "task": "Fruit Drop: Drop infected clusters to direct energy to vine survival."},
+            {"day": 6, "task": "Hygiene: Disinfect shears between EVERY cut (Esca spreads via tools)."},
+            {"day": 7, "task": "Re-Diagnose: Document symptoms for year-over-year comparison."}
+        ]
     },
     "Grape_Leaf_blight": {
         "description": "Grape leaf blight is a general term for various conditions causing browning and death of leaf tissue. It can be caused by fungi, bacteria, or environmental factors.",
-        "symptoms": "Irregular brown spots or patches on leaves, often starting at the margins or between veins. Affected areas may dry out and become brittle. Severe cases can lead to defoliation."
+        "symptoms": "Irregular brown spots or patches on leaves, often starting at the margins or between veins. Affected areas may dry out and become brittle. Severe cases can lead to defoliation.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Identify Cause: Check if spots have halos (fungal) or V-shapes (bacterial/environmental)."},
+            {"day": 2, "task": "Water Stress Check: Ensure vines are not drought-stressed (can mimic blight)."},
+            {"day": 3, "task": "Fungicide: Apply Copper-based spray (works for both fungal and some bacterial issues)."},
+            {"day": 4, "task": "Pruning: Remove heavily blighted leaves to reduce spread."},
+            {"day": 5, "task": "Nutrients: Check for Potassium deficiency (can cause marginal leaf burn)."},
+            {"day": 6, "task": "Observation: Check new growth at the tips for symptoms."},
+            {"day": 7, "task": "Re-Diagnose: Use the app to see if the blight has progressed."}
+        ]
     },
-    "Grape_healthy": { # This will map to 'healthy' key
+    "Grape_healthy": {
         "description": "The grape plant appears healthy. Continue with good plant care practices to maintain its health.",
-        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy vine and fruit development."
+        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy vine and fruit development.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Canopy Management: Tuck stray shoots into trellis wires."},
+            {"day": 3, "task": "Pest Scout: Look for leafhoppers or japanese beetles."},
+            {"day": 5, "task": "Leaf Pulling: Remove leaves around fruit clusters to improve airflow (preventative)."},
+            {"day": 7, "task": "General Check: Inspect the trunk base for borer damage."}
+        ]
     },
     "Orange_Haunglongbing_Citrus_greening": {
         "description": "Huanglongbing (HLB), also known as Citrus Greening, is a devastating bacterial disease of citrus trees spread by psyllids. It causes yellowing of leaves, misshapen fruit, and eventual tree decline.",
-        "symptoms": "Asymmetrical blotchy mottling or yellowing of leaves, often resembling nutrient deficiencies but not symmetrical. Small, lopsided, green-bottomed fruit that taste bitter. Premature fruit drop."
+        "symptoms": "Asymmetrical blotchy mottling or yellowing of leaves, often resembling nutrient deficiencies but not symmetrical. Small, lopsided, green-bottomed fruit that taste bitter. Premature fruit drop.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Quarantine: This disease is fatal and incurable. Isolate the tree immediately."},
+            {"day": 2, "task": "Vector Control: Spray surrounding trees with insecticide (Imidacloprid) to kill Asian Citrus Psyllids."},
+            {"day": 3, "task": "Confirmation: Contact local agriculture extension for official lab testing if unsure."},
+            {"day": 4, "task": "Removal: If confirmed, cut down the infected tree to save the rest of your orchard."},
+            {"day": 5, "task": "Stump Treatment: Treat the stump with herbicide to prevent regrowth."},
+            {"day": 6, "task": "Inspection: Check all nearby citrus trees for blotchy yellow leaves."},
+            {"day": 7, "task": "Replacement: Plan to replant with certified disease-free nursery stock."}
+        ]
     },
     "Peach_Bacterial_spot": {
         "description": "Bacterial spot is a common disease of peaches caused by Xanthomonas arboricola pv. pruni. It causes small, angular spots on leaves, lesions on twigs, and fruit spots.",
-        "symptoms": "Small, angular, water-soaked spots on leaves that turn purplish-brown and may drop out, giving a 'shot-hole' appearance. Sunken, dark lesions on twigs and fruit. Fruit spots are dark, pitted, and may crack."
+        "symptoms": "Small, angular, water-soaked spots on leaves that turn purplish-brown and may drop out, giving a 'shot-hole' appearance. Sunken, dark lesions on twigs and fruit. Fruit spots are dark, pitted, and may crack.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Pruning: Remove twigs with 'spring cankers' (dark sunken lesions)."},
+            {"day": 2, "task": "Bactericide: Spray with Copper fungicide (avoid high rates in hot weather to prevent leaf burn)."},
+            {"day": 3, "task": "Fertilizer Management: Avoid excess Nitrogen (lush growth is more susceptible)."},
+            {"day": 4, "task": "Windbreaks: Bacteria spread via wind-blown rain; consider planting windbreaks for future."},
+            {"day": 5, "task": "Monitor: Check fruit for pitting or cracking."},
+            {"day": 6, "task": "Ground Care: Maintain sod/grass between rows to reduce blowing sand/soil."},
+            {"day": 7, "task": "Re-Diagnose: Monitor new leaves for 'shot-hole' symptoms."}
+        ]
     },
-    "Peach_healthy": { # This will map to 'healthy' key
+    "Peach_healthy": {
         "description": "The peach plant appears healthy. Continue with good plant care practices to maintain its health.",
-        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy fruit development."
+        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy fruit development.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Trunk Check: Look for gummy sap (borer damage) at the soil line."},
+            {"day": 3, "task": "Thinning: If fruit set is heavy, thin peaches to 6-8 inches apart for size."},
+            {"day": 5, "task": "Watering: Peaches need regular water during the final swell of fruit."},
+            {"day": 7, "task": "Weeding: Keep the area under the canopy weed-free."}
+        ]
     },
     "Pepper_bell_Bacterial_spot": {
         "description": "Bacterial spot is a common and destructive disease of pepper plants caused by Xanthomonas bacteria. It leads to dark, water-soaked spots on leaves and fruit.",
-        "symptoms": "Small, dark, water-soaked spots on leaves that may develop yellow halos. Spots on fruit are dark, raised, and scabby. Severe infections can cause leaf yellowing and defoliation."
+        "symptoms": "Small, dark, water-soaked spots on leaves that may develop yellow halos. Spots on fruit are dark, raised, and scabby. Severe infections can cause leaf yellowing and defoliation.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Remove Infected: Remove heavily infected leaves and fallen fruit immediately."},
+            {"day": 2, "task": "Spray: Apply Copper-based bactericide mixed with Mancozeb (improves efficacy)."},
+            {"day": 3, "task": "Irrigation: STOP overhead watering. Water only at the soil level."},
+            {"day": 4, "task": "Mulch: Apply straw or plastic mulch to prevent soil bacteria splashing onto leaves."},
+            {"day": 5, "task": "Sanitize: Wash hands and tools before touching healthy plants."},
+            {"day": 6, "task": "Observation: Check leaf undersides for water-soaked lesions."},
+            {"day": 7, "task": "Re-Diagnose: Verify if leaf drop has slowed down."}
+        ]
     },
-    "Pepper_bell_healthy": { # This will map to 'healthy' key
+    "Pepper_bell_healthy": {
         "description": "The bell pepper plant appears healthy. Continue with good plant care practices to maintain its health.",
-        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy fruit development."
+        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy fruit development.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Support: Stake or cage plants as fruit gets heavy."},
+            {"day": 3, "task": "Sunscald Prevention: Ensure enough leaf canopy covers the fruit from direct noon sun."},
+            {"day": 5, "task": "Pest Scout: Look for aphids or thrips in the flowers."},
+            {"day": 7, "task": "Harvest: Pick mature peppers to encourage new fruit set."}
+        ]
     },
     "Potato_Early_blight": {
         "description": "Early blight is a fungal disease affecting potato and tomato plants. It causes dark, concentric ringed spots on older leaves, leading to defoliation and reduced yield.",
-        "symptoms": "Dark brown to black spots with concentric rings (like a target) on older leaves. Lesions may also appear on stems and tubers. Yellowing of tissue around spots."
+        "symptoms": "Dark brown to black spots with concentric rings (like a target) on older leaves. Lesions may also appear on stems and tubers. Yellowing of tissue around spots.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Prune: Remove the lower 1/3rd of leaves if they are spotted/yellowing."},
+            {"day": 2, "task": "Fungicide: Apply Chlorothalonil or Mancozeb."},
+            {"day": 3, "task": "Stress Reduction: Ensure consistent watering (drought stress makes Early Blight worse)."},
+            {"day": 4, "task": "Fertilize: Apply Nitrogen if the crop is young (weak plants get Early Blight)."},
+            {"day": 5, "task": "Mulch: Mulch helps keep soil moisture stable and prevents spore splash."},
+            {"day": 6, "task": "Monitor: Check stems for dark lesions."},
+            {"day": 7, "task": "Re-Diagnose: Check if the 'bullseye' spots have stopped spreading."}
+        ]
     },
     "Potato_Late_blight": {
         "description": "Late blight is a devastating disease of potato and tomato caused by a water mold (Phytophthora infestans). It can rapidly destroy entire crops under cool, wet conditions.",
-        "symptoms": "Irregular, water-soaked, dark green to brown lesions on leaves, often starting at the leaf tips or edges. White, fuzzy fungal growth may be visible on the undersides of leaves during humid conditions. Brown, firm rot on tubers."
+        "symptoms": "Irregular, water-soaked, dark green to brown lesions on leaves, often starting at the leaf tips or edges. White, fuzzy fungal growth may be visible on the undersides of leaves during humid conditions. Brown, firm rot on tubers.",
+        "seven_day_plan": [
+            {"day": 1, "task": "EMERGENCY: Remove and bag/burn ALL infected plants immediately. Do not compost."},
+            {"day": 2, "task": "Protect: Spray ALL nearby healthy plants with preventative fungicide (Mancozeb/Copper)."},
+            {"day": 3, "task": "Inspect Tubers: Check exposed tubers near soil surface. Hilling up soil helps protect them."},
+            {"day": 4, "task": "Dry Out: Improve drainage and airflow. Stop watering if soil is wet."},
+            {"day": 5, "task": "Scout: Check field daily. Late blight can kill a field in 2-3 days."},
+            {"day": 6, "task": "Harvest Plan: If widespread, kill vines (desiccate) 2 weeks before harvest to save tubers."},
+            {"day": 7, "task": "Re-Diagnose: Any new fuzzy white growth means infection is still active."}
+        ]
     },
-    "Potato_healthy": { # This will map to 'healthy' key
+    "Potato_healthy": {
         "description": "The potato plant appears healthy. Continue with good plant care practices to maintain its health.",
-        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy tuber development."
+        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy tuber development.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Hilling: Mound soil around the base of the stems to cover developing tubers."},
+            {"day": 3, "task": "Pest Scout: Look for Colorado Potato Beetles (orange with black stripes)."},
+            {"day": 5, "task": "Watering: Potatoes need steady water. Uneven watering causes tuber cracks."},
+            {"day": 7, "task": "Flower Check: Flowering indicates tubers are starting to size up."}
+        ]
     },
-    "Raspberry_healthy": { # This will map to 'healthy' key
+    "Raspberry_healthy": {
         "description": "The raspberry plant appears healthy. Continue with good plant care practices to maintain its health.",
-        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy berry development."
+        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy berry development.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Pruning: Remove weak or spindly canes to focus energy on fruiting canes."},
+            {"day": 3, "task": "Trellising: Secure canes to wires to keep fruit off the ground."},
+            {"day": 5, "task": "Watering: Raspberries have shallow roots; ensure topsoil remains moist."},
+            {"day": 7, "task": "Harvest: Pick berries immediately when ripe to prevent pest attraction."}
+        ]
     },
-    "Soybean_healthy": { # This will map to 'healthy' key
+    "Soybean_healthy": {
         "description": "The soybean plant appears healthy. Continue with good plant care practices to maintain its health.",
-        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy pod development."
+        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy pod development.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Weeding: Soybeans compete poorly with weeds in early stages."},
+            {"day": 3, "task": "Pest Scout: Check for Japanese beetles or stink bugs."},
+            {"day": 5, "task": "Pod Check: Monitor pod filling stage. Water stress now reduces yield."},
+            {"day": 7, "task": "Leaf Color: Pale green may indicate need for inoculation (Nitrogen fixing bacteria)."}
+        ]
     },
     "Squash_Powdery_mildew": {
         "description": "Powdery mildew is a common fungal disease affecting squash and other cucurbits. It appears as white, powdery spots on leaves and stems, reducing photosynthesis and yield.",
-        "symptoms": "White, powdery patches on the upper and lower surfaces of leaves and stems. Leaves may turn yellow, then brown, and eventually die. Reduced fruit size and quality."
+        "symptoms": "White, powdery patches on the upper and lower surfaces of leaves and stems. Leaves may turn yellow, then brown, and eventually die. Reduced fruit size and quality.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Remove: Cut off the most heavily infected (completely white) leaves."},
+            {"day": 2, "task": "Spray: Apply Neem Oil, Sulfur, or a baking soda solution (1tbsp per gallon)."},
+            {"day": 3, "task": "Airflow: Thin out dense vines to let air circulate."},
+            {"day": 4, "task": "Sunlight: Mildew thrives in shade; ensure plants get full sun."},
+            {"day": 5, "task": "Watering: Water the soil, not the leaves. Wash off spores if you must wet leaves."},
+            {"day": 6, "task": "Monitor: Check undersides of leaves for new colonies."},
+            {"day": 7, "task": "Re-Diagnose: Treatment should turn white powder to gray/brown (inactive)."}
+        ]
     },
     "Strawberry_Leaf_scorch": {
         "description": "Leaf scorch is a fungal disease of strawberries causing purplish spots on leaves that eventually enlarge and coalesce, leading to a 'scorched' appearance.",
-        "symptoms": "Small, purplish spots on leaves that enlarge into irregular, reddish-brown blotches. Margins of the spots may turn brown or reddish. Severe infections can cause leaves to dry up and curl."
+        "symptoms": "Small, purplish spots on leaves that enlarge into irregular, reddish-brown blotches. Margins of the spots may turn brown or reddish. Severe infections can cause leaves to dry up and curl.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Sanitation: Remove and burn all dried/scorched leaves."},
+            {"day": 2, "task": "Fungicide: Apply Captan or Copper fungicide."},
+            {"day": 3, "task": "Irrigation: Use drip tape. Overhead sprinkling spreads this fungus rapidly."},
+            {"day": 4, "task": "Weeding: Weeds trap moisture and restrict airflow; clear them out."},
+            {"day": 5, "task": "Nutrients: Avoid excess Nitrogen (causes soft foliage)."},
+            {"day": 6, "task": "Mulch: Ensure straw mulch is dry and not matting down wet."},
+            {"day": 7, "task": "Re-Diagnose: Monitor new inner leaves for purple spots."}
+        ]
     },
-    "Strawberry_healthy": { # This will map to 'healthy' key
+    "Strawberry_healthy": {
         "description": "The strawberry plant appears healthy. Continue with good plant care practices to maintain its health.",
-        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy fruit development."
+        "symptoms": "Vibrant green leaves, no discoloration, spots, or wilting. Healthy fruit development.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Runner Control: Clip off runners to focus energy on fruit (unless propagating)."},
+            {"day": 3, "task": "Slug Watch: Check under mulch/straw for slugs damaging fruit."},
+            {"day": 5, "task": "Harvest: Pick ripe fruit daily to prevent rot."},
+            {"day": 7, "task": "Watering: Ensure 1 inch of water per week."}
+        ]
     },
     "Tomato_Bacterial_spot": {
         "description": "Bacterial spot is a common and destructive disease of tomato and pepper caused by several species of Xanthomonas bacteria. It leads to dark, water-soaked spots on leaves and fruit.",
-        "symptoms": "Small, dark, water-soaked spots on leaves that may develop yellow halos. Spots on fruit are dark, raised, and scabby. Severe infections can cause leaf yellowing and defoliation."
+        "symptoms": "Small, dark, water-soaked spots on leaves that may develop yellow halos. Spots on fruit are dark, raised, and scabby. Severe infections can cause leaf yellowing and defoliation.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Dry Foliage: Stop overhead watering immediately. Bacteria swim in water films."},
+            {"day": 2, "task": "Prune: Remove infected leaves (disinfect shears between every cut)."},
+            {"day": 3, "task": "Spray: Apply Copper bactericide. (Antibiotics like Streptomycin are used in some commercial settings)."},
+            {"day": 4, "task": "Stake: Get plants off the ground to improve drying."},
+            {"day": 5, "task": "Mulch: Cover soil to prevent splash-back of soil bacteria."},
+            {"day": 6, "task": "Monitor: Check fruit for 'scabby' raised spots."},
+            {"day": 7, "task": "Re-Diagnose: Check if yellowing/spotting has slowed."}
+        ]
     },
     "Tomato_Early_blight": {
         "description": "Early blight is a fungal disease affecting tomato and potato plants. It causes dark, concentric ringed spots on older leaves, leading to defoliation and reduced yield.",
-        "symptoms": "Dark brown to black spots with concentric rings (like a target) on older leaves. Lesions may also appear on stems and fruit. Yellowing of tissue around spots."
+        "symptoms": "Dark brown to black spots with concentric rings (like a target) on older leaves. Lesions may also appear on stems and fruit. Yellowing of tissue around spots.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Isolate & Prune: Remove and burn all infected leaves immediately to stop spore spread."},
+            {"day": 2, "task": "Fungicide Application: Spray Chlorothalonil or Copper-based fungicide in the evening."},
+            {"day": 3, "task": "Water Management: Switch to drip irrigation. Do not water overhead to keep leaves dry."},
+            {"day": 4, "task": "Monitor: Check for new lesions on middle leaves. Ensure soil moisture is moderate."},
+            {"day": 5, "task": "Nutrient Boost: Apply a calcium-rich organic fertilizer to boost plant immunity."},
+            {"day": 6, "task": "Sanitation: Clean all garden tools with a bleach solution."},
+            {"day": 7, "task": "Re-Diagnose: Use CropDoctor AI to scan the plant again and check for recovery."}
+        ]
     },
     "Tomato_Late_blight": {
         "description": "Late blight is a devastating disease of tomato and potato caused by a water mold (Phytophthora infestans). It can rapidly destroy entire crops under cool, wet conditions.",
-        "symptoms": "Irregular, water-soaked, dark green to brown lesions on leaves, often starting at the leaf tips or edges. White, fuzzy fungal growth may be visible on the undersides of leaves during humid conditions. Brown, firm rot on fruit."
+        "symptoms": "Irregular, water-soaked, dark green to brown lesions on leaves, often starting at the leaf tips or edges. White, fuzzy fungal growth may be visible on the undersides of leaves during humid conditions. Brown, firm rot on fruit.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Critical Action: Remove and destroy infected plants immediately. Do NOT compost."},
+            {"day": 2, "task": "Prevention: Spray all remaining healthy tomato plants with Copper or Chlorothalonil."},
+            {"day": 3, "task": "Inspection: Check stems for dark, greasy lesions (a sign of systemic infection)."},
+            {"day": 4, "task": "Airflow: Aggressively prune healthy plants to maximize airflow and drying."},
+            {"day": 5, "task": "Monitor Weather: Be alert during cool, rainy weather (high risk)."},
+            {"day": 6, "task": "Fruit Check: Harvest mature green fruit early if the disease is spreading."},
+            {"day": 7, "task": "Re-Diagnose: Any fuzzy white mold means the disease is still active."}
+        ]
     },
     "Tomato_Leaf_Mold": {
         "description": "Leaf mold is a fungal disease of tomatoes, especially common in humid conditions. It causes velvety, olive-green to brown patches on the undersides of leaves.",
-        "symptoms": "Yellowish spots on the upper leaf surface, with olive-green to brown, velvety fungal growth on the corresponding undersides. Leaves may curl, dry up, and fall off."
+        "symptoms": "Yellowish spots on the upper leaf surface, with olive-green to brown, velvety fungal growth on the corresponding undersides. Leaves may curl, dry up, and fall off.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Ventilation: If in a greenhouse, increase fans/venting immediately. Reduce humidity."},
+            {"day": 2, "task": "Prune: Remove lower leaves and any leaves with dense mold underneath."},
+            {"day": 3, "task": "Fungicide: Apply Copper or Chlorothalonil fungicide."},
+            {"day": 4, "task": "Spacing: Ensure plants are not touching; prune side shoots (suckers)."},
+            {"day": 5, "task": "Watering: Water only at the base, never on leaves."},
+            {"day": 6, "task": "Temperature: Leaf mold hates heat; if possible, increase temp to >85°F to slow it."},
+            {"day": 7, "task": "Re-Diagnose: Check undersides of new leaves for velvety growth."}
+        ]
     },
     "Tomato_Septoria_leaf_spot": {
         "description": "Septoria leaf spot is a common fungal disease of tomatoes. It causes numerous small, circular spots on older leaves, often with dark borders and tiny black dots in the center.",
-        "symptoms": "Numerous small, circular spots (1/8 to 1/4 inch) on older leaves. Spots have dark brown borders and tan to gray centers, often with tiny black specks (pycnidia) in the middle. Severe infections lead to defoliation."
+        "symptoms": "Numerous small, circular spots (1/8 to 1/4 inch) on older leaves. Spots have dark brown borders and tan to gray centers, often with tiny black specks (pycnidia) in the middle. Severe infections lead to defoliation.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Sanitation: Remove lower leaves (splash zone). Septoria starts from the soil."},
+            {"day": 2, "task": "Fungicide: Apply Chlorothalonil or Mancozeb sprays."},
+            {"day": 3, "task": "Mulching: Apply a thick layer of mulch to bury fungal spores in the soil."},
+            {"day": 4, "task": "Weed Control: Remove Nightshade weeds (related to tomatoes) nearby."},
+            {"day": 5, "task": "Monitor: Check if spots are moving up the plant."},
+            {"day": 6, "task": "Tools: Disinfect cages/stakes if reusing them."},
+            {"day": 7, "task": "Re-Diagnose: New leaves should be free of small gray spots."}
+        ]
     },
-    "Tomato_Spider_mites_Two_spotted_spider_mite": { # This key is correct as is, matching the class_labels
+    "Tomato_Spider_mites_Two_spotted_spider_mite": {
         "description": "Spider mites are tiny pests that feed on plant cells, causing stippling and yellowing of leaves. Heavy infestations can lead to webbing and severe plant damage.",
-        "symptoms": "Tiny yellow or white stippling (pinprick dots) on leaves. Yellowing, bronzing, or drying of leaves. Fine webbing on the undersides of leaves or between stems. Mites are barely visible to the naked eye."
+        "symptoms": "Tiny yellow or white stippling (pinprick dots) on leaves. Yellowing, bronzing, or drying of leaves. Fine webbing on the undersides of leaves or between stems. Mites are barely visible to the naked eye.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Isolate: Separate infected potted plants. Prune heavily webbed leaves."},
+            {"day": 2, "task": "Water Blast: Spray undersides of leaves with a strong stream of water (mites hate water)."},
+            {"day": 3, "task": "Treatment: Apply Insecticidal Soap or Neem Oil (coat undersides thoroughly)."},
+            {"day": 4, "task": "Humidity: Mites love dry heat. Mist the leaves daily to increase humidity."},
+            {"day": 5, "task": "Biocontrol: Consider releasing predatory mites (Phytoseiulus persimilis)."},
+            {"day": 6, "task": "Monitor: Use a magnifying glass to check for moving specks."},
+            {"day": 7, "task": "Re-Diagnose: Check if webbing has returned."}
+        ]
     },
     "Tomato_Target_Spot": {
         "description": "Target spot is a fungal disease of tomatoes causing circular lesions with concentric rings, resembling a target. It affects leaves, stems, and fruit.",
-        "symptoms": "Small, circular, water-soaked spots on leaves that enlarge and develop concentric rings, turning brown to black. A yellow halo may surround the spots. Lesions can also appear on stems and fruit."
+        "symptoms": "Small, circular, water-soaked spots on leaves that enlarge and develop concentric rings, turning brown to black. A yellow halo may surround the spots. Lesions can also appear on stems and fruit.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Airflow: Target spot loves humidity. Prune lower leaves to improve airflow."},
+            {"day": 2, "task": "Fungicide: Apply Azoxystrobin or Copper fungicide."},
+            {"day": 3, "task": "Inspection: Check fruit for firm, brown, sunken spots (indicates severe infection)."},
+            {"day": 4, "task": "Nitrogen Check: Ensure plant nutrition is balanced (weak plants suffer more)."},
+            {"day": 5, "task": "Weed: Remove weeds that block air circulation."},
+            {"day": 6, "task": "Sanitation: Remove fallen fruit/leaves."},
+            {"day": 7, "task": "Re-Diagnose: Monitor new growth for lesions."}
+        ]
     },
-    "Tomato_Tomato_Yellow_Leaf_Curl_Virus": { # Key now matches full predicted_label
+    "Tomato_Tomato_Yellow_Leaf_Curl_Virus": {
         "description": "Tomato Yellow Leaf Curl Virus (TYLCV) is a devastating viral disease of tomatoes transmitted by whiteflies. It causes severe stunting and yellowing of leaves.",
-        "symptoms": "Severe stunting of plants. Upward curling and yellowing of leaf margins, especially on younger leaves. Leaves become thickened and brittle. Flowers may drop, and fruit set is severely reduced."
+        "symptoms": "Severe stunting of plants. Upward curling and yellowing of leaf margins, especially on younger leaves. Leaves become thickened and brittle. Flowers may drop, and fruit set is severely reduced.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Immediate Removal: Bag and remove infected plants. There is NO CURE for the virus."},
+            {"day": 2, "task": "Vector Control: Inspect remaining plants for Whiteflies (tiny white moths)."},
+            {"day": 3, "task": "Treatment: Apply Neem Oil or Pyrethrin to control whiteflies on healthy plants."},
+            {"day": 4, "task": "Weed: Remove weeds which may host asymptomatic virus."},
+            {"day": 5, "task": "Traps: Set up yellow sticky traps to catch whiteflies."},
+            {"day": 6, "task": "Reflective Mulch: Use silver mulch to repel whiteflies in future plantings."},
+            {"day": 7, "task": "Re-Diagnose: Monitor neighbors for stunting or curling."}
+        ]
     },
-    "Tomato_Tomato_mosaic_virus": { # Key now matches full predicted_label
+    "Tomato_Tomato_mosaic_virus": {
         "description": "Tomato Mosaic Virus (ToMV) is a highly contagious viral disease that causes mosaic patterns, mottling, and distortion of leaves in tomato plants.",
-        "symptoms": "Light and dark green mosaic patterns or mottling on leaves. Leaves may be distorted, puckered, or fern-like. Stunting of plants and reduced fruit size or quality."
+        "symptoms": "Light and dark green mosaic patterns or mottling on leaves. Leaves may be distorted, puckered, or fern-like. Stunting of plants and reduced fruit size or quality.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Sanitation: Do not touch healthy plants after touching infected ones. Wash hands with milk or soap."},
+            {"day": 2, "task": "Removal: Remove infected plants. Do not compost (virus survives high heat)."},
+            {"day": 3, "task": "Tool Sterilization: Soak tools in a 10% bleach solution or trisodium phosphate."},
+            {"day": 4, "task": "Smokers Warning: Tobacco mosaic virus is related; smokers should wash hands before gardening."},
+            {"day": 5, "task": "Weed Control: Remove nightshade weeds."},
+            {"day": 6, "task": "Soil Care: Virus persists in root debris; remove as much root material as possible."},
+            {"day": 7, "task": "Re-Diagnose: Monitor neighbors for mottled leaves."}
+        ]
     },
-    "healthy": { # Single generic healthy entry for all healthy crops
+    "healthy": {
         "description": "The plant appears healthy with no visible signs of disease. Maintaining good cultural practices is key to preventing future issues.",
-        "symptoms": "Uniform green coloration, no spots, lesions, or deformities. Leaves are turgid and vibrant."
+        "symptoms": "Uniform green coloration, no spots, lesions, or deformities. Leaves are turgid and vibrant.",
+        "seven_day_plan": [
+            {"day": 1, "task": "Routine Check: Inspect undersides of leaves for hidden pests (aphids/mites)."},
+            {"day": 3, "task": "Soil Health: Verify soil moisture is adequate (not too wet, not too dry)."},
+            {"day": 5, "task": "Weeding: Remove weeds around the base to prevent pest habitats."},
+            {"day": 7, "task": "Maintenance: Continue standard watering and fertilization schedule."}
+        ]
     }
 }
-
-# --- Standardized Treatment Suggestions Dictionary ---
-# Keys here MUST exactly match the 'predicted_label' from the model output,
-# except for 'healthy' which is a generic key.
+ 
 treatment_suggestions_data = {
     "Apple_Apple_scab": [
         {"text": "Apply fungicides containing myclobutanil or sulfur", "link": "https://www.bighaat.com/collections/fungicides"},
@@ -711,7 +1032,7 @@ def diagnose_disease(img_bytes):
         predictions = disease_model.predict(img_array, verbose=0)
         idx = np.argmax(predictions, axis=1)[0]
         confidence = np.max(predictions) * 100
-        predicted_label = list(class_labels.keys())[idx]
+        predicted_label = index_to_label[idx]
 
         disease_key = "healthy" if "healthy" in predicted_label.lower() else predicted_label
         display_name = "Healthy" if "healthy" in predicted_label.lower() else predicted_label.replace('_', ' ')
@@ -747,7 +1068,7 @@ def apply_image_filters(img_bytes, filters):
 # [Paste this where the old is_plant_image function was]
 def verify_plant_ai(img_bytes):
     """
-    Returns True if AI is >90% sure it's a plant.
+    Returns True if AI is >60% sure it's a plant.
     """
     if not gatekeeper_model:
         return True # Fallback: if model missing, allow everything
@@ -762,9 +1083,9 @@ def verify_plant_ai(img_bytes):
         # 2. Predict
         prediction = gatekeeper_model.predict(img_array, verbose=0)[0][0]
         
-        # 3. STRICT Threshold Logic (0.90 = 90%)
-        # If prediction > 0.90, it is a Plant (1).
-        is_plant = prediction > 0.90
+        # 3. STRICT Threshold Logic (0.60 = 60%)
+        # If prediction > 0.60, it is a Plant (1).
+        is_plant = prediction > 0.60
         
         status = "✅ ACCEPTED" if is_plant else "❌ REJECTED"
         confidence = prediction * 100
@@ -827,9 +1148,22 @@ def diagnose_page():
 
             result = diagnose_disease(img_bytes)
             if "error" in result: return jsonify(result), 500
+            
+            # --- NEW CODE START: Fetch 7-Day Plan ---
+            lookup_key = result.get('disease_key_for_lookup', 'healthy')
+            
+            # Get specific plan or fallback to healthy plan
+            disease_data = disease_info.get(lookup_key, disease_info['healthy'])
+            seven_day_plan = disease_data.get('seven_day_plan', disease_info['healthy']['seven_day_plan'])
+            
+            # Capture Location Data from the Frontend Form
+            lat = request.form.get('latitude')
+            long = request.form.get('longitude')
+            city = request.form.get('city')
 
             # Save to SQLite
             with get_db_connection() as conn:
+                # [EXISTING] Save to History
                 conn.execute('''
                     INSERT INTO history (image_filename, crop_type, disease_name, confidence, timestamp, full_details, disease_key_for_lookup)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -842,11 +1176,29 @@ def diagnose_page():
                     json.dumps(result),
                     result['disease_key_for_lookup']
                 ))
+                # Save to Heatmap (Only if location exists and it's a disease)
+                if lat and long and "healthy" not in result['disease_name'].lower():
+                    try:
+                        conn.execute('''
+                            INSERT INTO disease_heatmap (disease_name, crop_type, latitude, longitude, city, timestamp)
+                            VALUES (?, ?, ?, ?, ?, ?)
+                        ''', (
+                            result['disease_name'], 
+                            result['crop_type'], 
+                            float(lat), 
+                            float(long), 
+                            city, 
+                            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        ))
+                    except Exception as e:
+                        logging.error(f"Failed to save heatmap data: {e}")
+                
                 conn.commit()
 
             return jsonify({
                 "success": True,
                 "diagnosis": result,
+                "seven_day_plan": seven_day_plan,
                 "image_url": url_for('uploaded_file', filename=filename),
                 "image_filename": filename
             })
@@ -1103,6 +1455,7 @@ def generate_report():
     details = data.get('diagnosis_details')
     info = data.get('disease_info')
     treatments = data.get('treatment_suggestions')
+    seven_day_plan = data.get('seven_day_plan', [])
 
     if not filename or not details: return jsonify({"error": "Missing data"}), 400
     
@@ -1174,7 +1527,27 @@ def generate_report():
                     pdf.set_font("Helvetica", size=12) # Reset Normal
             else:
                 # Fallback for old simple string data
-                pdf.cell(0, 7, f"- {t}", ln=True)       
+                pdf.cell(0, 7, f"- {t}", ln=True) 
+    
+    if seven_day_plan:
+        pdf.ln(5) # Add some spacing
+        pdf.set_font("Helvetica", 'B', 14)
+        pdf.set_text_color(0, 100, 0) # Green Header
+        pdf.cell(0, 10, "Structured 7-Day Recovery Plan:", ln=True)
+        
+        pdf.set_font("Helvetica", '', 11)
+        pdf.set_text_color(0, 0, 0) # Reset to Black
+        
+        for item in seven_day_plan:
+            day_num = item.get('day', '?')
+            task_desc = item.get('task', '')
+            
+            # Format: "Day 1: Remove leaves..."
+            line_text = f"Day {day_num}: {task_desc}"
+            
+            # Use multi_cell to handle text wrapping automatically
+            pdf.multi_cell(0, 7, line_text)
+            pdf.ln(1) # Small gap between days
                 
     pdf_out = pdf.output(dest='S').encode('latin-1')
     return send_file(io.BytesIO(pdf_out), download_name="report.pdf", as_attachment=True, mimetype='application/pdf')
@@ -1643,6 +2016,87 @@ def set_language(language):
     if language in app.config['BABEL_SUPPORTED_LOCALES']:
         session['language'] = language
     return redirect(request.referrer or '/')
+
+@app.route('/api/update_sensor', methods=['POST'])
+def receive_sensor_data():
+    try:
+        data = request.json
+        # Extract data with defaults
+        device_id = data.get('device_id', 'Unknown')
+        moisture = data.get('moisture', 0)
+        temp = data.get('temperature', 0)
+        humid = data.get('humidity', 0)
+        pump = data.get('pump_status', 'OFF') # New field
+
+        with get_db_connection() as conn:
+            conn.execute('''
+                INSERT INTO soil_readings (device_id, moisture, temperature, humidity, pump_status)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (device_id, moisture, temp, humid, pump))
+            conn.commit()
+            
+        return jsonify({"status": "success", "message": "Data saved"}), 201
+    except Exception as e:
+        print(f"Sensor Error: {e}")
+        return jsonify({"status": "error", "error": str(e)}), 500
+    
+@app.route('/api/get_sensor_history')
+def get_sensor_history():
+    try:
+        with get_db_connection() as conn:
+            # Get the last 20 readings for the graph
+            rows = conn.execute("SELECT * FROM soil_readings ORDER BY id DESC LIMIT 20").fetchall()
+        
+        # Reverse to show oldest -> newest (Left to Right on graph)
+        data = [dict(row) for row in reversed(rows)]
+        return jsonify(data)
+    except Exception as e:
+        return jsonify([])
+
+@app.route('/sensors')
+def sensors_page():
+    return render_template('sensors.html', dark_mode=get_dark_mode())
+
+@app.route('/api/disease_heatmap')
+def get_heatmap_data():
+    with get_db_connection() as conn:
+        # Get data from last 30 days only (trends change!)
+        rows = conn.execute('''
+            SELECT disease_name, crop_type, latitude, longitude, city, timestamp 
+            FROM disease_heatmap 
+            WHERE date(timestamp) >= date('now', '-30 days')
+        ''').fetchall()
+    
+    data = [dict(row) for row in rows]
+    return jsonify(data)
+
+@app.route('/api/update_location', methods=['POST'])
+def update_location():
+    try:
+        lat = request.form.get('latitude')
+        long = request.form.get('longitude')
+        city = request.form.get('city')
+        disease = request.form.get('disease')
+        crop = request.form.get('crop')
+        
+        # Only save to Heatmap if it's a disease
+        if lat and long and disease and "healthy" not in disease.lower():
+            with get_db_connection() as conn:
+                conn.execute('''
+                    INSERT INTO disease_heatmap (disease_name, crop_type, latitude, longitude, city, timestamp)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                ''', (disease, crop, float(lat), float(long), city, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                conn.commit()
+            return jsonify(success=True)
+            
+        return jsonify(success=False, message="Healthy crop or missing data")
+    except Exception as e:
+        return jsonify(success=False, error=str(e)), 500
+
+@app.route('/heatmap')
+def heatmap_page():
+    return render_template('heatmap.html', dark_mode=get_dark_mode())
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

@@ -18,12 +18,7 @@
         }
     </script>
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
-    </script>    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -169,19 +164,9 @@
                {{ _('Diagnose') }}
             </a>
 
-            <a href="/history" 
-               class="px-3 py-2 rounded-md transition-colors duration-300 {{ 'bg-primary/10 text-primary font-bold' if request.path == '/history' else 'hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700' }}">
-               {{ _('History') }}
-            </a>
-
-            <a href="/feedback" 
-               class="px-3 py-2 rounded-md transition-colors duration-300 {{ 'bg-primary/10 text-primary font-bold' if request.path == '/feedback' else 'hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700' }}">
-               {{ _('Feedback') }}
-            </a>
-
-            <a href="/help" 
-               class="px-3 py-2 rounded-md transition-colors duration-300 {{ 'bg-primary/10 text-primary font-bold' if request.path == '/help' else 'hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700' }}">
-               {{ _('Help') }}
+            <a href="{{ url_for('heatmap_page') }}" 
+               class="px-3 py-2 rounded-md transition-colors duration-300 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700">
+               {{ _('Live Map') }}
             </a>
 
             <a href="/community" 
@@ -189,9 +174,9 @@
                {{ _('Community') }}
             </a>
 
-            <a href="/about" 
-               class="px-3 py-2 rounded-md transition-colors duration-300 {{ 'bg-primary/10 text-primary font-bold' if request.path == '/about' else 'hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700' }}">
-               {{ _('About') }}
+            <a href="{{ url_for('schemes_page') }}" 
+                class="px-3 py-2 rounded-md transition-colors duration-300 {{ 'bg-primary/10 text-primary font-bold' if request.endpoint == 'schemes_page' else 'hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                {{ _('Schemes') }}
             </a>
 
             <a href="/library" 
@@ -199,18 +184,13 @@
                {{ _('Library') }}
             </a>
 
-            <a href="{{ url_for('schemes_page') }}" 
-                class="px-3 py-2 rounded-md transition-colors duration-300 {{ 'bg-primary/10 text-primary font-bold' if request.endpoint == 'schemes_page' else 'hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700' }}">
-                {{ _('Schemes') }}
-            </a>
-
             <div class="relative ml-2">
                 <select onchange="window.location.href='/set_language/' + this.value" 
                         class="bg-gray-100 dark:bg-gray-700 text-sm rounded p-1 text-gray-800 dark:text-gray-200 border-none outline-none focus:ring-2 focus:ring-green-500">
-                    <option value="en" {% if session.get('language') == 'en' %}selected{% endif %}>🇬🇧 English</option>
-                    <option value="hi" {% if session.get('language') == 'hi' %}selected{% endif %}>🇮🇳 Hindi</option>
-                    <option value="mr" {% if session.get('language') == 'mr' %}selected{% endif %}>🇮🇳 Marathi</option>
-                    <option value="kn" {% if session.get('language') == 'kn' %}selected{% endif %}>🇮🇳 Kannada</option>
+                    <option value="en" {% if session.get('language') == 'en' %}selected{% endif %}>English</option>
+                    <option value="hi" {% if session.get('language') == 'hi' %}selected{% endif %}>Hindi</option>
+                    <option value="mr" {% if session.get('language') == 'mr' %}selected{% endif %}>Marathi</option>
+                    <option value="kn" {% if session.get('language') == 'kn' %}selected{% endif %}>Kannada</option>
                 </select>
             </div>
 
@@ -397,5 +377,6 @@
         }, duration);
     };
 </script>
+
 </body>
 </html>

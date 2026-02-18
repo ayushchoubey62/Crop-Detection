@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier-Leaflet/0.2.6/oms.min.js"></script>
+
+<style>
+    /* Custom thin scrollbar for the legend */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: rgba(156, 163, 175, 0.5);
+        border-radius: 20px;
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: rgba(75, 85, 99, 0.5);
+    }
+</style>
+
+<div class="max-w-7xl mx-auto p-4 min-h-screen">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">🦠 {{ _('Live Disease Outbreak Map') }}</h1>
+        <p class="text-gray-500">{{ _('Real-time tracking of crop diseases reported by farmers in the last 30 days.') }}</p>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-6">
+        <div id="map" class="w-full h-[600px] rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-0 lg:flex-1"></div>
+        
+        <div class="w-full lg:w-72 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 flex flex-col h-[600px]">
+            <h3 class="font-bold text-gray-800 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2 mb-4 flex items-center gap-2">
+                 {{ _('Crop Legend') }}
+            </h3>
+            <div id="externalLegend" class="flex-grow overflow-y-auto pr-2 space-y-1 custom-scrollbar">
+                <p class="text-xs text-gray-400 italic">{{ _('Loading categories...') }}</p>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">{{ _('Note') }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 leading-tight">
+                    {{ _('Click markers on the map to see specific diagnosis details.') }}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-8 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border-l-4 border-green-600 dark:border-green-500 transition-colors duration-300">
+        <div class="flex items-start gap-4">
+            <div class="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg text-green-600 dark:text-green-400">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+        
+            <div>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-1">
+                {{ _('Understanding the Map') }}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                    {{ _('Markers are color-coded by crop type. If multiple diseases are reported at the same exact location, they will') }} 
+                    <span class="text-green-600 dark:text-green-400 font-bold uppercase tracking-tighter text-xs italic">{{ _('"Spider" Out') }}</span> 
+                    {{ _('when clicked, allowing you to inspect every individual case.') }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Initialize Map (Centered on India)
+    var map = L.map('map').setView([20.5937, 78.9629], 5);
+
+    // 2. Add OpenStreetMap Tile Layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // 3. Initialize the Spiderfier for overlapping points
+    var oms = new OverlappingMarkerSpiderfier(map, {
+        keepSpiderfied: true,
+        nearbyDistance: 20
+    });
+
+    // Comprehensive Color Mapping based on your AI Class Labels
+    const cropColors = {
+        "Apple": "#ff4d4d",      // Red
+        "Blueberry": "#3b82f6",  // Blue
+        "Cherry": "#9f1239",     // Deep Rose
+        "Corn": "#ffcc00",       // Yellow
+        "Grape": "#9933ff",      // Purple
+        "Orange": "#ffa500",     // Orange
+        "Peach": "#fb923c",      // Peach
+        "Pepper_bell": "#16a34a",// Forest Green
+        "Potato": "#996633",     // Brown
+        "Raspberry": "#e11d48",  // Crimson
+        "Soybean": "#84cc16",    // Lime Green
+        "Squash": "#a855f7",     // Light Purple
+        "Strawberry": "#ff3399", // Pink
+        "Tomato": "#e60000",     // Bright Red
+        "Default": "#666666"     // Gray
+    };
+
+    // 4. Build the Legend outside the map
+    function buildExternalLegend() {
+        const legendContainer = document.getElementById('externalLegend');
+        legendContainer.innerHTML = ''; 
+
+        // Sort crops alphabetically
+        const sortedCrops = Object.keys(cropColors).filter(k => k !== "Default").sort();
+
+        sortedCrops.forEach(crop => {
+            const color = cropColors[crop];
+            const item = document.createElement('div');
+            // Tailwind classes for hover and transitions
+            item.className = "flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-default group";
+            
+            item.innerHTML = `
+                <span class="w-3 h-3 rounded-full shadow-sm ring-2 ring-white dark:ring-gray-900 group-hover:scale-125 transition-transform" style="background-color: ${color}"></span>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
+                    ${crop.replace('_', ' ')}
+                </span>
+            `;
+            legendContainer.appendChild(item);
+        });
+    }
+
+    // 5. Fetch Data & Plot
+    fetch('/api/disease_heatmap')
+        .then(res => res.json())
+        .then(data => {
+            if(data.length === 0) {
+                if (typeof showNotification === "function") {
+                    showNotification("No disease data found for this month.", "info");
+                }
+                return;
+            }
+
+            data.forEach(point => {
+                const markerColor = cropColors[point.crop_type] || cropColors["Default"];
+
+                const marker = L.circleMarker([point.latitude, point.longitude], {
+                    color: markerColor,
+                    fillColor: markerColor,
+                    fillOpacity: 0.7,
+                    radius: 10,
+                    weight: 2
+                });
+
+                // Formatted description for the global popup
+                marker.desc = `
+                    <div class="text-gray-800" style="min-width: 200px;">
+                        <b class="text-lg border-b border-gray-100 block mb-2">${point.disease_name}</b>
+                        <p class="text-sm"><span class="font-bold">Crop:</span> ${point.crop_type}</p>
+                        <p class="text-sm"><span class="font-bold">Location:</span> ${point.city}</p>
+                        <span class="text-[10px] text-gray-400 mt-2 block">${point.timestamp}</span>
+                    </div>
+                `;
+
+                map.addLayer(marker);
+                oms.addMarker(marker); 
+            });
+
+            // Configure global popup with Auto-Panning to prevent "cutoff" views
+            var popup = new L.Popup({ 
+                autoPan: true, 
+                autoPanPadding: [50, 50] 
+            });
+
+            oms.addListener('click', function(marker) {
+                popup.setContent(marker.desc);
+                popup.setLatLng(marker.getLatLng());
+                map.openPopup(popup);
+            });
+
+            // After markers are done, build the side legend
+            buildExternalLegend(); 
+        })
+        .catch(err => console.error("Map Error:", err));
+</script>
+{% endblock %}

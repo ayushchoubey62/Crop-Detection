@@ -93,7 +93,8 @@
                 
                 info: {
                     description: {{ item.get('info', {}).get('description', 'No description available.') | tojson }},
-                    symptoms: {{ item.get('info', {}).get('symptoms', 'No symptoms available.') | tojson }}
+                    symptoms: {{ item.get('info', {}).get('symptoms', 'No symptoms available.') | tojson }},
+                    seven_day_plan: {{ item.get('info', {}).get('seven_day_plan', []) | tojson }}
                 },
                 treatments: {{ item.get('treatment_suggestions', []) | tojson }}
             },
@@ -227,6 +228,37 @@
             }).join('') 
             : '<li class="text-gray-500 italic text-sm">No specific treatments available.</li>';
 
+        const plan = (item.info && item.info.seven_day_plan) ? item.info.seven_day_plan : [];
+        let planHtml = '';
+
+        if (plan.length > 0) {
+            const timelineItems = plan.map(step => `
+                <div class="mb-4 ml-6 relative">
+                    <span class="absolute -left-[33px] flex items-center justify-center w-6 h-6 bg-green-500 rounded-full ring-4 ring-white dark:ring-gray-800">
+                        <span class="text-xs text-white font-bold">${step.day}</span>
+                    </span>
+                    <div class="p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+                        <h4 class="text-xs font-bold uppercase text-green-600 dark:text-green-400">Day ${step.day}</h4>
+                        <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">${step.task}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            planHtml = `
+                <div id="historyPlanSection" class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4 animate-enter" style="animation-delay: 0.2s">
+                    <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center">
+                        <span class="bg-green-100 text-green-800 text-xl mr-2 px-2 py-1 rounded">📅</span> 
+                        {{ _('7-Day Recovery Plan') }}
+                    </h3>
+                    <div id="historyPlanTimeline" class="relative border-l-2 border-green-500 ml-3 space-y-4">
+                        ${timelineItems}
+                    </div>
+                </div>
+            `;
+        }
+
+       
+
         detailText.innerHTML = `
             <div class="animate-enter">
                 <div class="flex justify-between items-start mb-4">
@@ -266,10 +298,16 @@
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         Recommended Action
                     </h4>
+                    
+                    <div id="soilAdvisory" class="hidden mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 rounded-r text-sm transition-all"></div>
+
                     <ul class="text-sm text-gray-700 dark:text-gray-300 list-none pl-1">
                         ${treatments}
                     </ul>
                 </div>
+
+                ${planHtml} 
+
             </div>
         `;
 

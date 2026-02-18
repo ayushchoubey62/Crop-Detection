@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">📡 Live Field Monitor</h1>
+        <div class="flex items-center space-x-2">
+            <span class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+            </span>
+            <span class="text-sm text-green-600 font-medium">System Online</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        
+        <div class="bg-blue-100 dark:bg-blue-900 p-6 rounded-xl shadow-md border-l-4 border-blue-500 transition hover:scale-105">
+            <h3 class="text-blue-800 dark:text-blue-300 font-bold uppercase text-xs">💧 Soil Moisture</h3>
+            <p class="text-5xl font-extrabold text-blue-900 dark:text-white mt-2">
+                <span id="liveMoisture">--</span><span class="text-2xl">%</span>
+            </p>
+            <p id="moistureStatus" class="text-sm mt-2 font-medium">Waiting for data...</p>
+        </div>
+
+        <div class="bg-red-100 dark:bg-red-900 p-6 rounded-xl shadow-md border-l-4 border-red-500 transition hover:scale-105">
+            <h3 class="text-red-800 dark:text-red-300 font-bold uppercase text-xs">🌡️ Temperature</h3>
+            <p class="text-5xl font-extrabold text-red-900 dark:text-white mt-2">
+                <span id="liveTemp">--</span><span class="text-2xl">°C</span>
+            </p>
+        </div>
+
+        <div class="bg-purple-100 dark:bg-purple-900 p-6 rounded-xl shadow-md border-l-4 border-purple-500 transition hover:scale-105">
+            <h3 class="text-purple-800 dark:text-purple-300 font-bold uppercase text-xs">☁️ Humidity</h3>
+            <p class="text-5xl font-extrabold text-purple-900 dark:text-white mt-2">
+                <span id="liveHumidity">--</span><span class="text-2xl">%</span>
+            </p>
+        </div>
+
+        <div class="bg-teal-100 dark:bg-teal-900 p-6 rounded-xl shadow-md border-l-4 border-teal-500 transition hover:scale-105">
+            <h3 class="text-teal-800 dark:text-teal-300 font-bold uppercase text-xs">💦 Irrigation Pump</h3>
+            <p class="text-5xl font-extrabold mt-2 text-gray-400" id="pumpStatusText">
+                OFF
+            </p>
+            <p class="text-sm mt-2 font-medium text-teal-800 dark:text-teal-200">Auto-controlled</p>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Live Trends</h3>
+        <div class="relative h-80">
+            <canvas id="sensorChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('sensorChart').getContext('2d');
+    
+    // Initialize Chart
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [], 
+            datasets: [
+                {
+                    label: 'Moisture (%)',
+                    borderColor: '#3B82F6', // Blue
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    data: [],
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Temperature (°C)',
+                    borderColor: '#EF4444', // Red
+                    data: [],
+                    borderDash: [5, 5],
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            scales: {
+                y: { beginAtZero: true, max: 100 }
+            }
+        }
+    });
+
+    async function fetchData() {
+        try {
+            const res = await fetch('/api/get_sensor_history');
+            const data = await res.json();
+            
+            if(data.length > 0) {
+                // Update Chart Data
+                const labels = data.map(d => {
+                    const date = new Date(d.timestamp);
+                    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second:'2-digit' });
+                });
+                myChart.data.labels = labels;
+                myChart.data.datasets[0].data = data.map(d => d.moisture);
+                myChart.data.datasets[1].data = data.map(d => d.temperature);
+                myChart.update();
+
+                // Get Latest Reading
+                const latest = data[data.length - 1];
+
+                // Update Numbers
+                document.getElementById('liveMoisture').innerText = latest.moisture.toFixed(0);
+                document.getElementById('liveTemp').innerText = latest.temperature.toFixed(1);
+                document.getElementById('liveHumidity').innerText = latest.humidity.toFixed(0);
+
+                // Update Pump Status
+                const pumpText = document.getElementById('pumpStatusText');
+                const pStatus = latest.pump_status || 'OFF';
+                pumpText.innerText = pStatus;
+
+                if (pStatus === 'ON') {
+                    pumpText.className = "text-5xl font-extrabold mt-2 text-green-600 animate-pulse";
+                } else {
+                    pumpText.className = "text-5xl font-extrabold mt-2 text-gray-400";
+                }
+
+                // Update Advisory Text
+                const statusEl = document.getElementById('moistureStatus');
+                if(latest.moisture < 30) {
+                    statusEl.innerText = "⚠️ Soil is Dry! Pump is ON.";
+                    statusEl.className = "text-sm mt-2 font-bold text-red-600";
+                } else if(latest.moisture > 80) {
+                    statusEl.innerText = "⚠️ Soil is Wet. Pump is OFF.";
+                    statusEl.className = "text-sm mt-2 font-bold text-orange-600";
+                } else {
+                    statusEl.innerText = "✅ Moisture is Optimal.";
+                    statusEl.className = "text-sm mt-2 font-bold text-green-600";
+                }
+            }
+        } catch(err) { console.error(err); }
+    }
+
+    // Refresh every 2 seconds
+    setInterval(fetchData, 2000);
+    fetchData();
+</script>
+{% endblock %}

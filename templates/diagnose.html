@@ -43,6 +43,26 @@
                 <span class="text-gray-700 dark:text-gray-300">{{ _('Live Preview') }}</span>
             </label>
 
+            <div class="mb-4">
+                <div id="cameraContainer" class="hidden relative w-full aspect-video bg-gray-900 dark:bg-black rounded-lg overflow-hidden mb-4 border-2 border-primary/30 shadow-inner">
+                    <video id="webcamVideo" autoplay playsinline class="w-full h-full object-cover"></video>
+                    <div class="absolute inset-0 border-2 border-dashed border-green-500 opacity-50 pointer-events-none m-8 rounded-lg"></div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button id="toggleCameraBtn" type="button" class="btn-primary flex-1 py-3 rounded-lg transition-all flex items-center justify-center gap-2 shadow-md">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812-1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                        </svg>
+                        <span id="cameraBtnText" class="font-bold uppercase tracking-wider text-sm">{{ _('Open Live Camera') }}</span>
+                    </button>
+    
+                    <button id="captureBtn" type="button" class="hidden px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-all shadow-lg transform active:scale-95 animate-pulse">
+                        {{ _('Capture') }}
+                    </button>
+                </div>
+            </div>
+
             <div class="flex items-center space-x-2 bg-yellow-50 dark:bg-yellow-900 px-3 py-2 rounded-md border border-yellow-200 dark:border-yellow-700">
                 <label class="flex items-center space-x-2 cursor-pointer">
                     <input type="checkbox" id="fieldModeToggle" class="form-checkbox h-5 w-5 text-yellow-600 rounded">
@@ -57,6 +77,17 @@
 
             <span id="statusMessage" class="text-sm text-gray-600 dark:text-gray-400 ml-auto">{{ _('Ready to upload image') }}</span>
             <span id="loadingIndicator" class="text-xl ml-2 hidden"></span>
+        </div>
+        <div class="card p-4 mb-6 rounded-lg shadow-md">
+            <div class="mt-4 flex items-center gap-2">
+                <button onclick="getLocation()" class="text-sm bg-blue-100 text-blue-600 px-3 py-1 rounded-full hover:bg-blue-200 transition flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <span id="locStatus">{{ _('Tag Location for Heatmap') }}</span>
+                </button>
+                <input type="hidden" id="geoLat" name="latitude">
+                <input type="hidden" id="geoLong" name="longitude">
+                <input type="hidden" id="geoCity" name="city">
+            </div>
         </div>
     </div>
 
@@ -299,8 +330,8 @@
         modelStatus.textContent = "Downloading AI Brain... (one time)";
         
         try {
-            // CRITICAL CHANGE: Use loadGraphModel because we converted from a SavedModel
-            tfModel = await tf.loadGraphModel('/static/tfjs_model/model.json');
+            // CRITICAL CHANGE: Use loadLayersModel because we converted from a SavedModel
+            tfModel = await tf.loadLayersModel('/static/tfjs_model/model.json');
             
             // Warmup prediction to initialize the system
             const warmupResult = tfModel.predict(tf.zeros([1, 150, 150, 3]));
@@ -336,6 +367,71 @@
         }
     });
 
+
+    // --- LIVE WEBCAM LOGIC ---
+    let stream = null;
+    const video = document.getElementById('webcamVideo');
+    const cameraContainer = document.getElementById('cameraContainer');
+    const toggleBtn = document.getElementById('toggleCameraBtn');
+    const captureBtn = document.getElementById('captureBtn');
+    const cameraBtnText = document.getElementById('cameraBtnText');
+
+    toggleBtn.addEventListener('click', async () => {
+        if (stream) { stopCamera(); } 
+        else { await startCamera(); }
+    });
+
+    async function startCamera() {
+        try {
+            // facingMode: "environment" targets the REAR camera on mobile phones
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "environment" }, 
+                audio: false 
+            });
+            video.srcObject = stream;
+            cameraContainer.classList.remove('hidden');
+            captureBtn.classList.remove('hidden');
+            cameraBtnText.innerText = "{{ _('Close Camera') }}";
+            if(typeof showNotification === "function") showNotification("Camera started", "success");
+        } catch (err) {
+            console.error("Camera error:", err);
+            if(typeof showNotification === "function") showNotification("Could not access camera. Ensure you are using HTTPS.", "error");
+        }
+    }
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+            video.srcObject = null;
+            cameraContainer.classList.add('hidden');
+            captureBtn.classList.add('hidden');
+            cameraBtnText.innerText = "{{ _('Open Live Camera') }}";
+        }
+    }
+
+    // Hooking the "Capture" button into your existing analysis pipeline
+    captureBtn.addEventListener('click', () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const dataUrl = canvas.toDataURL('image/jpeg');
+    
+        // 1. Sync with existing image preview variables
+        originalImageBase64 = dataUrl;
+        currentImageBase64 = dataUrl;
+    
+        // 2. Update the UI Preview and enable control buttons
+        displayImage(dataUrl);
+        enableImageControls();
+    
+        // 3. Close the camera and start the diagnosis
+        stopCamera();
+        diagnoseImage(dataUrl);
+    });
 
     // --- Main Entry Point: Handle Upload ---
     async function handleImageUpload(event, file = null) {
@@ -573,6 +669,73 @@
         }
     });
 
+    function getLocation() {
+        const status = document.getElementById('locStatus');
+    
+        if (!navigator.geolocation) {
+            status.innerText = "Geolocation not supported";
+            return;
+        }
+
+        status.innerText = "Locating...";
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => { // Make async
+                const lat = position.coords.latitude;
+                const long = position.coords.longitude;
+            
+                document.getElementById('geoLat').value = lat;
+                document.getElementById('geoLong').value = long;
+            
+                // 1. UI Feedback
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${long}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const city = data.address.city || data.address.town || "Unknown";
+                        document.getElementById('geoCity').value = city;
+                        status.innerText = `📍 ${city}`;
+                        showNotification("Location tagged!", "success");
+
+                        // 2. NEW: Check if we already have a diagnosis result. 
+                        // If yes, we missed the boat! Let's save it now.
+                        if (currentDiagnosisDetails && !fieldModeToggle.checked) {
+                            saveLocationToBackend(lat, long, city);
+                        }
+                    });
+            },
+            () => {
+                status.innerText = "Location denied";
+                showNotification("Could not get location.", "error");
+            }
+        );
+    }
+
+    // --- NEW HELPER FUNCTION ---
+    async function saveLocationToBackend(lat, long, city) {
+        // We need the filename of the image we just diagnosed
+        if (!currentImageFilename) return;
+
+        console.log("Late-tagging location...");
+        
+        // We create a special FormData just to update the location
+        const formData = new FormData();
+        formData.append('filename', currentImageFilename);
+        formData.append('latitude', lat);
+        formData.append('longitude', long);
+        formData.append('city', city);
+        // We also need disease info to know if we should add to heatmap
+        formData.append('disease', currentDiagnosisDetails.disease_name);
+        formData.append('crop', currentDiagnosisDetails.crop_type);
+
+        try {
+            await fetch('/api/update_location', { method: 'POST', body: formData });
+            showNotification("Map updated with new location!", "success");
+        } catch (e) {
+            console.error("Failed to update map", e);
+        }
+    }
+
+
     // --- MAIN DIAGNOSIS ORCHESTRATOR ---
     async function diagnoseImage(base64Image) {
         if (!base64Image) {
@@ -757,18 +920,21 @@
         if (originalImageBase64) {
             try {
                 // Add image at x=20, y=65, width=80, height=80
-                doc.addImage(originalImageBase64, 'JPEG', 65, cursorY, 80, 80);
-                cursorY +=90;
+                doc.addImage(originalImageBase64, 'JPEG', 20, cursorY, 80, 80);
+                cursorY += 90; 
             } catch (e) {
                 console.error("Image add failed", e);
             }
         }
 
-        // 5. Treatments (Positioned below image)
+        // Check if we need a new page before Treatments
+        if (cursorY > 250) { doc.addPage(); cursorY = 20; }
+
+        // 5. Treatments 
         doc.setFontSize(14);
         doc.setFont(undefined, 'bold');
         doc.setTextColor(0, 100, 0);
-        doc.text("Recommended Actions & Treatments:", 20, cursorY); cursorY +=10;
+        doc.text("Recommended Actions:", 20, cursorY); cursorY +=10;
     
         doc.setFontSize(12);
         doc.setTextColor(0, 0, 0);
@@ -776,33 +942,49 @@
 
         const treatments = currentTreatmentSuggestions || ["No specific treatments available."];
         treatments.forEach((t) => {
-            let text = t;
-            let link = "";
-            if (typeof t === 'object' && t !== null){
-                text = t.text || "";
-                link = t.link || "";
-            }
-            doc.setTextColor(0, 0, 0);
-            doc.text(`• ${text}`, 20, cursorY); cursorY += 7;
-
-            if (link) {
-                doc.setTextColor(0, 0, 255); // Blue
-                doc.setFontSize(10);
-                // jsPDF method to add link
-                doc.text("   [View Product / Buy Now]", 25, cursorY, { url: link });
-                
-                doc.setFontSize(12); // Reset size
-                doc.setTextColor(0, 0, 0); // Reset color
-                cursorY += 7;
-            }
+            let text = t.text || t; 
+            // Handle long text wrapping
+            const splitText = doc.splitTextToSize(`• ${text}`, 170);
+            doc.text(splitText, 20, cursorY);
+            cursorY += (splitText.length * 7); 
         });
 
-        // 6. Disclaimer
+        cursorY += 10; // Add space before 7-Day Plan
+
+        // --- NEW CODE START: 6. 7-Day Recovery Plan ---
+        if (currentDiseaseInfo && currentDiseaseInfo.seven_day_plan) {
+            // Check page break
+            if (cursorY > 230) { doc.addPage(); cursorY = 20; }
+
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(0, 100, 0);
+            doc.text("7-Day Recovery Plan:", 20, cursorY); 
+            cursorY += 10;
+
+            doc.setFontSize(11);
+            doc.setTextColor(0, 0, 0);
+            doc.setFont(undefined, 'normal');
+
+            currentDiseaseInfo.seven_day_plan.forEach(item => {
+                // Check page break inside loop
+                if (cursorY > 270) { doc.addPage(); cursorY = 20; }
+
+                const line = `Day ${item.day}: ${item.task}`;
+                const splitText = doc.splitTextToSize(line, 170);
+                doc.text(splitText, 20, cursorY);
+                cursorY += (splitText.length * 6) + 4; // Spacing between days
+            });
+        }
+        // --- NEW CODE END ---
+
+        // 7. Disclaimer (Footer)
         doc.setFontSize(10);
         doc.setTextColor(150, 150, 150);
-        doc.text("Disclaimer: AI diagnosis is for informational purposes only.", 105, 280, null, null, "center");
+        // Ensure footer is at bottom of current page
+        doc.text("Disclaimer: AI diagnosis is for informational purposes only.", 105, 290, null, null, "center");
 
-        // 7. Save File
+        // 8. Save File
         doc.save(`Offline_Report_${Date.now()}.pdf`);
         showNotification("Report saved to device!", "success");
     }
@@ -826,6 +1008,11 @@
             formData.append('edge_enhance', edgeEnhanceSlider.value);
             formData.append('blur_reduce', blurReduceSlider.value);
             formData.append('color_balance', colorBalanceSlider.value);
+
+            // Send Location Data
+            formData.append('latitude', document.getElementById('geoLat').value);
+            formData.append('longitude', document.getElementById('geoLong').value);
+            formData.append('city', document.getElementById('geoCity').value);
 
             const response = await fetch('/diagnose', {
                 method: 'POST',
@@ -868,6 +1055,39 @@
             statusMessage.textContent = "An unexpected error occurred.";
             showNotification("Error during diagnosis.", "error");
         }
+    }
+
+    // --- 7-Day Plan Renderer ---
+    function renderRecoveryPlan(plan) {
+        const container = document.getElementById('planTimeline');
+        // Matches the ID in your HTML: <div id="actionPlanContainer"...>
+        const section = document.getElementById('actionPlanContainer'); 
+        
+        if (!container || !section) return; // Safety check
+
+        container.innerHTML = ''; // Clear previous results
+        
+        if (!plan || plan.length === 0) {
+            section.classList.add('hidden');
+            return;
+        }
+
+        section.classList.remove('hidden');
+
+        plan.forEach(item => {
+            const step = document.createElement('div');
+            step.className = "relative mb-4 ml-6"; // Added ml-6 for spacing
+            step.innerHTML = `
+                <span class="absolute -left-[35px] flex items-center justify-center w-6 h-6 bg-green-500 rounded-full ring-4 ring-white dark:ring-gray-900 shadow-sm">
+                    <span class="text-xs text-white font-bold">${item.day}</span>
+                </span>
+                <div class="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+                    <h4 class="text-xs font-bold uppercase text-green-600 dark:text-green-400">Day ${item.day}</h4>
+                    <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">${item.task}</p>
+                </div>
+            `;
+            container.appendChild(step);
+        });
     }
 
     function displayDiagnosisResults(diagnosis, info, treatments) {
@@ -948,6 +1168,18 @@
 
         html += `</ul></div>`;
 
+        html += `
+            <div id="actionPlanContainer" class="hidden mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center">
+                    <span class="bg-green-100 text-green-800 text-2xl mr-2 px-2 py-1 rounded">📅</span> 
+                    {{ _('7-Day Recovery Plan') }}
+                </h3>
+                
+                <div id="planTimeline" class="relative border-l-2 border-green-500 ml-3 space-y-6 pb-2">
+                </div>
+            </div>
+        `;
+
         // --- NEW: COMMUNITY EXPERT BUTTON ---
         html += `
             <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 animate-enter delay-500">
@@ -962,6 +1194,16 @@
         // 3. Inject into DOM
         diagnosisResults.innerHTML = html;
         diagnosisResults.classList.remove('hidden');
+
+        // --- RENDER 7-DAY PLAN ---
+        // 'info' contains the disease details passed from Python/Offline Data
+        if (info && info.seven_day_plan) {
+            renderRecoveryPlan(info.seven_day_plan);
+        } else {
+            // Hide if no plan exists
+            const planSec = document.getElementById('actionPlanContainer');
+            if(planSec) planSec.classList.add('hidden');
+        }
 
         // 4. Trigger Chat Widget Entrance & Auto-Open
         setTimeout(() => {
@@ -1005,12 +1247,17 @@
         
         // CHECK: Are we in Offline Mode?
         if(fieldModeToggle.checked) {
-            // Use the NEW Client-Side function
+            // Use the NEW Client-Side function (Updated above)
             generateOfflineReport();
         } else {
             // Use the EXISTING Server-Side function
             showNotification("Generating report...", "info");
             try {
+                // Extract plan safely
+                const planData = (currentDiseaseInfo && currentDiseaseInfo.seven_day_plan) 
+                                 ? currentDiseaseInfo.seven_day_plan 
+                                 : [];
+
                 const response = await fetch('/generate_report', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1018,7 +1265,9 @@
                         image_filename: currentImageFilename,
                         diagnosis_details: currentDiagnosisDetails,
                         disease_info: currentDiseaseInfo,
-                        treatment_suggestions: currentTreatmentSuggestions
+                        treatment_suggestions: currentTreatmentSuggestions,
+                        // --- NEW: Explicitly send the plan to server ---
+                        seven_day_plan: planData 
                     })
                 });
 
@@ -1056,6 +1305,11 @@
             // Use the EXISTING Server-Side function (Online Mode)
             showNotification("Generating printable report...", "info");
             try {
+                // --- NEW: Extract plan safely ---
+                const planData = (currentDiseaseInfo && currentDiseaseInfo.seven_day_plan) 
+                                 ? currentDiseaseInfo.seven_day_plan 
+                                 : [];
+
                 const response = await fetch('/generate_report', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1063,7 +1317,8 @@
                         image_filename: currentImageFilename,
                         diagnosis_details: currentDiagnosisDetails,
                         disease_info: currentDiseaseInfo,
-                        treatment_suggestions: currentTreatmentSuggestions
+                        treatment_suggestions: currentTreatmentSuggestions,
+                        seven_day_plan: planData
                     })
                 });
 

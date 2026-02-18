@@ -72,6 +72,39 @@ def fix_database():
         if "duplicate column name" in str(e):
             print("   ✅ Column 'role' already exists in verification_requests.")
             
+    # 4. IOT SENSORS TABLE (NEW ADDITION)
+    # ==========================================
+    print("📝 Checking/Creating 'soil_readings' table...")
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS soil_readings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            device_id TEXT,
+            moisture REAL,
+            temperature REAL,
+            humidity REAL,
+            pump_status TEXT,
+            timestamp TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    print("   ✅ Table 'soil_readings' is ready.")
+    
+    # ==========================================
+    # 5. DISEASE HEATMAP TABLE (NEW ADDITION)
+    # ==========================================
+    print("📝 Checking/Creating 'disease_heatmap' table...")
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS disease_heatmap (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            disease_name TEXT NOT NULL,
+            crop_type TEXT NOT NULL,
+            latitude REAL,
+            longitude REAL,
+            city TEXT,
+            timestamp TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    print("   ✅ Table 'disease_heatmap' is ready.")
+            
     print("📜 Creating/Updating 'government_schemes' table...")
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS government_schemes (
@@ -86,6 +119,26 @@ def fix_database():
             deadline DATE
         )
     ''')
+    
+    # ==========================================
+    # 6. MANDI PRICES TABLE (NEW ADDITION)
+    # ==========================================
+    print("📝 Checking/Creating 'mandi_prices' table...")
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS mandi_prices (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            state TEXT,
+            district TEXT,
+            market TEXT,
+            commodity TEXT,
+            variety TEXT,
+            min_price REAL,
+            max_price REAL,
+            modal_price REAL,
+            updated_date TEXT
+        )
+    ''')
+    print("   ✅ Table 'mandi_prices' is ready.")
     
     # ✅ NEW ROBUST DATA (Verified HTTPS Links)
     schemes_data = [
@@ -159,3 +212,4 @@ def fix_database():
 
 if __name__ == "__main__":
     fix_database()
+    

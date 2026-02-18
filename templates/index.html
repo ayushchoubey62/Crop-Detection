@@ -22,6 +22,13 @@
                 <span class="text-lg font-bold text-white">{{ _('Diagnose Crop') }}</span>
             </a>
 
+            <a href="{{ url_for('heatmap_page') }}" class="group relative flex items-center justify-center p-4 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-lg no-underline">
+                <svg class="w-6 h-6 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-lg font-bold text-white">{{ _('Live Disease Map') }}</span>
+            </a>
+
             <a href="{{ url_for('history_page') }}" class="group relative flex items-center justify-center p-4 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-lg no-underline">
                 <svg class="w-6 h-6 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <span class="text-lg font-bold text-white">{{ _('View History') }}</span>
@@ -60,86 +67,7 @@
             </a>
 
         </div>
-
-        <div class="mx-auto max-w-md bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl ring-1 ring-white/20 mb-10">
-            <div class="flex items-center justify-center space-x-2 mb-4">
-                <span class="text-2xl">🌦️</span>
-                <h3 class="text-xl font-bold text-white">{{ _('Live Disease Forecast') }}</h3>
-            </div>
-            
-            <div class="flex gap-2 relative">
-                <input type="text" id="cityInput" placeholder="{{ _('Enter City (e.g. Pune)') }}" 
-                       class="w-full px-4 py-3 rounded-xl bg-white/90 border-none text-gray-900 placeholder-gray-500 shadow-inner outline-none focus:ring-2 focus:ring-green-400 text-base">
-                <button onclick="checkWeather()" 
-                        class="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl shadow-lg transition-transform transform hover:scale-105 border-none cursor-pointer">
-                    {{ _('Check') }}
-                </button>
-            </div>
-
-            <div id="weatherResult" class="hidden mt-6 bg-white/10 rounded-xl p-4 text-left border-l-4 border-green-500 transition-all duration-500">
-                <div class="flex justify-between items-center mb-3 border-b border-white/10 pb-2">
-                    <p class="text-white text-lg m-0">🌡️ <span id="dispTemp" class="font-bold">--</span>°C</p>
-                    <p class="text-white text-lg m-0">💧 <span id="dispHumid" class="font-bold">--</span>%</p>
-                </div>
-                <p class="text-white mb-2 m-0">⚠️ {{ _('Risk') }}: <span id="dispRisk" class="font-bold uppercase tracking-wider">--</span></p>
-                <div class="bg-black/20 p-3 rounded-lg mt-2">
-                    <p id="dispAdvice" class="text-sm text-gray-200 italic leading-relaxed m-0"></p>
-                </div>
-            </div>
-        </div>
-        <p class="mt-4 text-sm text-gray-400">{{ _('Grow Smarter • Harvest Better') }}</p>
     </div>
 </div>
 
-<script>
-    async function checkWeather() {
-        const city = document.getElementById('cityInput').value;
-        const resultDiv = document.getElementById('weatherResult');
-        
-        if(!city) { alert("{{ _('Please enter a city!') }}"); return; }
-
-        try {
-            const response = await fetch('/check_weather_risk', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ city: city })
-            });
-
-            const data = await response.json();
-
-            if (data.error) {
-                alert(data.error);
-            } else {
-                resultDiv.classList.remove('hidden');
-                
-                document.getElementById('dispTemp').innerText = data.temp;
-                document.getElementById('dispHumid').innerText = data.humidity;
-                document.getElementById('dispRisk').innerText = data.risk_level;
-                document.getElementById('dispAdvice').innerText = data.alert_message;
-
-                // Color Logic
-                const riskText = document.getElementById('dispRisk');
-                const box = document.getElementById('weatherResult');
-
-                riskText.className = "font-bold uppercase tracking-wider";
-                box.className = "hidden mt-6 bg-white/10 rounded-xl p-4 text-left border-l-4 transition-all duration-500"; 
-                box.classList.remove('hidden');
-
-                if(data.risk_level.includes("HIGH")) {
-                    riskText.classList.add("text-red-400");
-                    box.classList.add("border-red-500");
-                } else if(data.risk_level.includes("Medium")) {
-                    riskText.classList.add("text-orange-400");
-                    box.classList.add("border-orange-500");
-                } else {
-                    riskText.classList.add("text-green-400");
-                    box.classList.add("border-green-500");
-                }
-            }
-        } catch (error) {
-            console.error(error);
-            alert("{{ _('Failed to connect to weather service.') }}");
-        }
-    }
-</script>
 {% endblock %}
